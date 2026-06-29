@@ -1,0 +1,240 @@
++-- src
+¦   +-- config
+¦   ¦   +-- cloudinary.ts
+¦   ¦   +-- database.ts
+¦   ¦   +-- env.ts
+¦   ¦   +-- index.ts
+¦   +-- constants
+¦   ¦   +-- index.ts
+¦   ¦   +-- message.constant.ts
+¦   ¦   +-- role.constant.ts
+¦   ¦   +-- status.constant.ts
+¦   +-- docs
+¦   ¦   +-- swagger.ts
+¦   +-- helpers
+¦   ¦   +-- index.ts
+¦   ¦   +-- jwt.ts
+¦   ¦   +-- password.ts
+¦   +-- interfaces
+¦   ¦   +-- apiResponse.interface.ts
+¦   ¦   +-- image.interface.ts
+¦   ¦   +-- index.ts
+¦   ¦   +-- jwtPayload.interface.ts
+¦   +-- middlewares
+¦   ¦   +-- auth.middleware.ts
+¦   ¦   +-- globalErrorHandler.ts
+¦   ¦   +-- index.ts
+¦   ¦   +-- multer.middleware.ts
+¦   ¦   +-- notFound.ts
+¦   ¦   +-- validateRequest.ts
+¦   +-- modules
+¦   ¦   +-- about
+¦   ¦   ¦   +-- about.constant.ts
+¦   ¦   ¦   +-- about.controller.ts
+¦   ¦   ¦   +-- about.interface.ts
+¦   ¦   ¦   +-- about.model.ts
+¦   ¦   ¦   +-- about.route.ts
+¦   ¦   ¦   +-- about.seeder.ts
+¦   ¦   ¦   +-- about.service.ts
+¦   ¦   ¦   +-- about.swagger.ts
+¦   ¦   ¦   +-- about.validation.ts
+¦   ¦   ¦   +-- index.ts
+¦   ¦   +-- auth
+¦   ¦   ¦   +-- auth.constant.ts
+¦   ¦   ¦   +-- auth.controller.ts
+¦   ¦   ¦   +-- auth.interface.ts
+¦   ¦   ¦   +-- auth.model.ts
+¦   ¦   ¦   +-- auth.route.ts
+¦   ¦   ¦   +-- auth.seeder.ts
+¦   ¦   ¦   +-- auth.service.ts
+¦   ¦   ¦   +-- auth.swagger.ts
+¦   ¦   ¦   +-- auth.validation.ts
+¦   ¦   ¦   +-- index.ts
+¦   ¦   +-- blogs
+¦   ¦   ¦   +-- blogs.constant.ts
+¦   ¦   ¦   +-- blogs.controller.ts
+¦   ¦   ¦   +-- blogs.interface.ts
+¦   ¦   ¦   +-- blogs.model.ts
+¦   ¦   ¦   +-- blogs.route.ts
+¦   ¦   ¦   +-- blogs.seeder.ts
+¦   ¦   ¦   +-- blogs.service.ts
+¦   ¦   ¦   +-- blogs.swagger.ts
+¦   ¦   ¦   +-- blogs.validation.ts
+¦   ¦   ¦   +-- index.ts
+¦   ¦   +-- certifications
+¦   ¦   ¦   +-- certifications.constant.ts
+¦   ¦   ¦   +-- certifications.controller.ts
+¦   ¦   ¦   +-- certifications.interface.ts
+¦   ¦   ¦   +-- certifications.model.ts
+¦   ¦   ¦   +-- certifications.route.ts
+¦   ¦   ¦   +-- certifications.seeder.ts
+¦   ¦   ¦   +-- certifications.service.ts
+¦   ¦   ¦   +-- certifications.swagger.ts
+¦   ¦   ¦   +-- certifications.validation.ts
+¦   ¦   ¦   +-- index.ts
+¦   ¦   +-- contact
+¦   ¦   ¦   +-- contact.constant.ts
+¦   ¦   ¦   +-- contact.controller.ts
+¦   ¦   ¦   +-- contact.interface.ts
+¦   ¦   ¦   +-- contact.model.ts
+¦   ¦   ¦   +-- contact.route.ts
+¦   ¦   ¦   +-- contact.seeder.ts
+¦   ¦   ¦   +-- contact.service.ts
+¦   ¦   ¦   +-- contact.swagger.ts
+¦   ¦   ¦   +-- contact.validation.ts
+¦   ¦   ¦   +-- index.ts
+¦   ¦   +-- dashboard
+¦   ¦   ¦   +-- dashboard.controller.ts
+¦   ¦   ¦   +-- dashboard.route.ts
+¦   ¦   ¦   +-- dashboard.service.ts
+¦   ¦   ¦   +-- dashboard.swagger.ts
+¦   ¦   ¦   +-- index.ts
+¦   ¦   +-- education
+¦   ¦   ¦   +-- education.constant.ts
+¦   ¦   ¦   +-- education.controller.ts
+¦   ¦   ¦   +-- education.interface.ts
+¦   ¦   ¦   +-- education.model.ts
+¦   ¦   ¦   +-- education.route.ts
+¦   ¦   ¦   +-- education.seeder.ts
+¦   ¦   ¦   +-- education.service.ts
+¦   ¦   ¦   +-- education.swagger.ts
+¦   ¦   ¦   +-- education.validation.ts
+¦   ¦   ¦   +-- index.ts
+¦   ¦   +-- experience
+¦   ¦   ¦   +-- experience.constant.ts
+¦   ¦   ¦   +-- experience.controller.ts
+¦   ¦   ¦   +-- experience.interface.ts
+¦   ¦   ¦   +-- experience.model.ts
+¦   ¦   ¦   +-- experience.route.ts
+¦   ¦   ¦   +-- experience.seeder.ts
+¦   ¦   ¦   +-- experience.service.ts
+¦   ¦   ¦   +-- experience.swagger.ts
+¦   ¦   ¦   +-- experience.validation.ts
+¦   ¦   ¦   +-- index.ts
+¦   ¦   +-- hero
+¦   ¦   ¦   +-- hero.constant.ts
+¦   ¦   ¦   +-- hero.controller.ts
+¦   ¦   ¦   +-- hero.interface.ts
+¦   ¦   ¦   +-- hero.model.ts
+¦   ¦   ¦   +-- hero.route.ts
+¦   ¦   ¦   +-- hero.seeder.ts
+¦   ¦   ¦   +-- hero.service.ts
+¦   ¦   ¦   +-- hero.swagger.ts
+¦   ¦   ¦   +-- hero.validation.ts
+¦   ¦   ¦   +-- index.ts
+¦   ¦   +-- projects
+¦   ¦   ¦   +-- index.ts
+¦   ¦   ¦   +-- projects.constant.ts
+¦   ¦   ¦   +-- projects.controller.ts
+¦   ¦   ¦   +-- projects.interface.ts
+¦   ¦   ¦   +-- projects.model.ts
+¦   ¦   ¦   +-- projects.route.ts
+¦   ¦   ¦   +-- projects.seeder.ts
+¦   ¦   ¦   +-- projects.service.ts
+¦   ¦   ¦   +-- projects.swagger.ts
+¦   ¦   ¦   +-- projects.validation.ts
+¦   ¦   +-- services
+¦   ¦   ¦   +-- index.ts
+¦   ¦   ¦   +-- services.constant.ts
+¦   ¦   ¦   +-- services.controller.ts
+¦   ¦   ¦   +-- services.interface.ts
+¦   ¦   ¦   +-- services.model.ts
+¦   ¦   ¦   +-- services.route.ts
+¦   ¦   ¦   +-- services.seeder.ts
+¦   ¦   ¦   +-- services.service.ts
+¦   ¦   ¦   +-- services.swagger.ts
+¦   ¦   ¦   +-- services.validation.ts
+¦   ¦   +-- settings
+¦   ¦   ¦   +-- index.ts
+¦   ¦   ¦   +-- settings.constant.ts
+¦   ¦   ¦   +-- settings.controller.ts
+¦   ¦   ¦   +-- settings.interface.ts
+¦   ¦   ¦   +-- settings.model.ts
+¦   ¦   ¦   +-- settings.route.ts
+¦   ¦   ¦   +-- settings.seeder.ts
+¦   ¦   ¦   +-- settings.service.ts
+¦   ¦   ¦   +-- settings.swagger.ts
+¦   ¦   ¦   +-- settings.validation.ts
+¦   ¦   +-- skills
+¦   ¦   ¦   +-- index.ts
+¦   ¦   ¦   +-- skills.constant.ts
+¦   ¦   ¦   +-- skills.controller.ts
+¦   ¦   ¦   +-- skills.interface.ts
+¦   ¦   ¦   +-- skills.model.ts
+¦   ¦   ¦   +-- skills.route.ts
+¦   ¦   ¦   +-- skills.seeder.ts
+¦   ¦   ¦   +-- skills.service.ts
+¦   ¦   ¦   +-- skills.swagger.ts
+¦   ¦   ¦   +-- skills.validation.ts
+¦   ¦   +-- testimonials
+¦   ¦   ¦   +-- index.ts
+¦   ¦   ¦   +-- testimonials.constant.ts
+¦   ¦   ¦   +-- testimonials.controller.ts
+¦   ¦   ¦   +-- testimonials.interface.ts
+¦   ¦   ¦   +-- testimonials.model.ts
+¦   ¦   ¦   +-- testimonials.route.ts
+¦   ¦   ¦   +-- testimonials.seeder.ts
+¦   ¦   ¦   +-- testimonials.service.ts
+¦   ¦   ¦   +-- testimonials.swagger.ts
+¦   ¦   ¦   +-- testimonials.validation.ts
+¦   ¦   +-- upload
+¦   ¦       +-- index.ts
+¦   ¦       +-- upload.constant.ts
+¦   ¦       +-- upload.controller.ts
+¦   ¦       +-- upload.interface.ts
+¦   ¦       +-- upload.model.ts
+¦   ¦       +-- upload.route.ts
+¦   ¦       +-- upload.service.ts
+¦   ¦       +-- upload.swagger.ts
+¦   ¦       +-- upload.validation.ts
+¦   +-- routes
+¦   ¦   +-- index.ts
+¦   ¦   +-- route.constant.ts
+¦   ¦   +-- v1.ts
+¦   +-- seeders
+¦   ¦   +-- index.ts
+¦   ¦   +-- seed.ts
+¦   +-- shared
+¦   ¦   +-- base
+¦   ¦   ¦   +-- baseCrud.service.ts
+¦   ¦   ¦   +-- baseSingleton.service.ts
+¦   ¦   ¦   +-- index.ts
+¦   ¦   +-- cloudinary
+¦   ¦   ¦   +-- deleteFromCloudinary.ts
+¦   ¦   ¦   +-- index.ts
+¦   ¦   ¦   +-- uploadToCloudinary.ts
+¦   ¦   +-- logger
+¦   ¦   ¦   +-- index.ts
+¦   ¦   ¦   +-- logger.ts
+¦   ¦   +-- pagination
+¦   ¦   ¦   +-- index.ts
+¦   ¦   ¦   +-- pagination.ts
+¦   ¦   +-- query-builder
+¦   ¦   ¦   +-- index.ts
+¦   ¦   ¦   +-- queryBuilder.ts
+¦   ¦   +-- schemas
+¦   ¦   ¦   +-- image.schema.ts
+¦   ¦   ¦   +-- index.ts
+¦   ¦   +-- slug
+¦   ¦       +-- generateSlug.ts
+¦   ¦       +-- index.ts
+¦   +-- types
+¦   ¦   +-- express.d.ts
+¦   ¦   +-- multer.d.ts
+¦   +-- utils
+¦   ¦   +-- AppError.ts
+¦   ¦   +-- catchAsync.ts
+¦   ¦   +-- index.ts
+¦   ¦   +-- sendResponse.ts
+¦   +-- app.ts
+¦   +-- server.ts
++-- uploads
++-- .env
++-- .env.example
++-- .gitignore
++-- .prettierrc
++-- eslint.config.js
++-- package.json
++-- package-lock.json
++-- README.md
++-- tsconfig.json
