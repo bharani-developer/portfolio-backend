@@ -18,7 +18,7 @@ import { v1Router } from "./routes/index.js";
 const app = express();
 
 /* -------------------------------------------------------------------------- */
-/*                               Allowed Origins                              */
+/*                              Allowed Origins                               */
 /* -------------------------------------------------------------------------- */
 
 const allowedOrigins = env.CORS_ORIGIN.split(",")
@@ -26,7 +26,7 @@ const allowedOrigins = env.CORS_ORIGIN.split(",")
   .filter(Boolean);
 
 /* -------------------------------------------------------------------------- */
-/*                                Security                                    */
+/*                                  Security                                  */
 /* -------------------------------------------------------------------------- */
 
 app.use(
@@ -36,17 +36,18 @@ app.use(
 );
 
 /* -------------------------------------------------------------------------- */
-/*                                   CORS                                     */
+/*                                    CORS                                    */
 /* -------------------------------------------------------------------------- */
 
 const corsOptions: CorsOptions = {
   origin(origin, callback) {
     /**
-     * Allow:
-     * - Server-to-server requests
-     * - Swagger
+     * Allow requests without Origin header.
+     * Examples:
      * - Postman
      * - Curl
+     * - Render Health Checks
+     * - Swagger
      */
     if (!origin) {
       return callback(null, true);
@@ -57,7 +58,7 @@ const corsOptions: CorsOptions = {
     }
 
     return callback(
-      new Error(`CORS Error: Origin '${origin}' is not allowed.`),
+      new Error(`CORS: Origin '${origin}' is not allowed.`),
     );
   },
 
@@ -74,23 +75,23 @@ const corsOptions: CorsOptions = {
 
   allowedHeaders: [
     "Origin",
-    "X-Requested-With",
     "Content-Type",
     "Accept",
     "Authorization",
+    "X-Requested-With",
   ],
 
   exposedHeaders: [
     "Content-Disposition",
   ],
+
+  optionsSuccessStatus: 204,
 };
 
 app.use(cors(corsOptions));
 
-app.options("*", cors(corsOptions));
-
 /* -------------------------------------------------------------------------- */
-/*                               Performance                                  */
+/*                                Performance                                 */
 /* -------------------------------------------------------------------------- */
 
 app.use(compression());
@@ -171,7 +172,7 @@ app.use(
 app.use("/api/v1", v1Router);
 
 /* -------------------------------------------------------------------------- */
-/*                               404 Handler                                  */
+/*                                404 Handler                                 */
 /* -------------------------------------------------------------------------- */
 
 app.use(notFound);
