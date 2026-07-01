@@ -1,14 +1,10 @@
-
 // src/modules/auth/auth.route.ts
 
 import { Router } from "express";
 
 import { ROLE } from "../../constants/role.constant.js";
 
-import {
-  auth,
-  validateRequest,
-} from "../../middlewares/index.js";
+import { auth, validateRequest } from "../../middlewares/index.js";
 
 import { AuthController } from "./auth.controller.js";
 import { AuthValidation } from "./auth.validation.js";
@@ -24,9 +20,7 @@ const router = Router();
  */
 router.post(
   "/login",
-  validateRequest(
-    AuthValidation.loginValidationSchema,
-  ),
+  validateRequest(AuthValidation.loginValidationSchema),
   AuthController.login,
 );
 
@@ -35,9 +29,7 @@ router.post(
  */
 router.post(
   "/google",
-  validateRequest(
-    AuthValidation.googleLoginValidationSchema,
-  ),
+  validateRequest(AuthValidation.googleLoginValidationSchema),
   AuthController.googleLogin,
 );
 
@@ -46,9 +38,7 @@ router.post(
  */
 router.post(
   "/refresh-token",
-  validateRequest(
-    AuthValidation.refreshTokenValidationSchema,
-  ),
+  validateRequest(AuthValidation.refreshTokenValidationSchema),
   AuthController.refreshToken,
 );
 
@@ -61,10 +51,7 @@ router.post(
  */
 router.get(
   "/profile",
-  auth(
-    ROLE.ADMIN,
-    ROLE.VIEWER,
-  ),
+  auth(ROLE.ADMIN, ROLE.VIEWER),
   AuthController.getProfile,
 );
 
@@ -73,26 +60,14 @@ router.get(
  */
 router.post(
   "/change-password",
-  auth(
-    ROLE.ADMIN,
-    ROLE.VIEWER,
-  ),
-  validateRequest(
-    AuthValidation.changePasswordValidationSchema,
-  ),
+  auth(ROLE.ADMIN, ROLE.VIEWER),
+  validateRequest(AuthValidation.changePasswordValidationSchema),
   AuthController.changePassword,
 );
 
 /**
  * Logout
  */
-router.post(
-  "/logout",
-  auth(
-    ROLE.ADMIN,
-    ROLE.VIEWER,
-  ),
-  AuthController.logout,
-);
+router.post("/logout", auth(ROLE.ADMIN, ROLE.VIEWER), AuthController.logout);
 
 export const AuthRoutes = router;

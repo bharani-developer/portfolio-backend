@@ -1,6 +1,14 @@
 // src\modules\education\education.constant.ts
 
 export const EDUCATION_MESSAGE = {
+  CREATED: "Education created successfully",
+
+  RETRIEVED: "Education retrieved successfully",
+
+  UPDATED: "Education updated successfully",
+
+  DELETED: "Education deleted successfully",
+
   NOT_FOUND: "Education not found",
 
   ALREADY_EXISTS: "Education already exists",

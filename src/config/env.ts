@@ -33,77 +33,50 @@ for (const key of requiredEnvVariables) {
   const value = process.env[key];
 
   if (!value || value.trim() === "") {
-    throw new Error(
-      `Missing required environment variable: ${key}`,
-    );
+    throw new Error(`Missing required environment variable: ${key}`);
   }
 }
 
-const bcryptSaltRounds = Number(
-  process.env.BCRYPT_SALT_ROUNDS,
-);
+const bcryptSaltRounds = Number(process.env.BCRYPT_SALT_ROUNDS);
 
-if (
-  Number.isNaN(bcryptSaltRounds) ||
-  bcryptSaltRounds < 4
-) {
-  throw new Error(
-    "BCRYPT_SALT_ROUNDS must be a valid number",
-  );
+if (Number.isNaN(bcryptSaltRounds) || bcryptSaltRounds < 4) {
+  throw new Error("BCRYPT_SALT_ROUNDS must be a valid number");
 }
 
 export const env = {
-  NODE_ENV:
-    process.env.NODE_ENV?.trim() ??
-    "development",
+  NODE_ENV: process.env.NODE_ENV?.trim() ?? "development",
 
-  PORT:
-    Number(process.env.PORT) || 5000,
+  PORT: Number(process.env.PORT) || 5000,
 
-  DATABASE_URL:
-    process.env.DATABASE_URL!.trim(),
+  DATABASE_URL: process.env.DATABASE_URL!.trim(),
 
-  JWT_SECRET:
-    process.env.JWT_SECRET!.trim(),
+  JWT_SECRET: process.env.JWT_SECRET!.trim(),
 
-  JWT_EXPIRES_IN:
-    process.env.JWT_EXPIRES_IN!.trim(),
+  JWT_EXPIRES_IN: process.env.JWT_EXPIRES_IN!.trim(),
 
-  JWT_REFRESH_SECRET:
-    process.env.JWT_REFRESH_SECRET!.trim(),
+  JWT_REFRESH_SECRET: process.env.JWT_REFRESH_SECRET!.trim(),
 
-  JWT_REFRESH_EXPIRES_IN:
-    process.env.JWT_REFRESH_EXPIRES_IN!.trim(),
+  JWT_REFRESH_EXPIRES_IN: process.env.JWT_REFRESH_EXPIRES_IN!.trim(),
 
-  BCRYPT_SALT_ROUNDS:
-    bcryptSaltRounds,
+  BCRYPT_SALT_ROUNDS: bcryptSaltRounds,
 
-  CORS_ORIGIN:
-    process.env.CORS_ORIGIN!.trim(),
+  CORS_ORIGIN: process.env.CORS_ORIGIN!.trim(),
 
-  CLOUDINARY_CLOUD_NAME:
-    process.env.CLOUDINARY_CLOUD_NAME!.trim(),
+  CLOUDINARY_CLOUD_NAME: process.env.CLOUDINARY_CLOUD_NAME!.trim(),
 
-  CLOUDINARY_API_KEY:
-    process.env.CLOUDINARY_API_KEY!.trim(),
+  CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY!.trim(),
 
-  CLOUDINARY_API_SECRET:
-    process.env.CLOUDINARY_API_SECRET!.trim(),
+  CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET!.trim(),
 
-  CLOUDINARY_FOLDER:
-    process.env.CLOUDINARY_FOLDER!.trim(),
+  CLOUDINARY_FOLDER: process.env.CLOUDINARY_FOLDER!.trim(),
 
-  ADMIN_NAME:
-    process.env.ADMIN_NAME!.trim(),
+  ADMIN_NAME: process.env.ADMIN_NAME!.trim(),
 
-  ADMIN_EMAIL:
-    process.env.ADMIN_EMAIL!.trim(),
+  ADMIN_EMAIL: process.env.ADMIN_EMAIL!.trim(),
 
-  ADMIN_PASSWORD:
-    process.env.ADMIN_PASSWORD!.trim(),
+  ADMIN_PASSWORD: process.env.ADMIN_PASSWORD!.trim(),
 
-  GOOGLE_CLIENT_ID:
-    process.env.GOOGLE_CLIENT_ID!.trim(),
+  GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID!.trim(),
 } as const;
 
 export type Env = typeof env;

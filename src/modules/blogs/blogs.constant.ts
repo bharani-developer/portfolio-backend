@@ -1,6 +1,14 @@
 // src/modules/blogs/blogs.constant.ts
 
 export const BLOG_MESSAGE = {
+  CREATED: "Blog created successfully",
+
+  RETRIEVED: "Blog retrieved successfully",
+
+  UPDATED: "Blog updated successfully",
+
+  DELETED: "Blog deleted successfully",
+
   NOT_FOUND: "Blog not found",
 
   ALREADY_EXISTS: "Blog already exists",

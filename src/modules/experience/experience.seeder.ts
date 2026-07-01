@@ -6,10 +6,7 @@ import { connectDatabase } from "../../config/database.js";
 
 import { generateSlug } from "../../shared/slug/index.js";
 
-import {
-  EMPLOYMENT_TYPE,
-  WORK_MODE,
-} from "./experience.constant.js";
+import { EMPLOYMENT_TYPE, WORK_MODE } from "./experience.constant.js";
 
 import { Experience } from "./experience.model.js";
 

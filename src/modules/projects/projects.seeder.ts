@@ -65,8 +65,7 @@ export const seedProjects = async (): Promise<void> => {
 
       slug: generateSlug("GK Milk"),
 
-      shortDescription:
-        "Cross-platform Flutter application for milk delivery.",
+      shortDescription: "Cross-platform Flutter application for milk delivery.",
 
       description:
         "Developed customer and delivery applications with Google Maps, Firebase Cloud Messaging, Razorpay payment integration, and real-time order management.",
@@ -104,12 +103,7 @@ export const seedProjects = async (): Promise<void> => {
       description:
         "Developed Flutter mobile application allowing customers to discover nearby services, purchase products, and connect with technicians.",
 
-      technologies: [
-        "Flutter",
-        "Laravel",
-        "MySQL",
-        "Razorpay",
-      ],
+      technologies: ["Flutter", "Laravel", "MySQL", "Razorpay"],
 
       category: PROJECT_CATEGORY.MOBILE_APPLICATION,
 
@@ -135,12 +129,7 @@ export const seedProjects = async (): Promise<void> => {
       description:
         "Mobile application helping farmers locate nearby veterinary services, hospitals, shops, and buy or sell poultry using Google Maps.",
 
-      technologies: [
-        "Flutter",
-        "Laravel",
-        "MySQL",
-        "Google Maps",
-      ],
+      technologies: ["Flutter", "Laravel", "MySQL", "Google Maps"],
 
       category: PROJECT_CATEGORY.MOBILE_APPLICATION,
 
@@ -166,14 +155,7 @@ export const seedProjects = async (): Promise<void> => {
       description:
         "Maintained and enhanced the BHEL Employees' Co-Operative Bank administration portal by developing new modules, fixing production issues, and implementing client requirements.",
 
-      technologies: [
-        "Laravel",
-        "PHP",
-        "JavaScript",
-        "HTML",
-        "CSS",
-        "MySQL",
-      ],
+      technologies: ["Laravel", "PHP", "JavaScript", "HTML", "CSS", "MySQL"],
 
       category: PROJECT_CATEGORY.WEB_APPLICATION,
 
@@ -193,8 +175,7 @@ export const seedProjects = async (): Promise<void> => {
 
       slug: generateSlug("Rubin Glass Calculator"),
 
-      shortDescription:
-        "Glass quotation and invoice generation system.",
+      shortDescription: "Glass quotation and invoice generation system.",
 
       description:
         "Built a web application to calculate glass specifications, generate quotations, calculate GST, create PDF invoices, and send them through email.",
@@ -226,9 +207,7 @@ export const seedProjects = async (): Promise<void> => {
   console.info("Projects seeded successfully.");
 };
 
-export const runProjectsSeeder = async (
-  standalone = false,
-): Promise<void> => {
+export const runProjectsSeeder = async (standalone = false): Promise<void> => {
   try {
     if (standalone) {
       await connectDatabase();

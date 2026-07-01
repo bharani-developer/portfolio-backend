@@ -129,225 +129,222 @@ export const skillsSchemas = {
       },
     },
   },
- 
-CreateSkillRequest: {
-  type: "object",
 
-    required: [
-      "name",
-      "category",
-    ],
+  CreateSkillRequest: {
+    type: "object",
 
-      properties: {
-    name: {
-      type: "string",
+    required: ["name", "category"],
+
+    properties: {
+      name: {
+        type: "string",
         minLength: SKILLS_VALIDATION.NAME.MIN_LENGTH,
-          maxLength: SKILLS_VALIDATION.NAME.MAX_LENGTH,
-            example: "React",
+        maxLength: SKILLS_VALIDATION.NAME.MAX_LENGTH,
+        example: "React",
       },
 
-    category: {
-      type: "string",
+      category: {
+        type: "string",
         enum: skillCategoryEnum,
         example: "Frontend",
       },
 
-    proficiency: {
-      type: "integer",
+      proficiency: {
+        type: "integer",
         minimum: SKILLS_VALIDATION.PROFICIENCY.MIN,
-          maximum: SKILLS_VALIDATION.PROFICIENCY.MAX,
+        maximum: SKILLS_VALIDATION.PROFICIENCY.MAX,
         default: SKILLS_DEFAULT.PROFICIENCY,
         example: 95,
       },
 
-    image: {
-      allOf: [
-        {
-          $ref: "#/components/schemas/Image",
-        },
-      ],
+      image: {
+        allOf: [
+          {
+            $ref: "#/components/schemas/Image",
+          },
+        ],
       },
 
-    description: {
-      type: "string",
+      description: {
+        type: "string",
         maxLength: SKILLS_VALIDATION.DESCRIPTION.MAX_LENGTH,
-          example:
-      "Building scalable frontend applications using React, Next.js and TypeScript.",
+        example:
+          "Building scalable frontend applications using React, Next.js and TypeScript.",
       },
 
-    sortOrder: {
-      type: "integer",
+      sortOrder: {
+        type: "integer",
         minimum: SKILLS_VALIDATION.SORT_ORDER.MIN,
-          maximum: SKILLS_VALIDATION.SORT_ORDER.MAX,
+        maximum: SKILLS_VALIDATION.SORT_ORDER.MAX,
         default: SKILLS_DEFAULT.SORT_ORDER,
         example: 1,
       },
 
-    isActive: {
-      type: "boolean",
+      isActive: {
+        type: "boolean",
         default: SKILLS_DEFAULT.IS_ACTIVE,
         example: true,
       },
+    },
   },
-},
 
-UpdateSkillRequest: {
-  type: "object",
+  UpdateSkillRequest: {
+    type: "object",
 
     properties: {
-    name: {
-      type: "string",
+      name: {
+        type: "string",
         minLength: SKILLS_VALIDATION.NAME.MIN_LENGTH,
-          maxLength: SKILLS_VALIDATION.NAME.MAX_LENGTH,
-            example: "Next.js",
+        maxLength: SKILLS_VALIDATION.NAME.MAX_LENGTH,
+        example: "Next.js",
       },
 
-    category: {
-      type: "string",
+      category: {
+        type: "string",
         enum: skillCategoryEnum,
         example: "Frontend",
       },
 
-    proficiency: {
-      type: "integer",
+      proficiency: {
+        type: "integer",
         minimum: SKILLS_VALIDATION.PROFICIENCY.MIN,
-          maximum: SKILLS_VALIDATION.PROFICIENCY.MAX,
-            example: 98,
+        maximum: SKILLS_VALIDATION.PROFICIENCY.MAX,
+        example: 98,
       },
 
-    image: {
-      allOf: [
-        {
-          $ref: "#/components/schemas/Image",
-        },
-      ],
+      image: {
+        allOf: [
+          {
+            $ref: "#/components/schemas/Image",
+          },
+        ],
       },
 
-    description: {
-      type: "string",
+      description: {
+        type: "string",
         maxLength: SKILLS_VALIDATION.DESCRIPTION.MAX_LENGTH,
-          example:
-      "Updated skill description for the latest technologies and frameworks.",
+        example:
+          "Updated skill description for the latest technologies and frameworks.",
       },
 
-    sortOrder: {
-      type: "integer",
+      sortOrder: {
+        type: "integer",
         minimum: SKILLS_VALIDATION.SORT_ORDER.MIN,
-          maximum: SKILLS_VALIDATION.SORT_ORDER.MAX,
-            example: 2,
+        maximum: SKILLS_VALIDATION.SORT_ORDER.MAX,
+        example: 2,
       },
 
-    isActive: {
-      type: "boolean",
+      isActive: {
+        type: "boolean",
         example: true,
       },
+    },
   },
-},
 
-SkillResponse: {
-  type: "object",
+  SkillResponse: {
+    type: "object",
 
     properties: {
-    success: {
-      type: "boolean",
+      success: {
+        type: "boolean",
         example: true,
       },
 
-    statusCode: {
-      type: "integer",
+      statusCode: {
+        type: "integer",
         example: 200,
       },
 
-    message: {
-      type: "string",
+      message: {
+        type: "string",
         example: "Skill retrieved successfully",
       },
 
-    data: {
-      $ref: "#/components/schemas/Skill",
+      data: {
+        $ref: "#/components/schemas/Skill",
       },
+    },
   },
-},
 
-SkillsResponse: {
-  type: "object",
+  SkillsResponse: {
+    type: "object",
 
     properties: {
-    success: {
-      type: "boolean",
+      success: {
+        type: "boolean",
         example: true,
       },
 
-    statusCode: {
-      type: "integer",
+      statusCode: {
+        type: "integer",
         example: 200,
       },
 
-    message: {
-      type: "string",
+      message: {
+        type: "string",
         example: "Skill retrieved successfully",
       },
 
-    meta: {
-      type: "object",
+      meta: {
+        type: "object",
 
         properties: {
-        page: {
-          type: "integer",
+          page: {
+            type: "integer",
             example: 1,
           },
 
-        limit: {
-          type: "integer",
+          limit: {
+            type: "integer",
             example: 10,
           },
 
-        total: {
-          type: "integer",
+          total: {
+            type: "integer",
             example: 50,
           },
 
-        totalPage: {
-          type: "integer",
+          totalPage: {
+            type: "integer",
             example: 5,
           },
+        },
       },
-    },
 
-    data: {
-      type: "array",
+      data: {
+        type: "array",
 
         items: {
-        $ref: "#/components/schemas/Skill",
+          $ref: "#/components/schemas/Skill",
         },
+      },
     },
   },
-},
 
-SkillDeleteResponse: {
-  type: "object",
+  SkillDeleteResponse: {
+    type: "object",
 
     properties: {
-    success: {
-      type: "boolean",
+      success: {
+        type: "boolean",
         example: true,
       },
 
-    statusCode: {
-      type: "integer",
+      statusCode: {
+        type: "integer",
         example: 200,
       },
 
-    message: {
-      type: "string",
+      message: {
+        type: "string",
         example: "Skill deleted successfully",
       },
 
-    data: {
-      $ref: "#/components/schemas/Skill",
+      data: {
+        $ref: "#/components/schemas/Skill",
       },
+    },
   },
-},
 };
 export const skillsPaths = {
   "/skills": {
@@ -364,8 +361,7 @@ export const skillsPaths = {
           in: "query",
           name: "searchTerm",
           required: false,
-          description:
-            "Search by skill name or category.",
+          description: "Search by skill name or category.",
           schema: {
             type: "string",
             example: "React",
@@ -403,8 +399,7 @@ export const skillsPaths = {
           in: "query",
           name: "sort",
           required: false,
-          description:
-            "Sort fields. Prefix with '-' for descending order.",
+          description: "Sort fields. Prefix with '-' for descending order.",
           schema: {
             type: "string",
             example: "-createdAt",
@@ -415,12 +410,10 @@ export const skillsPaths = {
           in: "query",
           name: "fields",
           required: false,
-          description:
-            "Comma-separated list of fields to include.",
+          description: "Comma-separated list of fields to include.",
           schema: {
             type: "string",
-            example:
-              "name,category,proficiency,image",
+            example: "name,category,proficiency,image",
           },
         },
 
@@ -501,11 +494,9 @@ export const skillsPaths = {
 
                         isActive: true,
 
-                        createdAt:
-                          "2026-06-26T08:30:00.000Z",
+                        createdAt: "2026-06-26T08:30:00.000Z",
 
-                        updatedAt:
-                          "2026-06-26T08:30:00.000Z",
+                        updatedAt: "2026-06-26T08:30:00.000Z",
                       },
                     ],
                   },
@@ -647,11 +638,9 @@ export const skillsPaths = {
 
                       isActive: true,
 
-                      createdAt:
-                        "2026-06-26T08:30:00.000Z",
+                      createdAt: "2026-06-26T08:30:00.000Z",
 
-                      updatedAt:
-                        "2026-06-26T08:30:00.000Z",
+                      updatedAt: "2026-06-26T08:30:00.000Z",
                     },
                   },
                 },
@@ -805,11 +794,9 @@ export const skillsPaths = {
 
                         isActive: true,
 
-                        createdAt:
-                          "2026-06-26T08:30:00.000Z",
+                        createdAt: "2026-06-26T08:30:00.000Z",
 
-                        updatedAt:
-                          "2026-06-26T08:30:00.000Z",
+                        updatedAt: "2026-06-26T08:30:00.000Z",
                       },
 
                       {
@@ -836,11 +823,9 @@ export const skillsPaths = {
 
                         isActive: true,
 
-                        createdAt:
-                          "2026-06-26T08:30:00.000Z",
+                        createdAt: "2026-06-26T08:30:00.000Z",
 
-                        updatedAt:
-                          "2026-06-26T08:30:00.000Z",
+                        updatedAt: "2026-06-26T08:30:00.000Z",
                       },
                     ],
                   },
@@ -944,11 +929,9 @@ export const skillsPaths = {
 
                         isActive: true,
 
-                        createdAt:
-                          "2026-06-26T08:30:00.000Z",
+                        createdAt: "2026-06-26T08:30:00.000Z",
 
-                        updatedAt:
-                          "2026-06-26T08:30:00.000Z",
+                        updatedAt: "2026-06-26T08:30:00.000Z",
                       },
 
                       {
@@ -975,11 +958,9 @@ export const skillsPaths = {
 
                         isActive: true,
 
-                        createdAt:
-                          "2026-06-26T08:30:00.000Z",
+                        createdAt: "2026-06-26T08:30:00.000Z",
 
-                        updatedAt:
-                          "2026-06-26T08:30:00.000Z",
+                        updatedAt: "2026-06-26T08:30:00.000Z",
                       },
                     ],
                   },
@@ -1045,8 +1026,7 @@ export const skillsPaths = {
 
       summary: "Get skill by ID",
 
-      description:
-        "Retrieve a single skill using its unique MongoDB ObjectId.",
+      description: "Retrieve a single skill using its unique MongoDB ObjectId.",
 
       parameters: [
         {
@@ -1102,8 +1082,7 @@ export const skillsPaths = {
                         publicId: "portfolio/skills/react",
                       },
 
-                      description:
-                        "Building scalable React applications.",
+                      description: "Building scalable React applications.",
 
                       sortOrder: 1,
 
@@ -1306,8 +1285,7 @@ export const skillsPaths = {
                         publicId: "portfolio/skills/react",
                       },
 
-                      description:
-                        "Building scalable React applications.",
+                      description: "Building scalable React applications.",
 
                       sortOrder: 1,
 

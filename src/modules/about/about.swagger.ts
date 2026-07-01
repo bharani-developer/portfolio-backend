@@ -22,8 +22,7 @@ export const aboutSchemas = {
   About: {
     type: "object",
 
-    required: ["fullName", "designation", "bio", "isActive"],
-
+    required: ["images", "fullName", "designation", "bio"],
     properties: {
       _id: {
         type: "string",
@@ -33,7 +32,19 @@ export const aboutSchemas = {
       profileImage: {
         $ref: "#/components/schemas/Image",
       },
+      images: {
+        type: "array",
 
+        minItems: 1,
+
+        maxItems: 20,
+
+        items: {
+          $ref: "#/components/schemas/Image",
+        },
+
+        description: "About gallery images.",
+      },
       fullName: {
         type: "string",
         example: "Bharani",
@@ -73,8 +84,11 @@ export const aboutSchemas = {
       },
 
       yearsOfExperience: {
-        type: "number",
-        example: 3,
+        type: "integer",
+
+        minimum: 0,
+
+        maximum: 100,
       },
 
       stats: {
@@ -105,13 +119,22 @@ export const aboutSchemas = {
   CreateAboutRequest: {
     type: "object",
 
-    required: ["fullName", "designation", "bio"],
-
+    required: ["images", "fullName", "designation", "bio", "isActive"],
     properties: {
       profileImage: {
         $ref: "#/components/schemas/Image",
       },
+      images: {
+        type: "array",
 
+        minItems: 1,
+
+        maxItems: 20,
+
+        items: {
+          $ref: "#/components/schemas/Image",
+        },
+      },
       fullName: {
         type: "string",
       },
@@ -143,7 +166,11 @@ export const aboutSchemas = {
       },
 
       yearsOfExperience: {
-        type: "number",
+        type: "integer",
+
+        minimum: 0,
+
+        maximum: 100,
       },
 
       stats: {
@@ -168,7 +195,17 @@ export const aboutSchemas = {
       profileImage: {
         $ref: "#/components/schemas/Image",
       },
+      images: {
+        type: "array",
 
+        minItems: 1,
+
+        maxItems: 20,
+
+        items: {
+          $ref: "#/components/schemas/Image",
+        },
+      },
       fullName: {
         type: "string",
       },
@@ -200,7 +237,11 @@ export const aboutSchemas = {
       },
 
       yearsOfExperience: {
-        type: "number",
+        type: "integer",
+
+        minimum: 0,
+
+        maximum: 100,
       },
 
       stats: {
@@ -228,7 +269,7 @@ export const aboutSchemas = {
 
       message: {
         type: "string",
-        example: "Data retrieved successfully",
+        example: "About section retrieved successfully",
       },
 
       data: {
@@ -248,7 +289,7 @@ export const aboutSchemas = {
 
       message: {
         type: "string",
-        example: "Deleted successfully",
+        example: "About section deleted successfully",
       },
 
       data: {

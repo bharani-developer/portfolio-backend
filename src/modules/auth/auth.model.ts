@@ -55,19 +55,19 @@ const userSchema = new Schema<IUser>(
       index: true,
     },
 
-avatar: {
-  url: {
-    type: String,
-    default: "",
-    trim: true,
-  },
+    avatar: {
+      url: {
+        type: String,
+        default: "",
+        trim: true,
+      },
 
-  publicId: {
-    type: String,
-    default: "",
-    trim: true,
-  },
-},
+      publicId: {
+        type: String,
+        default: "",
+        trim: true,
+      },
+    },
 
     emailVerified: {
       type: Boolean,

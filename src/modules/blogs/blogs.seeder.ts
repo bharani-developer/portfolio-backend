@@ -21,7 +21,7 @@ export const seedBlogs = async (): Promise<void> => {
     return;
   }
 
-  const blogs =[
+  const blogs = [
     {
       title:
         "Building a Production Ready Portfolio Backend with Express and TypeScript",
@@ -303,9 +303,7 @@ This guide introduces the core concepts and tools.
   logger.info(`Seeded ${blogs.length} blogs successfully.`);
 };
 
-export const runBlogsSeeder = async (
-  standalone = false,
-): Promise<void> => {
+export const runBlogsSeeder = async (standalone = false): Promise<void> => {
   try {
     if (standalone) {
       await connectDatabase();

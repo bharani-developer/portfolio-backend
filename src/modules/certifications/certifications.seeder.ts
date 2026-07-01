@@ -40,12 +40,7 @@ export const seedCertifications = async (): Promise<void> => {
       description:
         "Completed professional training in AutoCAD, Core Java, and C++ programming fundamentals.",
 
-      skills: [
-        "AutoCAD",
-        "Java",
-        "C++",
-        "Programming",
-      ],
+      skills: ["AutoCAD", "Java", "C++", "Programming"],
 
       sortOrder: 1,
 
@@ -55,9 +50,7 @@ export const seedCertifications = async (): Promise<void> => {
     {
       title: "In-Plant & Corporate Training",
 
-      slug: generateSlug(
-        "In Plant Training Code Bind Technologies",
-      ),
+      slug: generateSlug("In Plant Training Code Bind Technologies"),
 
       issuer: "Code Bind Technologies, Chennai",
 
@@ -74,11 +67,7 @@ export const seedCertifications = async (): Promise<void> => {
       description:
         "Successfully completed in-plant and corporate training focused on software development practices and real-world application development.",
 
-      skills: [
-        "Software Development",
-        "PHP",
-        "Web Development",
-      ],
+      skills: ["Software Development", "PHP", "Web Development"],
 
       sortOrder: 2,
 
@@ -88,9 +77,7 @@ export const seedCertifications = async (): Promise<void> => {
     {
       title: "Networking - Switching & Routing",
 
-      slug: generateSlug(
-        "Basics Concept of Networking Switching Routing",
-      ),
+      slug: generateSlug("Basics Concept of Networking Switching Routing"),
 
       issuer: "CMS IT Training Institute",
 
@@ -107,12 +94,7 @@ export const seedCertifications = async (): Promise<void> => {
       description:
         "Completed training covering networking fundamentals, switching, routing, and network infrastructure concepts.",
 
-      skills: [
-        "Networking",
-        "Switching",
-        "Routing",
-        "Network Infrastructure",
-      ],
+      skills: ["Networking", "Switching", "Routing", "Network Infrastructure"],
 
       sortOrder: 3,
 
@@ -141,11 +123,7 @@ export const seedCertifications = async (): Promise<void> => {
       description:
         "Completed Android application development training covering mobile application fundamentals and Android development concepts.",
 
-      skills: [
-        "Android",
-        "Mobile Development",
-        "Java",
-      ],
+      skills: ["Android", "Mobile Development", "Java"],
 
       sortOrder: 4,
 

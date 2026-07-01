@@ -4,7 +4,11 @@ import { model, Schema } from "mongoose";
 
 import { imageSchema } from "../../shared/schemas/image.schema.js";
 
-import { SKILLS_CATEGORIES, SKILLS_DEFAULT, SKILLS_VALIDATION } from "./skills.constant.js";
+import {
+  SKILLS_CATEGORIES,
+  SKILLS_DEFAULT,
+  SKILLS_VALIDATION,
+} from "./skills.constant.js";
 
 import type { ISkill, ISkillModel } from "./skills.interface.js";
 
@@ -97,7 +101,4 @@ skillsSchema.index({
 /*                                  Model                                     */
 /* -------------------------------------------------------------------------- */
 
-export const Skill = model<ISkill, ISkillModel>(
-  "Skill",
-  skillsSchema,
-);
+export const Skill = model<ISkill, ISkillModel>("Skill", skillsSchema);

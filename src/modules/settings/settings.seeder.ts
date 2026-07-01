@@ -76,9 +76,7 @@ export const seedSettings = async (): Promise<void> => {
   console.info("Settings seeded successfully.");
 };
 
-export const runSettingsSeeder = async (
-  standalone = false,
-): Promise<void> => {
+export const runSettingsSeeder = async (standalone = false): Promise<void> => {
   try {
     if (standalone) {
       await connectDatabase();

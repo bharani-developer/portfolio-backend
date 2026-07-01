@@ -2,11 +2,15 @@
 
 export const SKILLS_MESSAGE = {
   CREATED: "Skill created successfully",
+
   RETRIEVED: "Skill retrieved successfully",
+
   UPDATED: "Skill updated successfully",
+
   DELETED: "Skill deleted successfully",
 
   NOT_FOUND: "Skill not found",
+
   ALREADY_EXISTS: "Skill already exists",
 } as const;
 
@@ -26,15 +30,13 @@ export const SKILLS_CATEGORY = {
   CLOUD: "Cloud",
   AI_ML: "AI / ML",
   TESTING: "Testing",
+  API_INTEGRATION: "API Integration",
   OTHER: "Other",
 } as const;
 
 export const SKILLS_CATEGORIES = Object.values(SKILLS_CATEGORY);
 
-export const SKILLS_SEARCHABLE_FIELDS = [
-  "name",
-  "category",
-] as const;
+export const SKILLS_SEARCHABLE_FIELDS = ["name", "category"] as const;
 
 /* -------------------------------------------------------------------------- */
 /*                                Validation                                  */

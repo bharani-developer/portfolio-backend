@@ -6,14 +6,9 @@ import { Hero } from "./hero.model.js";
 
 import type { IHero } from "./hero.interface.js";
 
-const heroBaseService = new BaseSingletonService<IHero>(
-  Hero,
-  "Hero section",
-);
+const heroBaseService = new BaseSingletonService<IHero>(Hero, "Hero section");
 
-const createHero = async (
-  payload: Partial<IHero>,
-) => {
+const createHero = async (payload: Partial<IHero>) => {
   return heroBaseService.create(payload);
 };
 
@@ -21,9 +16,7 @@ const getHero = async () => {
   return heroBaseService.get();
 };
 
-const updateHero = async (
-  payload: Partial<IHero>,
-) => {
+const updateHero = async (payload: Partial<IHero>) => {
   return heroBaseService.update(payload);
 };
 

@@ -57,9 +57,7 @@ export const seedContact = async (): Promise<void> => {
   console.info("Contact messages seeded successfully.");
 };
 
-export const runContactSeeder = async (
-  standalone = false,
-): Promise<void> => {
+export const runContactSeeder = async (standalone = false): Promise<void> => {
   try {
     if (standalone) {
       await connectDatabase();

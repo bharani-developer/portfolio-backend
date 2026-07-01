@@ -110,10 +110,7 @@ const googleLogin = async (
   if (!user) {
     const displayName =
       payload.name?.trim() ||
-      [
-        payload.given_name,
-        payload.family_name,
-      ]
+      [payload.given_name, payload.family_name]
         .filter(Boolean)
         .join(" ")
         .trim() ||
@@ -130,8 +127,7 @@ const googleLogin = async (
 
       googleId: payload.sub,
 
-      emailVerified:
-        payload.email_verified ?? true,
+      emailVerified: payload.email_verified ?? true,
 
       isActive: true,
 
@@ -141,23 +137,19 @@ const googleLogin = async (
     };
 
     if (payload.given_name) {
-      createUserPayload.givenName =
-        payload.given_name;
+      createUserPayload.givenName = payload.given_name;
     }
 
     if (payload.family_name) {
-      createUserPayload.familyName =
-        payload.family_name;
+      createUserPayload.familyName = payload.family_name;
     }
 
     if (payload.locale) {
-      createUserPayload.locale =
-        payload.locale;
+      createUserPayload.locale = payload.locale;
     }
 
     if (payload.hd) {
-      createUserPayload.hostedDomain =
-        payload.hd;
+      createUserPayload.hostedDomain = payload.hd;
     }
 
     if (payload.picture) {
@@ -167,29 +159,18 @@ const googleLogin = async (
       };
     }
 
-    user = await User.create(
-      createUserPayload,
-    );
+    user = await User.create(createUserPayload);
   }
 
   if (user.isDeleted) {
-    throw new AppError(
-      httpStatus.FORBIDDEN,
-      AUTH_MESSAGE.ACCOUNT_NOT_FOUND,
-    );
+    throw new AppError(httpStatus.FORBIDDEN, AUTH_MESSAGE.ACCOUNT_NOT_FOUND);
   }
 
   if (!user.isActive) {
-    throw new AppError(
-      httpStatus.FORBIDDEN,
-      AUTH_MESSAGE.ACCOUNT_INACTIVE,
-    );
+    throw new AppError(httpStatus.FORBIDDEN, AUTH_MESSAGE.ACCOUNT_INACTIVE);
   }
 
-  if (
-    user.authProvider ===
-    AUTH_PROVIDER.LOCAL
-  ) {
+  if (user.authProvider === AUTH_PROVIDER.LOCAL) {
     throw new AppError(
       httpStatus.BAD_REQUEST,
       AUTH_MESSAGE.LOCAL_ACCOUNT_REQUIRED,
@@ -198,32 +179,22 @@ const googleLogin = async (
 
   let hasChanges = false;
 
-  if (
-    payload.sub &&
-    user.googleId !== payload.sub
-  ) {
+  if (payload.sub && user.googleId !== payload.sub) {
     user.googleId = payload.sub;
 
     hasChanges = true;
   }
 
   if (
-    payload.email_verified !==
-    undefined &&
-    user.emailVerified !==
-    payload.email_verified
+    payload.email_verified !== undefined &&
+    user.emailVerified !== payload.email_verified
   ) {
-    user.emailVerified =
-      payload.email_verified;
+    user.emailVerified = payload.email_verified;
 
     hasChanges = true;
   }
 
-  if (
-    payload.picture &&
-    payload.picture !==
-    user.avatar?.url
-  ) {
+  if (payload.picture && payload.picture !== user.avatar?.url) {
     user.avatar = {
       url: payload.picture,
       publicId: "",
@@ -232,42 +203,25 @@ const googleLogin = async (
     hasChanges = true;
   }
 
-  if (
-    payload.given_name &&
-    payload.given_name !==
-    user.givenName
-  ) {
-    user.givenName =
-      payload.given_name;
+  if (payload.given_name && payload.given_name !== user.givenName) {
+    user.givenName = payload.given_name;
 
     hasChanges = true;
   }
 
-  if (
-    payload.family_name &&
-    payload.family_name !==
-    user.familyName
-  ) {
-    user.familyName =
-      payload.family_name;
+  if (payload.family_name && payload.family_name !== user.familyName) {
+    user.familyName = payload.family_name;
 
     hasChanges = true;
   }
 
-  if (
-    payload.locale &&
-    payload.locale !== user.locale
-  ) {
+  if (payload.locale && payload.locale !== user.locale) {
     user.locale = payload.locale;
 
     hasChanges = true;
   }
 
-  if (
-    payload.hd &&
-    payload.hd !==
-    user.hostedDomain
-  ) {
+  if (payload.hd && payload.hd !== user.hostedDomain) {
     user.hostedDomain = payload.hd;
 
     hasChanges = true;
@@ -281,11 +235,7 @@ const googleLogin = async (
     await user.save();
   }
 
-  return createTokens(
-    user._id.toString(),
-    user.email,
-    user.role,
-  );
+  return createTokens(user._id.toString(), user.email, user.role);
 };
 
 const refreshToken = async (token: string): Promise<IRefreshTokenResponse> => {

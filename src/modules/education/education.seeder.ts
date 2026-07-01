@@ -139,9 +139,7 @@ export const seedEducation = async (): Promise<void> => {
     {
       institution: "Sri Kulabathi Balaih Higher Secondary School",
 
-      slug: generateSlug(
-        "Sri Kulabathi Balaih Higher Secondary School SSLC",
-      ),
+      slug: generateSlug("Sri Kulabathi Balaih Higher Secondary School SSLC"),
 
       degree: "Secondary School Leaving Certificate (SSLC)",
 
@@ -178,9 +176,7 @@ export const seedEducation = async (): Promise<void> => {
     {
       institution: "Sri Kulabathi Balaih Higher Secondary School",
 
-      slug: generateSlug(
-        "Sri Kulabathi Balaih Higher Secondary School HSC",
-      ),
+      slug: generateSlug("Sri Kulabathi Balaih Higher Secondary School HSC"),
 
       degree: "Higher Secondary Certificate (HSC)",
 
@@ -207,10 +203,7 @@ export const seedEducation = async (): Promise<void> => {
 
       achievements: [],
 
-      skills: [
-        "Computer Science",
-        "Mathematics",
-      ],
+      skills: ["Computer Science", "Mathematics"],
 
       sortOrder: 5,
 
@@ -253,15 +246,7 @@ export const seedEducation = async (): Promise<void> => {
         "Active Rotary Club Member",
       ],
 
-      skills: [
-        "C++",
-        "Java",
-        "PHP",
-        "HTML",
-        "CSS",
-        "JavaScript",
-        "MySQL",
-      ],
+      skills: ["C++", "Java", "PHP", "HTML", "CSS", "JavaScript", "MySQL"],
 
       sortOrder: 6,
 
@@ -272,9 +257,7 @@ export const seedEducation = async (): Promise<void> => {
   console.info("Education seeded successfully.");
 };
 
-export const runEducationSeeder = async (
-  standalone = false,
-): Promise<void> => {
+export const runEducationSeeder = async (standalone = false): Promise<void> => {
   try {
     if (standalone) {
       await connectDatabase();

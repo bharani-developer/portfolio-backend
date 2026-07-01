@@ -90,9 +90,7 @@ export const seedServices = async (): Promise<void> => {
   console.info("Services seeded successfully.");
 };
 
-export const runServicesSeeder = async (
-  standalone = false,
-): Promise<void> => {
+export const runServicesSeeder = async (standalone = false): Promise<void> => {
   try {
     if (standalone) {
       await connectDatabase();

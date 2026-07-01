@@ -1,6 +1,14 @@
 // src/modules/contact/contact.constant.ts
 
 export const CONTACT_MESSAGE = {
+  CREATED: "Contact created successfully",
+
+  RETRIEVED: "Contact retrieved successfully",
+
+  UPDATED: "Contact updated successfully",
+
+  DELETED: "Contact deleted successfully",
+
   NOT_FOUND: "Contact message not found",
 
   ALREADY_EXISTS: "Contact message already exists",

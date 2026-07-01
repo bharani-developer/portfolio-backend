@@ -14,10 +14,7 @@ const imageValidationSchema = z
   .object({
     url: z.url("Image URL must be a valid URL").trim(),
 
-    publicId: z
-      .string()
-      .trim()
-      .min(1, "Image public ID is required"),
+    publicId: z.string().trim().min(1, "Image public ID is required"),
   })
   .strict();
 
@@ -27,23 +24,22 @@ const technologyValidationSchema = z
   .min(1, "Technology name is required")
   .max(
     TECHNOLOGY_MAX_LENGTH,
-    `Technology name cannot exceed ${TECHNOLOGY_MAX_LENGTH} characters`
+    `Technology name cannot exceed ${TECHNOLOGY_MAX_LENGTH} characters`,
   );
 
 const technologiesValidationSchema = z
   .array(technologyValidationSchema)
   .max(
     MAX_TECHNOLOGIES,
-    `You can add a maximum of ${MAX_TECHNOLOGIES} technologies`
+    `You can add a maximum of ${MAX_TECHNOLOGIES} technologies`,
   )
   .refine(
     (technologies) =>
-      new Set(
-        technologies.map((technology) => technology.toLowerCase())
-      ).size === technologies.length,
+      new Set(technologies.map((technology) => technology.toLowerCase()))
+        .size === technologies.length,
     {
       message: "Duplicate technologies are not allowed",
-    }
+    },
   );
 
 const createHeroBodySchema = z
@@ -54,7 +50,7 @@ const createHeroBodySchema = z
       .min(1, "Title is required")
       .max(
         TITLE_MAX_LENGTH,
-        `Title cannot exceed ${TITLE_MAX_LENGTH} characters`
+        `Title cannot exceed ${TITLE_MAX_LENGTH} characters`,
       ),
 
     subtitle: z
@@ -63,7 +59,7 @@ const createHeroBodySchema = z
       .min(1, "Subtitle is required")
       .max(
         SUBTITLE_MAX_LENGTH,
-        `Subtitle cannot exceed ${SUBTITLE_MAX_LENGTH} characters`
+        `Subtitle cannot exceed ${SUBTITLE_MAX_LENGTH} characters`,
       ),
 
     description: z
@@ -72,22 +68,19 @@ const createHeroBodySchema = z
       .min(1, "Description is required")
       .max(
         DESCRIPTION_MAX_LENGTH,
-        `Description cannot exceed ${DESCRIPTION_MAX_LENGTH} characters`
+        `Description cannot exceed ${DESCRIPTION_MAX_LENGTH} characters`,
       ),
 
     profileImage: imageValidationSchema.optional(),
 
-    resumeUrl: z
-      .url("Resume URL must be a valid URL")
-      .trim()
-      .optional(),
+    resumeUrl: z.url("Resume URL must be a valid URL").trim().optional(),
 
     ctaButtonText: z
       .string()
       .trim()
       .max(
         CTA_TEXT_MAX_LENGTH,
-        `CTA button text cannot exceed ${CTA_TEXT_MAX_LENGTH} characters`
+        `CTA button text cannot exceed ${CTA_TEXT_MAX_LENGTH} characters`,
       )
       .optional(),
 
@@ -96,7 +89,7 @@ const createHeroBodySchema = z
       .trim()
       .max(
         CTA_LINK_MAX_LENGTH,
-        `CTA button link cannot exceed ${CTA_LINK_MAX_LENGTH} characters`
+        `CTA button link cannot exceed ${CTA_LINK_MAX_LENGTH} characters`,
       )
       .optional(),
 
@@ -114,7 +107,7 @@ const updateHeroBodySchema = z
       .min(1, "Title cannot be empty")
       .max(
         TITLE_MAX_LENGTH,
-        `Title cannot exceed ${TITLE_MAX_LENGTH} characters`
+        `Title cannot exceed ${TITLE_MAX_LENGTH} characters`,
       )
       .optional(),
 
@@ -124,7 +117,7 @@ const updateHeroBodySchema = z
       .min(1, "Subtitle cannot be empty")
       .max(
         SUBTITLE_MAX_LENGTH,
-        `Subtitle cannot exceed ${SUBTITLE_MAX_LENGTH} characters`
+        `Subtitle cannot exceed ${SUBTITLE_MAX_LENGTH} characters`,
       )
       .optional(),
 
@@ -134,23 +127,20 @@ const updateHeroBodySchema = z
       .min(1, "Description cannot be empty")
       .max(
         DESCRIPTION_MAX_LENGTH,
-        `Description cannot exceed ${DESCRIPTION_MAX_LENGTH} characters`
+        `Description cannot exceed ${DESCRIPTION_MAX_LENGTH} characters`,
       )
       .optional(),
 
     profileImage: imageValidationSchema.optional(),
 
-    resumeUrl: z
-      .url("Resume URL must be a valid URL")
-      .trim()
-      .optional(),
+    resumeUrl: z.url("Resume URL must be a valid URL").trim().optional(),
 
     ctaButtonText: z
       .string()
       .trim()
       .max(
         CTA_TEXT_MAX_LENGTH,
-        `CTA button text cannot exceed ${CTA_TEXT_MAX_LENGTH} characters`
+        `CTA button text cannot exceed ${CTA_TEXT_MAX_LENGTH} characters`,
       )
       .optional(),
 
@@ -159,7 +149,7 @@ const updateHeroBodySchema = z
       .trim()
       .max(
         CTA_LINK_MAX_LENGTH,
-        `CTA button link cannot exceed ${CTA_LINK_MAX_LENGTH} characters`
+        `CTA button link cannot exceed ${CTA_LINK_MAX_LENGTH} characters`,
       )
       .optional(),
 
@@ -183,10 +173,6 @@ export const HeroValidation = {
   updateHeroValidationSchema,
 };
 
-export type TCreateHeroInput = z.infer<
-  typeof createHeroBodySchema
->;
+export type TCreateHeroInput = z.infer<typeof createHeroBodySchema>;
 
-export type TUpdateHeroInput = z.infer<
-  typeof updateHeroBodySchema
->;
+export type TUpdateHeroInput = z.infer<typeof updateHeroBodySchema>;

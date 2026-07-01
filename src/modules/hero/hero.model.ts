@@ -59,7 +59,7 @@ const heroSchema = new Schema<IHero, IHeroModel>(
       validate: {
         validator(technologies: string[]) {
           const normalized = technologies.map((technology) =>
-            technology.trim().toLowerCase()
+            technology.trim().toLowerCase(),
           );
 
           return normalized.length === new Set(normalized).size;
@@ -77,7 +77,7 @@ const heroSchema = new Schema<IHero, IHeroModel>(
   {
     timestamps: true,
     versionKey: false,
-  }
+  },
 );
 
 heroSchema.index({
@@ -87,12 +87,9 @@ heroSchema.index({
 heroSchema.pre("save", async function () {
   if (this.technologies?.length > 0) {
     this.technologies = this.technologies.map((technology) =>
-      technology.trim()
+      technology.trim(),
     );
   }
 });
 
-export const Hero = model<IHero, IHeroModel>(
-  "Hero",
-  heroSchema
-);
+export const Hero = model<IHero, IHeroModel>("Hero", heroSchema);

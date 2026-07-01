@@ -1,6 +1,5 @@
 // src/modules/auth/auth.swagger.ts
 
-
 import type { OpenAPIV3_1 } from "openapi-types";
 
 export const authSchemas = {
@@ -29,8 +28,7 @@ export const authSchemas = {
     properties: {
       token: {
         type: "string",
-        example:
-          "eyJhbGciOiJSUzI1NiIsImtpZCI6IjExMjM0NTY3ODkw...",
+        example: "eyJhbGciOiJSUzI1NiIsImtpZCI6IjExMjM0NTY3ODkw...",
       },
     },
     additionalProperties: false,
@@ -58,8 +56,7 @@ export const authSchemas = {
     properties: {
       url: {
         type: "string",
-        example:
-          "https://lh3.googleusercontent.com/avatar.jpg",
+        example: "https://lh3.googleusercontent.com/avatar.jpg",
       },
 
       publicId: {
@@ -74,8 +71,7 @@ export const authSchemas = {
     properties: {
       _id: {
         type: "string",
-        example:
-          "6857e6d7a2a9f4c9b8f4d123",
+        example: "6857e6d7a2a9f4c9b8f4d123",
       },
 
       name: {
@@ -86,8 +82,7 @@ export const authSchemas = {
       email: {
         type: "string",
         format: "email",
-        example:
-          "bharani.developer@gmail.com",
+        example: "bharani.developer@gmail.com",
       },
 
       role: {
@@ -104,8 +99,7 @@ export const authSchemas = {
 
       googleId: {
         type: "string",
-        example:
-          "108394857392847592384",
+        example: "108394857392847592384",
       },
 
       emailVerified: {
@@ -134,8 +128,7 @@ export const authSchemas = {
       },
 
       avatar: {
-        $ref:
-          "#/components/schemas/Avatar",
+        $ref: "#/components/schemas/Avatar",
       },
 
       isActive: {
@@ -188,8 +181,7 @@ export const authSchemas = {
         properties: {
           accessToken: {
             type: "string",
-            example:
-              "jwt-access-token",
+            example: "jwt-access-token",
           },
         },
       },
@@ -211,8 +203,7 @@ export const authSchemas = {
 
       message: {
         type: "string",
-        example:
-          "Access token refreshed successfully",
+        example: "Access token refreshed successfully",
       },
 
       data: {
@@ -220,8 +211,7 @@ export const authSchemas = {
         properties: {
           accessToken: {
             type: "string",
-            example:
-              "jwt-access-token",
+            example: "jwt-access-token",
           },
         },
       },
@@ -243,13 +233,11 @@ export const authSchemas = {
 
       message: {
         type: "string",
-        example:
-          "Profile retrieved successfully",
+        example: "Profile retrieved successfully",
       },
 
       data: {
-        $ref:
-          "#/components/schemas/UserProfile",
+        $ref: "#/components/schemas/UserProfile",
       },
     },
   },
@@ -269,8 +257,7 @@ export const authSchemas = {
 
       message: {
         type: "string",
-        example:
-          "Operation completed successfully",
+        example: "Operation completed successfully",
       },
 
       data: {
@@ -299,25 +286,20 @@ export const authSchemas = {
       },
     },
   },
-} satisfies Record<
-  string,
-  OpenAPIV3_1.SchemaObject
->;
+} satisfies Record<string, OpenAPIV3_1.SchemaObject>;
 
 export const authPaths: OpenAPIV3_1.PathsObject = {
   "/auth/login": {
     post: {
       tags: ["Auth"],
-      summary:
-        "Login using email and password",
+      summary: "Login using email and password",
 
       requestBody: {
         required: true,
         content: {
           "application/json": {
             schema: {
-              $ref:
-                "#/components/schemas/LoginRequest",
+              $ref: "#/components/schemas/LoginRequest",
             },
           },
         },
@@ -325,13 +307,11 @@ export const authPaths: OpenAPIV3_1.PathsObject = {
 
       responses: {
         "200": {
-          description:
-            "Login successful",
+          description: "Login successful",
           content: {
             "application/json": {
               schema: {
-                $ref:
-                  "#/components/schemas/LoginResponse",
+                $ref: "#/components/schemas/LoginResponse",
               },
             },
           },
@@ -344,11 +324,9 @@ export const authPaths: OpenAPIV3_1.PathsObject = {
     post: {
       tags: ["Auth"],
 
-      summary:
-        "Authenticate with Google",
+      summary: "Authenticate with Google",
 
-      description:
-        "Send Google ID Token received from Google Sign-In SDK.",
+      description: "Send Google ID Token received from Google Sign-In SDK.",
 
       requestBody: {
         required: true,
@@ -356,8 +334,7 @@ export const authPaths: OpenAPIV3_1.PathsObject = {
         content: {
           "application/json": {
             schema: {
-              $ref:
-                "#/components/schemas/GoogleLoginRequest",
+              $ref: "#/components/schemas/GoogleLoginRequest",
             },
           },
         },
@@ -365,14 +342,12 @@ export const authPaths: OpenAPIV3_1.PathsObject = {
 
       responses: {
         "200": {
-          description:
-            "Google login successful",
+          description: "Google login successful",
 
           content: {
             "application/json": {
               schema: {
-                $ref:
-                  "#/components/schemas/LoginResponse",
+                $ref: "#/components/schemas/LoginResponse",
               },
             },
           },
@@ -385,19 +360,16 @@ export const authPaths: OpenAPIV3_1.PathsObject = {
     post: {
       tags: ["Auth"],
 
-      summary:
-        "Refresh access token",
+      summary: "Refresh access token",
 
       responses: {
         "200": {
-          description:
-            "Token refreshed",
+          description: "Token refreshed",
 
           content: {
             "application/json": {
               schema: {
-                $ref:
-                  "#/components/schemas/RefreshTokenResponse",
+                $ref: "#/components/schemas/RefreshTokenResponse",
               },
             },
           },
@@ -410,8 +382,7 @@ export const authPaths: OpenAPIV3_1.PathsObject = {
     get: {
       tags: ["Auth"],
 
-      summary:
-        "Get current user profile",
+      summary: "Get current user profile",
 
       security: [
         {
@@ -421,14 +392,12 @@ export const authPaths: OpenAPIV3_1.PathsObject = {
 
       responses: {
         "200": {
-          description:
-            "Profile retrieved",
+          description: "Profile retrieved",
 
           content: {
             "application/json": {
               schema: {
-                $ref:
-                  "#/components/schemas/ProfileResponse",
+                $ref: "#/components/schemas/ProfileResponse",
               },
             },
           },
@@ -441,8 +410,7 @@ export const authPaths: OpenAPIV3_1.PathsObject = {
     post: {
       tags: ["Auth"],
 
-      summary:
-        "Change account password",
+      summary: "Change account password",
 
       security: [
         {
@@ -456,8 +424,7 @@ export const authPaths: OpenAPIV3_1.PathsObject = {
         content: {
           "application/json": {
             schema: {
-              $ref:
-                "#/components/schemas/ChangePasswordRequest",
+              $ref: "#/components/schemas/ChangePasswordRequest",
             },
           },
         },
@@ -465,8 +432,7 @@ export const authPaths: OpenAPIV3_1.PathsObject = {
 
       responses: {
         "200": {
-          description:
-            "Password changed successfully",
+          description: "Password changed successfully",
         },
       },
     },
@@ -476,8 +442,7 @@ export const authPaths: OpenAPIV3_1.PathsObject = {
     post: {
       tags: ["Auth"],
 
-      summary:
-        "Logout authenticated user",
+      summary: "Logout authenticated user",
 
       security: [
         {
@@ -487,8 +452,7 @@ export const authPaths: OpenAPIV3_1.PathsObject = {
 
       responses: {
         "200": {
-          description:
-            "Logout successful",
+          description: "Logout successful",
         },
       },
     },

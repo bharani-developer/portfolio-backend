@@ -1,6 +1,14 @@
 // src\modules\experience\experience.constant.ts
 
 export const EXPERIENCE_MESSAGE = {
+  CREATED: "Experience created successfully",
+
+  RETRIEVED: "Experience retrieved successfully",
+
+  UPDATED: "Experience updated successfully",
+
+  DELETED: "Experience deleted successfully",
+
   NOT_FOUND: "Experience not found",
 
   ALREADY_EXISTS: "Experience already exists",

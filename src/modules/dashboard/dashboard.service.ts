@@ -12,9 +12,7 @@ import { Settings } from "../settings/settings.model.js";
 import { Skill } from "../skills/skills.model.js";
 import { Testimonial } from "../testimonials/testimonials.model.js";
 
-const getDashboardStats = async (
-  role: TRole,
-) => {
+const getDashboardStats = async (role: TRole) => {
   const isAdmin = role === ROLE.ADMIN;
 
   const [
@@ -113,9 +111,7 @@ const getDashboardStats = async (
     Settings.exists({}),
 
     Project.find()
-      .select(
-        "title slug category featured createdAt",
-      )
+      .select("title slug category featured createdAt")
       .sort({
         createdAt: -1,
       })
@@ -123,9 +119,7 @@ const getDashboardStats = async (
       .lean(),
 
     Blog.find()
-      .select(
-        "title slug category isPublished isFeatured createdAt",
-      )
+      .select("title slug category isPublished isFeatured createdAt")
       .sort({
         createdAt: -1,
       })
@@ -133,9 +127,7 @@ const getDashboardStats = async (
       .lean(),
 
     Contact.find()
-      .select(
-        "name email subject status priority isRead createdAt",
-      )
+      .select("name email subject status priority isRead createdAt")
       .sort({
         createdAt: -1,
       })
@@ -151,10 +143,8 @@ const getDashboardStats = async (
       skills: totalSkills,
       experiences: totalExperiences,
       educations: totalEducations,
-      certifications:
-        totalCertifications,
-      testimonials:
-        totalTestimonials,
+      certifications: totalCertifications,
+      testimonials: totalTestimonials,
     },
 
     projects: {
@@ -200,10 +190,8 @@ const getDashboardStats = async (
     },
 
     configuration: {
-      heroConfigured:
-        Boolean(heroExists),
-      settingsConfigured:
-        Boolean(settingsExists),
+      heroConfigured: Boolean(heroExists),
+      settingsConfigured: Boolean(settingsExists),
     },
 
     recent: {

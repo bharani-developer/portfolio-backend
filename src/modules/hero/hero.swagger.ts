@@ -12,31 +12,21 @@ export const heroSchemas = {
           "https://res.cloudinary.com/demo/image/upload/v1/portfolio/profile.jpg",
       },
 
-
       publicId: {
         type: "string",
         example: "portfolio/profile-image",
       },
     },
-
-
   },
 
   Hero: {
     type: "object",
-    required: [
-      "title",
-      "subtitle",
-      "description",
-      "technologies",
-      "isActive",
-    ],
+    required: ["title", "subtitle", "description", "technologies", "isActive"],
     properties: {
       _id: {
         type: "string",
         example: "6848d5a4b63f9f4d9b8c1234",
       },
-
 
       title: {
         type: "string",
@@ -106,24 +96,17 @@ export const heroSchemas = {
         format: "date-time",
       },
     },
-
-
   },
 
   CreateHeroRequest: {
     type: "object",
-    required: [
-      "title",
-      "subtitle",
-      "description",
-    ],
+    required: ["title", "subtitle", "description"],
     properties: {
       title: {
         type: "string",
         maxLength: 150,
         example: "Hi, I'm Bharani",
       },
-
 
       subtitle: {
         type: "string",
@@ -168,13 +151,7 @@ export const heroSchemas = {
           type: "string",
           maxLength: 50,
         },
-        example: [
-          "React",
-          "Next.js",
-          "TypeScript",
-          "Node.js",
-          "MongoDB",
-        ],
+        example: ["React", "Next.js", "TypeScript", "Node.js", "MongoDB"],
       },
 
       isActive: {
@@ -182,8 +159,6 @@ export const heroSchemas = {
         default: true,
       },
     },
-
-
   },
 
   UpdateHeroRequest: {
@@ -193,7 +168,6 @@ export const heroSchemas = {
         type: "string",
         maxLength: 150,
       },
-
 
       subtitle: {
         type: "string",
@@ -238,8 +212,6 @@ export const heroSchemas = {
         type: "boolean",
       },
     },
-
-
   },
 
   HeroResponse: {
@@ -250,7 +222,6 @@ export const heroSchemas = {
         example: true,
       },
 
-
       message: {
         type: "string",
         example: "Hero section retrieved successfully",
@@ -260,8 +231,6 @@ export const heroSchemas = {
         $ref: "#/components/schemas/Hero",
       },
     },
-
-
   },
 
   DeleteHeroResponse: {
@@ -272,7 +241,6 @@ export const heroSchemas = {
         example: true,
       },
 
-
       message: {
         type: "string",
         example: "Hero section deleted successfully",
@@ -282,8 +250,6 @@ export const heroSchemas = {
         type: "null",
       },
     },
-
-
   },
 
   ValidationErrorResponse: {
@@ -293,7 +259,6 @@ export const heroSchemas = {
         type: "boolean",
         example: false,
       },
-
 
       message: {
         type: "string",
@@ -318,8 +283,6 @@ export const heroSchemas = {
         },
       },
     },
-
-
   },
 
   UnauthorizedResponse: {
@@ -330,14 +293,11 @@ export const heroSchemas = {
         example: false,
       },
 
-
       message: {
         type: "string",
         example: "Unauthorized access",
       },
     },
-
-
   },
 
   ForbiddenResponse: {
@@ -348,14 +308,11 @@ export const heroSchemas = {
         example: false,
       },
 
-
       message: {
         type: "string",
         example: "Forbidden",
       },
     },
-
-
   },
 
   NotFoundResponse: {
@@ -366,14 +323,11 @@ export const heroSchemas = {
         example: false,
       },
 
-
       message: {
         type: "string",
         example: "Hero section not found",
       },
     },
-
-
   },
 };
 
@@ -383,7 +337,6 @@ export const heroPaths = {
       tags: ["Hero"],
       summary: "Get Hero Section",
       description: "Retrieve the portfolio hero section.",
-
 
       responses: {
         200: {
@@ -616,7 +569,5 @@ export const heroPaths = {
         },
       },
     },
-
-
   },
 };

@@ -1,6 +1,8 @@
-// src\modules\about\about.model.ts
+// src/modules/about/about.model.ts
 
 import { model, Schema } from "mongoose";
+
+import type { IImage } from "../../interfaces/index.js";
 
 import { imageSchema } from "../../shared/schemas/index.js";
 
@@ -31,6 +33,45 @@ const aboutSchema = new Schema<IAbout, IAboutModel>(
   {
     profileImage: {
       type: imageSchema,
+    },
+
+    images: {
+      type: [imageSchema],
+      required: [true, "At least one image is required"],
+
+      validate: [
+        {
+          validator(images: IImage[]) {
+            return Array.isArray(images) && images.length > 0;
+          },
+          message: "At least one image is required",
+        },
+
+        {
+          validator(images: IImage[]) {
+            return images.length <= 20;
+          },
+          message: "Maximum 20 images are allowed",
+        },
+
+        {
+          validator(images: IImage[]) {
+            const publicIds = images.map((image) => image.publicId);
+
+            return new Set(publicIds).size === publicIds.length;
+          },
+          message: "Duplicate image public IDs are not allowed",
+        },
+
+        {
+          validator(images: IImage[]) {
+            const urls = images.map((image) => image.url);
+
+            return new Set(urls).size === urls.length;
+          },
+          message: "Duplicate image URLs are not allowed",
+        },
+      ],
     },
 
     fullName: {
@@ -86,6 +127,13 @@ const aboutSchema = new Schema<IAbout, IAboutModel>(
     stats: {
       type: [aboutStatsSchema],
       default: [],
+
+      validate: {
+        validator(stats: IAbout["stats"]) {
+          return !stats || stats.length <= 20;
+        },
+        message: "Maximum 20 stats are allowed",
+      },
     },
 
     isActive: {

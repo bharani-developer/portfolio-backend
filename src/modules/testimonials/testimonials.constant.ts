@@ -1,10 +1,6 @@
 // src/modules/testimonials/testimonials.constant.ts
 
 export const TESTIMONIAL_MESSAGE = {
-  NOT_FOUND: "Testimonial not found",
-
-  ALREADY_EXISTS: "Testimonial already exists",
-
   CREATED: "Testimonial created successfully",
 
   UPDATED: "Testimonial updated successfully",
@@ -12,6 +8,10 @@ export const TESTIMONIAL_MESSAGE = {
   DELETED: "Testimonial deleted successfully",
 
   FETCHED: "Testimonials fetched successfully",
+
+  NOT_FOUND: "Testimonial not found",
+
+  ALREADY_EXISTS: "Testimonial already exists",
 } as const;
 
 export const TESTIMONIAL_DEFAULT = {
@@ -42,9 +42,7 @@ export const TESTIMONIAL_CLIENT_TYPE = {
   OTHER: "Other",
 } as const;
 
-export const TESTIMONIAL_CLIENT_TYPES = Object.values(
-  TESTIMONIAL_CLIENT_TYPE,
-);
+export const TESTIMONIAL_CLIENT_TYPES = Object.values(TESTIMONIAL_CLIENT_TYPE);
 
 export const TESTIMONIAL_RATING = {
   ONE: 1,
@@ -58,9 +56,7 @@ export const TESTIMONIAL_RATING = {
   FIVE: 5,
 } as const;
 
-export const TESTIMONIAL_RATINGS = Object.values(
-  TESTIMONIAL_RATING,
-);
+export const TESTIMONIAL_RATINGS = Object.values(TESTIMONIAL_RATING);
 
 export const TESTIMONIAL_SEARCHABLE_FIELDS = [
   "clientName",

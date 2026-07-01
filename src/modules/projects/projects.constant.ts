@@ -1,6 +1,14 @@
 // src\modules\projects\projects.constant.ts
 
 export const PROJECT_MESSAGE = {
+  CREATED: "Project section created successfully",
+
+  RETRIEVED: "Project section retrieved successfully",
+
+  UPDATED: "Project section updated successfully",
+
+  DELETED: "Project section deleted successfully",
+
   NOT_FOUND: "Project not found",
 
   ALREADY_EXISTS: "Project already exists",

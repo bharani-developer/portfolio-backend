@@ -1,6 +1,14 @@
 // src\modules\services\services.constant.ts
 
 export const SERVICES_MESSAGE = {
+  CREATED: "Service section created successfully",
+
+  RETRIEVED: "Service section retrieved successfully",
+
+  UPDATED: "Service section updated successfully",
+
+  DELETED: "Service section deleted successfully",
+
   NOT_FOUND: "Service not found",
 
   ALREADY_EXISTS: "Service already exists",

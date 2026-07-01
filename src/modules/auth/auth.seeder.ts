@@ -32,9 +32,7 @@ export const seedAdminUser = async (): Promise<void> => {
   logger.info("Admin user seeded successfully.");
 };
 
-export const runAuthSeeder = async (
-  standalone = false,
-): Promise<void> => {
+export const runAuthSeeder = async (standalone = false): Promise<void> => {
   try {
     if (standalone) {
       await connectDatabase();

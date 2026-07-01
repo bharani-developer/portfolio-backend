@@ -1,6 +1,14 @@
 // src\modules\certifications\certifications.constant.ts
 
 export const CERTIFICATION_MESSAGE = {
+  CREATED: "Certification created successfully",
+
+  RETRIEVED: "Certification retrieved successfully",
+
+  UPDATED: "Certification updated successfully",
+
+  DELETED: "Certification deleted successfully",
+
   NOT_FOUND: "Certification not found",
 
   ALREADY_EXISTS: "Certification already exists",
