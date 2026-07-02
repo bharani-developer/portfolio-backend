@@ -123,7 +123,7 @@ app.use(
 /*                               Root Endpoint                                */
 /* -------------------------------------------------------------------------- */
 
-app.get("/", (_req, res) => {
+app.get("/home", (_req, res) => {
   res.status(200).json({
     success: true,
     message: "Portfolio API Running",
@@ -157,7 +157,7 @@ app.get("/api-docs/swagger.json", (_req, res) => {
 /* -------------------------------------------------------------------------- */
 
 app.use(
-  "/api-docs",
+  "/",
   swaggerUi.serve,
   swaggerUi.setup(swaggerDocument, {
     explorer: true,
