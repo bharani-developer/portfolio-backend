@@ -1,5 +1,7 @@
 // src/docs/swagger.ts
 
+import { env } from "../config/env.js";
+
 import { authPaths, authSchemas } from "../modules/auth/auth.swagger.js";
 
 import { heroPaths, heroSchemas } from "../modules/hero/hero.swagger.js";
@@ -74,8 +76,12 @@ export const swaggerDocument = {
 
   servers: [
     {
-      url: "http://localhost:5000/api/v1",
+      url: `${env.DEVELOPMENT_URL}/api/v1`,
       description: "Development Server",
+    },
+    {
+      url: `${env.PRODUCTION_URL}/api/v1`,
+      description: "Production Server",
     },
   ],
 
@@ -84,75 +90,61 @@ export const swaggerDocument = {
       name: "Auth",
       description: "Authentication APIs",
     },
-
     {
       name: "Hero",
       description: "Hero section APIs",
     },
-
     {
       name: "About",
       description: "About section APIs",
     },
-
     {
       name: "Services",
       description: "Services APIs",
     },
-
     {
       name: "Skills",
       description: "Skills APIs",
     },
-
     {
       name: "Experience",
       description: "Experience APIs",
     },
-
     {
       name: "Education",
       description: "Education APIs",
     },
-
     {
       name: "Certifications",
       description: "Certification APIs",
     },
-
     {
       name: "Projects",
       description: "Project APIs",
     },
-
     {
       name: "Blogs",
       description: "Blog APIs",
     },
-
     {
       name: "Testimonials",
       description: "Testimonial APIs",
     },
-
     {
       name: "Contact",
       description: "Contact APIs",
     },
-
     {
       name: "Settings",
-      description: "Portfolio settings APIs",
+      description: "Portfolio Settings APIs",
     },
-
     {
       name: "Upload",
-      description: "Media upload APIs",
+      description: "Media Upload APIs",
     },
-
     {
       name: "Dashboard",
-      description: "Admin dashboard APIs",
+      description: "Admin Dashboard APIs",
     },
   ],
 
@@ -201,4 +193,4 @@ export const swaggerDocument = {
     ...uploadPaths,
     ...dashboardPaths,
   },
-};
+} as const;

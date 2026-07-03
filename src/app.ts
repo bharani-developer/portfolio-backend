@@ -20,27 +20,13 @@ const app = express();
 /* -------------------------------------------------------------------------- */
 /*                              Allowed Origins                               */
 /* -------------------------------------------------------------------------- */
-
-const allowedOrigins = env.CORS_ORIGIN.split(",")
-  .map((origin) => origin.trim())
-  .filter(Boolean);
-
-/* -------------------------------------------------------------------------- */
-/*                                  Security                                  */
-/* -------------------------------------------------------------------------- */
-
-app.use(
-  helmet({
-    crossOriginResourcePolicy: false,
-  }),
-);
-
-/* -------------------------------------------------------------------------- */
-/*                                    CORS                                    */
-/* -------------------------------------------------------------------------- */
+const allowedOrigins = env.CORS_ORIGIN;
 
 const corsOptions: CorsOptions = {
-  origin(origin, callback) {
+  origin(
+    origin: string | undefined,
+    callback: (err: Error | null, allow?: boolean) => void,
+  ) {
     if (!origin) {
       return callback(null, true);
     }
@@ -52,9 +38,7 @@ const corsOptions: CorsOptions = {
       return callback(null, true);
     }
 
-    return callback(
-      new Error(`CORS blocked: ${origin}`),
-    );
+    return callback(new Error(`CORS blocked: ${origin}`));
   },
 
   credentials: true,
@@ -76,15 +60,13 @@ const corsOptions: CorsOptions = {
     "X-Requested-With",
   ],
 
-  exposedHeaders: [
-    "Content-Disposition",
-  ],
+  exposedHeaders: ["Content-Disposition"],
 
   optionsSuccessStatus: 204,
 };
 
 app.use(cors(corsOptions));
-
+app.options("*", cors(corsOptions));
 /* -------------------------------------------------------------------------- */
 /*                                Performance                                 */
 /* -------------------------------------------------------------------------- */
