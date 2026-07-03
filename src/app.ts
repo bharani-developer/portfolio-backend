@@ -41,24 +41,19 @@ app.use(
 
 const corsOptions: CorsOptions = {
   origin(origin, callback) {
-    /**
-     * Allow requests without Origin header.
-     * Examples:
-     * - Postman
-     * - Curl
-     * - Render Health Checks
-     * - Swagger
-     */
     if (!origin) {
       return callback(null, true);
     }
 
-    if (allowedOrigins.includes(origin)) {
+    if (
+      allowedOrigins.includes(origin) ||
+      origin.endsWith(".vercel.app")
+    ) {
       return callback(null, true);
     }
 
     return callback(
-      new Error(`CORS: Origin '${origin}' is not allowed.`),
+      new Error(`CORS blocked: ${origin}`),
     );
   },
 

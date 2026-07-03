@@ -8,10 +8,15 @@ import { env } from "../../config/env.js";
 import AppError from "../../utils/AppError.js";
 import catchAsync from "../../utils/catchAsync.js";
 import sendResponse from "../../utils/sendResponse.js";
-import type { IGooglePayload } from "./auth.interface.js";
-import { AUTH_COOKIE, AUTH_MESSAGE } from "./auth.constant.js";
+
+import {
+  AUTH_COOKIE,
+  AUTH_MESSAGE,
+} from "./auth.constant.js";
 
 import { AuthService } from "./auth.service.js";
+
+import type { IGooglePayload } from "./auth.interface.js";
 
 const googleClient = new OAuth2Client(env.GOOGLE_CLIENT_ID);
 
@@ -25,7 +30,11 @@ const cookieOptions = {
 const login = catchAsync(async (req, res) => {
   const result = await AuthService.login(req.body);
 
-  res.cookie(AUTH_COOKIE.REFRESH_TOKEN, result.refreshToken, cookieOptions);
+  res.cookie(
+    AUTH_COOKIE.REFRESH_TOKEN,
+    result.refreshToken,
+    cookieOptions,
+  );
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -43,56 +52,63 @@ const googleLogin = catchAsync(async (req, res) => {
   };
 
   if (!token) {
-    throw new AppError(httpStatus.BAD_REQUEST, "Google token is required");
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      AUTH_MESSAGE.INVALID_GOOGLE_TOKEN,
+    );
   }
 
-  const ticket = await googleClient.verifyIdToken({
-    idToken: token,
-    audience: env.GOOGLE_CLIENT_ID,
-  });
+  let payload;
 
-  const payload = ticket.getPayload();
+  try {
+    const ticket = await googleClient.verifyIdToken({
+      idToken: token,
+      audience: env.GOOGLE_CLIENT_ID,
+    });
+
+    payload = ticket.getPayload();
+  } catch {
+    throw new AppError(
+      httpStatus.UNAUTHORIZED,
+      AUTH_MESSAGE.INVALID_GOOGLE_TOKEN,
+    );
+  }
 
   if (!payload?.email) {
-    throw new AppError(httpStatus.BAD_REQUEST, "Invalid Google account");
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      AUTH_MESSAGE.GOOGLE_AUTH_FAILED,
+    );
+  }
+
+  if (!payload.email_verified) {
+    throw new AppError(
+      httpStatus.UNAUTHORIZED,
+      AUTH_MESSAGE.EMAIL_NOT_VERIFIED,
+    );
   }
 
   const googlePayload: IGooglePayload = {
     sub: payload.sub,
     email: payload.email,
+    email_verified: payload.email_verified,
+    name: payload.name,
+    given_name: payload.given_name,
+    family_name: payload.family_name,
+    picture: payload.picture,
+    locale: payload.locale,
+    hd: payload.hd,
   };
 
-  if (payload.email_verified !== undefined) {
-    googlePayload.email_verified = payload.email_verified;
-  }
+  const result = await AuthService.googleLogin(
+    googlePayload,
+  );
 
-  if (payload.name) {
-    googlePayload.name = payload.name;
-  }
-
-  if (payload.given_name) {
-    googlePayload.given_name = payload.given_name;
-  }
-
-  if (payload.family_name) {
-    googlePayload.family_name = payload.family_name;
-  }
-
-  if (payload.picture) {
-    googlePayload.picture = payload.picture;
-  }
-
-  if (payload.locale) {
-    googlePayload.locale = payload.locale;
-  }
-
-  if (payload.hd) {
-    googlePayload.hd = payload.hd;
-  }
-
-  const result = await AuthService.googleLogin(googlePayload);
-
-  res.cookie(AUTH_COOKIE.REFRESH_TOKEN, result.refreshToken, cookieOptions);
+  res.cookie(
+    AUTH_COOKIE.REFRESH_TOKEN,
+    result.refreshToken,
+    cookieOptions,
+  );
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -105,9 +121,11 @@ const googleLogin = catchAsync(async (req, res) => {
 });
 
 const refreshToken = catchAsync(async (req, res) => {
-  const token = req.cookies?.[AUTH_COOKIE.REFRESH_TOKEN];
+  const token =
+    req.cookies?.[AUTH_COOKIE.REFRESH_TOKEN];
 
-  const result = await AuthService.refreshToken(token);
+  const result =
+    await AuthService.refreshToken(token);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -118,7 +136,10 @@ const refreshToken = catchAsync(async (req, res) => {
 });
 
 const getProfile = catchAsync(async (req, res) => {
-  const result = await AuthService.getProfile(req.user.userId.toString());
+  const result =
+    await AuthService.getProfile(
+      req.user.userId.toString(),
+    );
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -129,7 +150,10 @@ const getProfile = catchAsync(async (req, res) => {
 });
 
 const changePassword = catchAsync(async (req, res) => {
-  await AuthService.changePassword(req.user.userId.toString(), req.body);
+  await AuthService.changePassword(
+    req.user.userId.toString(),
+    req.body,
+  );
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -140,11 +164,10 @@ const changePassword = catchAsync(async (req, res) => {
 });
 
 const logout = catchAsync(async (_req, res) => {
-  res.clearCookie(AUTH_COOKIE.REFRESH_TOKEN, {
-    httpOnly: true,
-    secure: env.NODE_ENV === "production",
-    sameSite: "strict",
-  });
+  res.clearCookie(
+    AUTH_COOKIE.REFRESH_TOKEN,
+    cookieOptions,
+  );
 
   sendResponse(res, {
     statusCode: httpStatus.OK,

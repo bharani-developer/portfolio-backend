@@ -136,6 +136,13 @@ const googleLogin = async (
       lastLoginAt: new Date(),
     };
 
+    if (payload.picture) {
+      createUserPayload.avatar = {
+        url: payload.picture,
+        publicId: "",
+      };
+    }
+
     if (payload.given_name) {
       createUserPayload.givenName = payload.given_name;
     }
@@ -152,22 +159,21 @@ const googleLogin = async (
       createUserPayload.hostedDomain = payload.hd;
     }
 
-    if (payload.picture) {
-      createUserPayload.avatar = {
-        url: payload.picture,
-        publicId: "",
-      };
-    }
-
     user = await User.create(createUserPayload);
   }
 
   if (user.isDeleted) {
-    throw new AppError(httpStatus.FORBIDDEN, AUTH_MESSAGE.ACCOUNT_NOT_FOUND);
+    throw new AppError(
+      httpStatus.FORBIDDEN,
+      AUTH_MESSAGE.ACCOUNT_NOT_FOUND,
+    );
   }
 
   if (!user.isActive) {
-    throw new AppError(httpStatus.FORBIDDEN, AUTH_MESSAGE.ACCOUNT_INACTIVE);
+    throw new AppError(
+      httpStatus.FORBIDDEN,
+      AUTH_MESSAGE.ACCOUNT_INACTIVE,
+    );
   }
 
   if (user.authProvider === AUTH_PROVIDER.LOCAL) {
@@ -179,7 +185,13 @@ const googleLogin = async (
 
   let hasChanges = false;
 
-  if (payload.sub && user.googleId !== payload.sub) {
+  if (payload.name && payload.name !== user.name) {
+    user.name = payload.name;
+
+    hasChanges = true;
+  }
+
+  if (payload.sub && payload.sub !== user.googleId) {
     user.googleId = payload.sub;
 
     hasChanges = true;
@@ -187,7 +199,7 @@ const googleLogin = async (
 
   if (
     payload.email_verified !== undefined &&
-    user.emailVerified !== payload.email_verified
+    payload.email_verified !== user.emailVerified
   ) {
     user.emailVerified = payload.email_verified;
 
@@ -203,13 +215,19 @@ const googleLogin = async (
     hasChanges = true;
   }
 
-  if (payload.given_name && payload.given_name !== user.givenName) {
+  if (
+    payload.given_name &&
+    payload.given_name !== user.givenName
+  ) {
     user.givenName = payload.given_name;
 
     hasChanges = true;
   }
 
-  if (payload.family_name && payload.family_name !== user.familyName) {
+  if (
+    payload.family_name &&
+    payload.family_name !== user.familyName
+  ) {
     user.familyName = payload.family_name;
 
     hasChanges = true;
@@ -221,7 +239,10 @@ const googleLogin = async (
     hasChanges = true;
   }
 
-  if (payload.hd && payload.hd !== user.hostedDomain) {
+  if (
+    payload.hd &&
+    payload.hd !== user.hostedDomain
+  ) {
     user.hostedDomain = payload.hd;
 
     hasChanges = true;
@@ -235,7 +256,11 @@ const googleLogin = async (
     await user.save();
   }
 
-  return createTokens(user._id.toString(), user.email, user.role);
+  return createTokens(
+    user._id.toString(),
+    user.email,
+    user.role,
+  );
 };
 
 const refreshToken = async (token: string): Promise<IRefreshTokenResponse> => {
