@@ -64,7 +64,7 @@ const corsOptions: CorsOptions = {
 
   optionsSuccessStatus: 204,
 };
-
+console.log("Allowed Origins:", env.CORS_ORIGIN);
 app.use(cors(corsOptions));
 /* -------------------------------------------------------------------------- */
 /*                                Performance                                 */
