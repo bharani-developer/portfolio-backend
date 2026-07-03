@@ -132,14 +132,21 @@ app.get("/api-docs/swagger.json", (_req, res) => {
 /*                                Swagger UI                                  */
 /* -------------------------------------------------------------------------- */
 
+// Swagger UI
 app.use(
-  "/",
+  "/api-docs",
   swaggerUi.serve,
   swaggerUi.setup(swaggerDocument, {
     explorer: true,
     customSiteTitle: "Portfolio Backend API",
   }),
 );
+
+// 404
+app.use(notFound);
+
+// Global Error Handler
+app.use(globalErrorHandler);
 
 /* -------------------------------------------------------------------------- */
 /*                                API Routes                                  */
