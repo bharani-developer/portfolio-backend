@@ -22,6 +22,10 @@ import { ContactRoutes } from "../modules/contact/contact.route.js";
 import { SettingsRoutes } from "../modules/settings/settings.route.js";
 import { UploadRoutes } from "../modules/upload/upload.route.js";
 import { DashboardRoutes } from "../modules/dashboard/dashboard.route.js";
+// Debug
+console.log("v1 router loaded");
+console.log("ROUTES.HERO =", ROUTES.HERO);
+console.log("HeroRoutes =", HeroRoutes);
 
 const v1Router = Router();
 

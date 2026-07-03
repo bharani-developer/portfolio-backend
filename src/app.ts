@@ -20,6 +20,7 @@ const app = express();
 /* -------------------------------------------------------------------------- */
 /*                              Allowed Origins                               */
 /* -------------------------------------------------------------------------- */
+
 const allowedOrigins = env.CORS_ORIGIN;
 
 const corsOptions: CorsOptions = {
@@ -31,14 +32,18 @@ const corsOptions: CorsOptions = {
       return callback(null, true);
     }
 
+    const normalizedOrigin = origin.replace(/\/$/, "");
+
     if (
-      allowedOrigins.includes(origin) ||
-      origin.endsWith(".vercel.app")
+      allowedOrigins.includes(normalizedOrigin) ||
+      normalizedOrigin.endsWith(".vercel.app")
     ) {
       return callback(null, true);
     }
 
-    return callback(new Error(`CORS blocked: ${origin}`));
+    console.error(`CORS blocked: ${normalizedOrigin}`);
+
+    return callback(new Error(`CORS blocked: ${normalizedOrigin}`));
   },
 
   credentials: true,
@@ -60,27 +65,28 @@ const corsOptions: CorsOptions = {
     "X-Requested-With",
   ],
 
-  exposedHeaders: ["Content-Disposition"],
+  exposedHeaders: [
+    "Content-Disposition",
+  ],
 
   optionsSuccessStatus: 204,
 };
-console.log("Allowed Origins:", env.CORS_ORIGIN);
+
+/* -------------------------------------------------------------------------- */
+/*                                 Middleware                                 */
+/* -------------------------------------------------------------------------- */
+
+app.use(
+  helmet({
+    crossOriginResourcePolicy: false,
+  }),
+);
+
 app.use(cors(corsOptions));
-/* -------------------------------------------------------------------------- */
-/*                                Performance                                 */
-/* -------------------------------------------------------------------------- */
 
 app.use(compression());
 
-/* -------------------------------------------------------------------------- */
-/*                                  Cookies                                   */
-/* -------------------------------------------------------------------------- */
-
 app.use(cookieParser());
-
-/* -------------------------------------------------------------------------- */
-/*                               Body Parsers                                 */
-/* -------------------------------------------------------------------------- */
 
 app.use(
   express.json({
@@ -132,7 +138,6 @@ app.get("/api-docs/swagger.json", (_req, res) => {
 /*                                Swagger UI                                  */
 /* -------------------------------------------------------------------------- */
 
-// Swagger UI
 app.use(
   "/api-docs",
   swaggerUi.serve,
@@ -141,12 +146,6 @@ app.use(
     customSiteTitle: "Portfolio Backend API",
   }),
 );
-
-// 404
-app.use(notFound);
-
-// Global Error Handler
-app.use(globalErrorHandler);
 
 /* -------------------------------------------------------------------------- */
 /*                                API Routes                                  */
