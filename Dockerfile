@@ -42,9 +42,6 @@ RUN npm ci --omit=dev --ignore-scripts \
 # Copy compiled application
 COPY --from=builder /app/dist ./dist
 
-# If your app needs uploads
-COPY uploads ./uploads
-
 EXPOSE 5000
 
 CMD ["node", "dist/app/server.js"]
