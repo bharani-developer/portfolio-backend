@@ -1,32 +1,39 @@
-// src\modules\projects\projects.service.ts
+/* -------------------------------------------------------------------------- */
+/*                                 1. Imports                                 */
+/* -------------------------------------------------------------------------- */
 
-import httpStatus from "http-status";
+import httpStatus from 'http-status';
 
-import { BaseCrudService } from "../../shared/base/index.js";
-import { generateSlug } from "../../shared/slug/index.js";
+import { BaseCrudService } from '../../shared/base/index.js';
 
-import AppError from "../../utils/AppError.js";
+import { PROJECT_MESSAGE, PROJECT_SEARCHABLE_FIELDS } from './projects.constant.js';
 
-import {
-  PROJECT_MESSAGE,
-  PROJECT_SEARCHABLE_FIELDS,
-} from "./projects.constant.js";
-
-import { Project } from "./projects.model.js";
+import { Project } from './projects.model.js';
 
 import type {
   IProject,
   TCreateProjectPayload,
   TProjectCategory,
+  TProjectDocument,
   TProjectStatus,
   TUpdateProjectPayload,
-} from "./projects.interface.js";
+} from './projects.types.js';
 
-const baseService = new BaseCrudService<IProject>(Project, [
+import { AppError, generateSlug } from '../../shared/utils/index.js';
+
+/* -------------------------------------------------------------------------- */
+/*                               2. Base Service                              */
+/* -------------------------------------------------------------------------- */
+
+const projectBaseService = new BaseCrudService<IProject>(Project, [
   ...PROJECT_SEARCHABLE_FIELDS,
 ] as string[]);
 
-const createProject = async (payload: TCreateProjectPayload) => {
+/* -------------------------------------------------------------------------- */
+/*                                  3. Create                                 */
+/* -------------------------------------------------------------------------- */
+
+const createProject = async (payload: TCreateProjectPayload): Promise<TProjectDocument> => {
   const title = payload.title.trim();
 
   const existingProject = await Project.findOne({
@@ -37,39 +44,67 @@ const createProject = async (payload: TCreateProjectPayload) => {
     throw new AppError(httpStatus.CONFLICT, PROJECT_MESSAGE.ALREADY_EXISTS);
   }
 
-  const slug = generateSlug(title);
-
-  const projectPayload = {
+  const projectPayload: Partial<IProject> = {
     ...payload,
 
     title,
 
-    slug,
+    shortDescription: payload.shortDescription.trim(),
+
+    description: payload.description.trim(),
+
+    technologies: payload.technologies.map((technology) => technology.trim()),
+
+    slug: generateSlug(title),
+
+    ...(payload.githubUrl
+      ? {
+        githubUrl: payload.githubUrl.trim(),
+      }
+      : {}),
+
+    ...(payload.liveUrl
+      ? {
+        liveUrl: payload.liveUrl.trim(),
+      }
+      : {}),
+
+    ...(payload.thumbnail
+      ? {
+        thumbnail: payload.thumbnail,
+      }
+      : {}),
   };
-
-  return baseService.create(projectPayload);
+  return projectBaseService.create(projectPayload);
 };
 
-const getProjects = async (query: Record<string, unknown>) => {
-  return baseService.getAll(query);
-};
+/* -------------------------------------------------------------------------- */
+/*                                 4. Get All                                 */
+/* -------------------------------------------------------------------------- */
 
-const getProjectById = async (id: string) => {
-  return baseService.getById(id);
-};
+const getProjects = async (query: Record<string, unknown>) => projectBaseService.getAll(query);
 
-const updateProject = async (id: string, payload: TUpdateProjectPayload) => {
-  const existingProject = await Project.findById(id);
+/* -------------------------------------------------------------------------- */
+/*                                5. Get By Id                                */
+/* -------------------------------------------------------------------------- */
 
-  if (!existingProject) {
-    throw new AppError(httpStatus.NOT_FOUND, PROJECT_MESSAGE.NOT_FOUND);
-  }
+const getProjectById = async (id: string): Promise<TProjectDocument> =>
+  projectBaseService.getById(id);
+
+/* -------------------------------------------------------------------------- */
+/*                                  6. Update                                 */
+/* -------------------------------------------------------------------------- */
+
+const updateProject = async (
+  id: string,
+  payload: TUpdateProjectPayload,
+): Promise<TProjectDocument> => {
+  const existingProject = await projectBaseService.getById(id);
 
   const title = payload.title?.trim() ?? existingProject.title;
 
   const duplicateProject = await Project.findOne({
     title,
-
     _id: {
       $ne: existingProject._id,
     },
@@ -81,37 +116,80 @@ const updateProject = async (id: string, payload: TUpdateProjectPayload) => {
 
   const updatePayload: Partial<IProject> = {
     ...payload,
+
+    ...(payload.title && {
+      title,
+      slug: generateSlug(title),
+    }),
+
+    ...(payload.shortDescription && {
+      shortDescription: payload.shortDescription.trim(),
+    }),
+
+    ...(payload.description && {
+      description: payload.description.trim(),
+    }),
+
+    ...(payload.githubUrl && {
+      githubUrl: payload.githubUrl.trim(),
+    }),
+
+    ...(payload.liveUrl && {
+      liveUrl: payload.liveUrl.trim(),
+    }),
+
+    ...(payload.technologies && {
+      technologies: payload.technologies.map((technology) => technology.trim()),
+    }),
   };
 
-  if (payload.title) {
-    updatePayload.slug = generateSlug(title);
-  }
-
-  return baseService.update(id, updatePayload);
+  return projectBaseService.update(id, updatePayload);
 };
+/* -------------------------------------------------------------------------- */
+/*                                  7. Delete                                 */
+/* -------------------------------------------------------------------------- */
 
-const deleteProject = async (id: string) => {
-  return baseService.delete(id);
-};
+const deleteProject = async (id: string): Promise<TProjectDocument> =>
+  projectBaseService.delete(id);
 
-const getFeaturedProjects = async () => {
-  return Project.find({
+/* -------------------------------------------------------------------------- */
+/*                              8. Custom Queries                             */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * Get all active projects.
+ */
+const getActiveProjects = async () =>
+  Project.find({
+    isActive: true,
+  })
+    .sort({
+      featured: -1,
+      sortOrder: 1,
+      createdAt: -1,
+    })
+    .lean();
+
+/**
+ * Get featured projects.
+ */
+const getFeaturedProjects = async () =>
+  Project.find({
     featured: true,
-
     isActive: true,
   })
     .sort({
       sortOrder: 1,
-
       createdAt: -1,
     })
     .lean();
-};
 
+/**
+ * Get project by slug.
+ */
 const getProjectBySlug = async (slug: string) => {
   const result = await Project.findOne({
     slug,
-
     isActive: true,
   });
 
@@ -122,63 +200,210 @@ const getProjectBySlug = async (slug: string) => {
   return result;
 };
 
-const getProjectsByCategory = async (category: TProjectCategory) => {
-  return Project.find({
+/**
+ * Get projects by category.
+ */
+const getProjectsByCategory = async (category: TProjectCategory) =>
+  Project.find({
     category,
-
     isActive: true,
   })
     .sort({
+      featured: -1,
       sortOrder: 1,
-
       createdAt: -1,
     })
     .lean();
-};
 
-const getProjectsByTechnology = async (technology: string) => {
-  return Project.find({
+/**
+ * Get projects by status.
+ */
+const getProjectsByStatus = async (status: TProjectStatus) =>
+  Project.find({
+    status,
+    isActive: true,
+  })
+    .sort({
+      featured: -1,
+      sortOrder: 1,
+      createdAt: -1,
+    })
+    .lean();
+
+/**
+ * Get projects by technology.
+ */
+const getProjectsByTechnology = async (technology: string) =>
+  Project.find({
     technologies: {
-      $in: [technology],
+      $in: [technology.trim()],
     },
 
     isActive: true,
   })
     .sort({
+      featured: -1,
       sortOrder: 1,
-
       createdAt: -1,
     })
     .lean();
-};
 
-const getProjectsByStatus = async (status: TProjectStatus) => {
-  return Project.find({
-    status,
-
+/**
+ * Get latest projects.
+ */
+const getLatestProjects = async (limit = 6) =>
+  Project.find({
     isActive: true,
   })
     .sort({
-      sortOrder: 1,
-
       createdAt: -1,
     })
+    .limit(limit)
     .lean();
-};
-
-const getActiveProjects = async () => {
-  return Project.find({
+/**
+ * Get projects ordered for portfolio display.
+ */
+const getProjectsOrdered = async () =>
+  Project.find({
     isActive: true,
   })
     .sort({
       featured: -1,
-
       sortOrder: 1,
-
       createdAt: -1,
     })
     .lean();
+
+/**
+ * Get ongoing projects.
+ */
+const getOngoingProjects = async () =>
+  Project.find({
+    status: 'In Progress',
+    isActive: true,
+  })
+    .sort({
+      featured: -1,
+      sortOrder: 1,
+      startDate: -1,
+    })
+    .lean();
+
+/**
+ * Get completed projects.
+ */
+const getCompletedProjects = async () =>
+  Project.find({
+    status: 'Completed',
+    isActive: true,
+  })
+    .sort({
+      featured: -1,
+      endDate: -1,
+      sortOrder: 1,
+    })
+    .lean();
+
+/**
+ * Get archived projects.
+ */
+const getArchivedProjects = async () =>
+  Project.find({
+    status: 'Archived',
+    isActive: true,
+  })
+    .sort({
+      updatedAt: -1,
+    })
+    .lean();
+
+/**
+ * Get projects started after a date.
+ */
+const getProjectsByDate = async (startDate: Date) =>
+  Project.find({
+    startDate: {
+      $gte: startDate,
+    },
+
+    isActive: true,
+  })
+    .sort({
+      startDate: -1,
+    })
+    .lean();
+
+/**
+ * Get project statistics.
+ */
+const getProjectStats = async () => {
+  const [
+    total,
+    active,
+    featured,
+    completed,
+    inProgress,
+    planning,
+    archived,
+    maintenance,
+    categories,
+  ] = await Promise.all([
+    projectBaseService.count(),
+
+    projectBaseService.count({
+      isActive: true,
+    }),
+
+    projectBaseService.count({
+      featured: true,
+    }),
+
+    projectBaseService.count({
+      status: 'Completed',
+    }),
+
+    projectBaseService.count({
+      status: 'In Progress',
+    }),
+
+    projectBaseService.count({
+      status: 'Planning',
+    }),
+
+    projectBaseService.count({
+      status: 'Archived',
+    }),
+
+    projectBaseService.count({
+      status: 'Maintenance',
+    }),
+
+    Project.distinct('category'),
+  ]);
+
+  return {
+    total,
+
+    active,
+
+    featured,
+
+    completed,
+
+    inProgress,
+
+    planning,
+
+    archived,
+
+    maintenance,
+
+    categories: categories.length,
+  };
 };
+/* -------------------------------------------------------------------------- */
+/*                                  9. Export                                 */
+/* -------------------------------------------------------------------------- */
 
 export const ProjectService = {
   createProject,
@@ -191,15 +416,29 @@ export const ProjectService = {
 
   deleteProject,
 
+  getActiveProjects,
+
   getFeaturedProjects,
 
   getProjectBySlug,
 
   getProjectsByCategory,
 
-  getProjectsByTechnology,
-
   getProjectsByStatus,
 
-  getActiveProjects,
+  getProjectsByTechnology,
+
+  getLatestProjects,
+
+  getProjectsOrdered,
+
+  getOngoingProjects,
+
+  getCompletedProjects,
+
+  getArchivedProjects,
+
+  getProjectsByDate,
+
+  getProjectStats,
 };

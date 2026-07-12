@@ -1,70 +1,55 @@
-// src\modules\settings\settings.service.ts
+// src/modules/settings/settings.service.ts
 
-import httpStatus from "http-status";
+/* -------------------------------------------------------------------------- */
+/*                                   Imports                                  */
+/* -------------------------------------------------------------------------- */
 
-import AppError from "../../utils/AppError.js";
+import { BaseSingletonService } from '../../shared/base/index.js';
 
-import { SETTINGS_MESSAGE } from "./settings.constant.js";
-import { Settings } from "./settings.model.js";
+import { Settings } from './settings.model.js';
 
-import type { ISettings } from "./settings.interface.js";
+import type { ISettings, TCreateSettingsPayload, TUpdateSettingsPayload } from './settings.types.js';
 
-const createSettings = async (payload: ISettings) => {
-  const existingSettings = await Settings.findOne();
+/* -------------------------------------------------------------------------- */
+/*                           Base Singleton Service                           */
+/* -------------------------------------------------------------------------- */
 
-  if (existingSettings) {
-    throw new AppError(httpStatus.CONFLICT, SETTINGS_MESSAGE.ALREADY_EXISTS);
-  }
+const singletonService = new BaseSingletonService<ISettings>(Settings, 'Settings');
 
-  const result = await Settings.create(payload);
+/* -------------------------------------------------------------------------- */
+/*                                   Create                                   */
+/* -------------------------------------------------------------------------- */
 
-  return result;
-};
+const createSettings = async (payload: TCreateSettingsPayload) => singletonService.create(payload);
 
-const getSettings = async () => {
-  const result = await Settings.findOne();
+/* -------------------------------------------------------------------------- */
+/*                                     Get                                    */
+/* -------------------------------------------------------------------------- */
 
-  if (!result) {
-    throw new AppError(httpStatus.NOT_FOUND, SETTINGS_MESSAGE.NOT_FOUND);
-  }
+const getSettings = async () => singletonService.get();
 
-  return result;
-};
+/* -------------------------------------------------------------------------- */
+/*                                   Update                                   */
+/* -------------------------------------------------------------------------- */
 
-const updateSettings = async (payload: Partial<ISettings>) => {
-  const existingSettings = await Settings.findOne();
+const updateSettings = async (payload: TUpdateSettingsPayload) => singletonService.update(payload);
 
-  if (!existingSettings) {
-    throw new AppError(httpStatus.NOT_FOUND, SETTINGS_MESSAGE.NOT_FOUND);
-  }
+/* -------------------------------------------------------------------------- */
+/*                                   Delete                                   */
+/* -------------------------------------------------------------------------- */
 
-  const result = await Settings.findByIdAndUpdate(
-    existingSettings._id,
-    payload,
-    {
-      new: true,
-      runValidators: true,
-    },
-  );
+const deleteSettings = async () => singletonService.delete();
 
-  return result;
-};
+/* -------------------------------------------------------------------------- */
+/*                                   Export                                   */
+/* -------------------------------------------------------------------------- */
 
-const deleteSettings = async () => {
-  const existingSettings = await Settings.findOne();
-
-  if (!existingSettings) {
-    throw new AppError(httpStatus.NOT_FOUND, SETTINGS_MESSAGE.NOT_FOUND);
-  }
-
-  await Settings.findByIdAndDelete(existingSettings._id);
-
-  return null;
-};
-
-export const SettingsService = {
+export const SettingsService = Object.freeze({
   createSettings,
+
   getSettings,
+
   updateSettings,
+
   deleteSettings,
-};
+});

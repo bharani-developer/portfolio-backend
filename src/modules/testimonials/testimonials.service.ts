@@ -1,29 +1,43 @@
-// src\modules\testimonials\testimonials.service.ts
+// src/modules/testimonials/testimonials.service.ts
 
-import httpStatus from "http-status";
+/* -------------------------------------------------------------------------- */
+/*                                 1. Imports                                 */
+/* -------------------------------------------------------------------------- */
 
-import { BaseCrudService } from "../../shared/base/index.js";
+import httpStatus from 'http-status';
 
-import AppError from "../../utils/AppError.js";
+import { BaseCrudService } from '../../shared/base/index.js';
 
-import {
-  TESTIMONIAL_MESSAGE,
-  TESTIMONIAL_SEARCHABLE_FIELDS,
-} from "./testimonials.constant.js";
+import { TESTIMONIAL_MESSAGE, TESTIMONIAL_SEARCHABLE_FIELDS } from './testimonials.constant.js';
 
-import { Testimonial } from "./testimonials.model.js";
+import { Testimonial } from './testimonials.model.js';
 
 import type {
   ITestimonial,
   TCreateTestimonialPayload,
   TUpdateTestimonialPayload,
-} from "./testimonials.interface.js";
+  TTestimonialDocument,
+  TTestimonialClientType,
+  TTestimonialRating,
+} from './testimonials.types.js';
 
-const baseService = new BaseCrudService<ITestimonial>(Testimonial, [
+import { AppError } from '../../shared/utils/index.js';
+
+/* -------------------------------------------------------------------------- */
+/*                               2. Base Service                              */
+/* -------------------------------------------------------------------------- */
+
+const testimonialBaseService = new BaseCrudService<ITestimonial>(Testimonial, [
   ...TESTIMONIAL_SEARCHABLE_FIELDS,
-]);
+] as string[]);
 
-const createTestimonial = async (payload: TCreateTestimonialPayload) => {
+/* -------------------------------------------------------------------------- */
+/*                                  3. Create                                 */
+/* -------------------------------------------------------------------------- */
+
+const createTestimonial = async (
+  payload: TCreateTestimonialPayload,
+): Promise<TTestimonialDocument> => {
   const clientName = payload.clientName.trim();
 
   const review = payload.review.trim();
@@ -37,33 +51,66 @@ const createTestimonial = async (payload: TCreateTestimonialPayload) => {
     throw new AppError(httpStatus.CONFLICT, TESTIMONIAL_MESSAGE.ALREADY_EXISTS);
   }
 
-  return baseService.create({
+  const testimonialPayload: Partial<ITestimonial> = {
     ...payload,
+
     clientName,
+
     review,
-  });
+
+    ...(payload.clientPosition
+      ? {
+        clientPosition: payload.clientPosition.trim(),
+      }
+      : {}),
+
+    ...(payload.clientCompany
+      ? {
+        clientCompany: payload.clientCompany.trim(),
+      }
+      : {}),
+
+    ...(payload.clientWebsite
+      ? {
+        clientWebsite: payload.clientWebsite.trim(),
+      }
+      : {}),
+
+    ...(payload.projectName
+      ? {
+        projectName: payload.projectName.trim(),
+      }
+      : {}),
+  };
+
+  return testimonialBaseService.create(testimonialPayload);
 };
 
-const getTestimonials = async (query: Record<string, unknown>) => {
-  return baseService.getAll(query);
-};
+/* -------------------------------------------------------------------------- */
+/*                                 4. Get All                                 */
+/* -------------------------------------------------------------------------- */
 
-const getTestimonialById = async (id: string) => {
-  return baseService.getById(id);
-};
+const getTestimonials = async (query: Record<string, unknown>) =>
+  testimonialBaseService.getAll(query);
+
+/* -------------------------------------------------------------------------- */
+/*                                5. Get By Id                                */
+/* -------------------------------------------------------------------------- */
+
+const getTestimonialById = async (id: string): Promise<TTestimonialDocument> =>
+  testimonialBaseService.getById(id);
+
+/* -------------------------------------------------------------------------- */
+/*                                  6. Update                                 */
+/* -------------------------------------------------------------------------- */
 
 const updateTestimonial = async (
   id: string,
   payload: TUpdateTestimonialPayload,
-) => {
-  const existingTestimonial = await Testimonial.findById(id);
+): Promise<TTestimonialDocument> => {
+  const existingTestimonial = await testimonialBaseService.getById(id);
 
-  if (!existingTestimonial) {
-    throw new AppError(httpStatus.NOT_FOUND, TESTIMONIAL_MESSAGE.NOT_FOUND);
-  }
-
-  const clientName =
-    payload.clientName?.trim() ?? existingTestimonial.clientName;
+  const clientName = payload.clientName?.trim() ?? existingTestimonial.clientName;
 
   const review = payload.review?.trim() ?? existingTestimonial.review;
 
@@ -79,77 +126,158 @@ const updateTestimonial = async (
     throw new AppError(httpStatus.CONFLICT, TESTIMONIAL_MESSAGE.ALREADY_EXISTS);
   }
 
-  return baseService.update(id, {
+  const updatePayload: Partial<ITestimonial> = {
     ...payload,
-    clientName,
-    review,
-  });
-};
 
-const deleteTestimonial = async (id: string) => {
-  return baseService.delete(id);
-};
+    ...(payload.clientName && {
+      clientName,
+    }),
 
-const getActiveTestimonials = async () => {
-  return Testimonial.find({
+    ...(payload.review && {
+      review,
+    }),
+
+    ...(payload.clientPosition && {
+      clientPosition: payload.clientPosition.trim(),
+    }),
+
+    ...(payload.clientCompany && {
+      clientCompany: payload.clientCompany.trim(),
+    }),
+
+    ...(payload.clientWebsite && {
+      clientWebsite: payload.clientWebsite.trim(),
+    }),
+
+    ...(payload.projectName && {
+      projectName: payload.projectName.trim(),
+    }),
+  };
+
+  return testimonialBaseService.update(id, updatePayload);
+};
+/* -------------------------------------------------------------------------- */
+/*                                  7. Delete                                 */
+/* -------------------------------------------------------------------------- */
+
+const deleteTestimonial = async (id: string): Promise<TTestimonialDocument> =>
+  testimonialBaseService.delete(id);
+
+/* -------------------------------------------------------------------------- */
+/*                              8. Custom Queries                             */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * Get all active testimonials.
+ */
+const getActiveTestimonials = async () =>
+  Testimonial.find({
     isActive: true,
   })
     .sort({
+      isFeatured: -1,
       sortOrder: 1,
       createdAt: -1,
     })
     .lean();
-};
 
-const getFeaturedTestimonials = async () => {
-  return Testimonial.find({
-    isFeatured: true,
+/**
+ * Get featured testimonials.
+ */
+const getFeaturedTestimonials = async () =>
+  Testimonial.find({
     isActive: true,
+    isFeatured: true,
   })
     .sort({
       sortOrder: 1,
       rating: -1,
+      createdAt: -1,
     })
     .lean();
-};
 
-const getTestimonialsByRating = async (rating: ITestimonial["rating"]) => {
-  return Testimonial.find({
+/**
+ * Get testimonials by rating.
+ */
+const getTestimonialsByRating = async (rating: TTestimonialRating) =>
+  Testimonial.find({
     rating,
     isActive: true,
   })
     .sort({
+      isFeatured: -1,
       sortOrder: 1,
+      createdAt: -1,
     })
     .lean();
-};
 
-const getTestimonialsByClientType = async (
-  clientType: ITestimonial["clientType"],
-) => {
-  return Testimonial.find({
+/**
+ * Get testimonials by client type.
+ */
+const getTestimonialsByClientType = async (clientType: TTestimonialClientType) =>
+  Testimonial.find({
     clientType,
     isActive: true,
   })
     .sort({
+      isFeatured: -1,
       sortOrder: 1,
+      createdAt: -1,
     })
     .lean();
-};
 
-const getTestimonialsByProject = async (projectName: string) => {
-  return Testimonial.find({
-    projectName,
+/**
+ * Get testimonials by project.
+ */
+const getTestimonialsByProject = async (projectName: string) =>
+  Testimonial.find({
+    projectName: projectName.trim(),
     isActive: true,
   })
     .sort({
+      isFeatured: -1,
       sortOrder: 1,
+      createdAt: -1,
     })
     .lean();
-};
 
+/**
+ * Get testimonials by company.
+ */
+const getTestimonialsByCompany = async (clientCompany: string) =>
+  Testimonial.find({
+    clientCompany: clientCompany.trim(),
+    isActive: true,
+  })
+    .sort({
+      isFeatured: -1,
+      sortOrder: 1,
+      createdAt: -1,
+    })
+    .lean();
+/**
+ * Get testimonials by client name.
+ */
+const getTestimonialsByClient = async (clientName: string) =>
+  Testimonial.find({
+    clientName: clientName.trim(),
+    isActive: true,
+  })
+    .sort({
+      isFeatured: -1,
+      sortOrder: 1,
+      createdAt: -1,
+    })
+    .lean();
+
+/**
+ * Get average testimonial rating.
+ */
 const getAverageRating = async () => {
-  const result = await Testimonial.aggregate([
+  const [result] = await Testimonial.aggregate<{
+    averageRating: number;
+    totalTestimonials: number;
+  }>([
     {
       $match: {
         isActive: true,
@@ -158,23 +286,71 @@ const getAverageRating = async () => {
     {
       $group: {
         _id: null,
+
         averageRating: {
-          $avg: "$rating",
+          $avg: '$rating',
         },
+
         totalTestimonials: {
           $sum: 1,
         },
       },
     },
+    {
+      $project: {
+        _id: 0,
+
+        averageRating: {
+          $round: ['$averageRating', 2],
+        },
+
+        totalTestimonials: 1,
+      },
+    },
   ]);
 
   return (
-    result[0] ?? {
+    result ?? {
       averageRating: 0,
       totalTestimonials: 0,
     }
   );
 };
+
+/**
+ * Get testimonial statistics.
+ */
+const getTestimonialStats = async () => {
+  const [total, active, featured, averageRating] = await Promise.all([
+    testimonialBaseService.count(),
+
+    testimonialBaseService.count({
+      isActive: true,
+    }),
+
+    testimonialBaseService.count({
+      isFeatured: true,
+      isActive: true,
+    }),
+
+    getAverageRating(),
+  ]);
+
+  return {
+    total,
+
+    active,
+
+    featured,
+
+    averageRating: averageRating.averageRating,
+
+    totalRatings: averageRating.totalTestimonials,
+  };
+};
+/* -------------------------------------------------------------------------- */
+/*                                  9. Export                                 */
+/* -------------------------------------------------------------------------- */
 
 export const TestimonialService = {
   createTestimonial,
@@ -197,5 +373,11 @@ export const TestimonialService = {
 
   getTestimonialsByProject,
 
+  getTestimonialsByCompany,
+
+  getTestimonialsByClient,
+
   getAverageRating,
+
+  getTestimonialStats,
 };

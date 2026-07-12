@@ -1,9 +1,31 @@
-// src\constants\index.ts
+// src/constants/index.ts
 
-export { MESSAGE } from "./message.constant.js";
+/**
+ * Application constants.
+ *
+ * Centralized exports for all shared constants used throughout
+ * the application.
+ *
+ * Responsibilities:
+ * - Response messages
+ * - User roles
+ * - HTTP status codes
+ */
 
-export { ROLE, ROLES } from "./role.constant.js";
+/* -------------------------------------------------------------------------- */
+/*                             Response Messages                              */
+/* -------------------------------------------------------------------------- */
 
-export type { TRole } from "./role.constant.js";
+export * from './message.constants.js';
 
-export { default as httpStatus } from "http-status";
+/* -------------------------------------------------------------------------- */
+/*                                 User Roles                                 */
+/* -------------------------------------------------------------------------- */
+
+export * from './role.constants.js';
+
+/* -------------------------------------------------------------------------- */
+/*                              HTTP Status Codes                             */
+/* -------------------------------------------------------------------------- */
+
+export type * from './status.constants.js';

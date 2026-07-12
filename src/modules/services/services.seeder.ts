@@ -1,34 +1,33 @@
 // src/modules/services/services.seeder.ts
 
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
-import { connectDatabase } from "../../config/database.js";
+import { connectDatabase } from '../../configs/database.config.js';
 
-import { generateSlug } from "../../shared/slug/index.js";
-
-import { Service } from "./services.model.js";
+import { Service } from './services.model.js';
+import { generateSlug } from '../../shared/utils/index.js';
 
 export const seedServices = async (): Promise<void> => {
   const totalServices = await Service.countDocuments();
 
   if (totalServices > 0) {
-    console.info("Services already seeded.");
+    console.info('Services already seeded.');
 
     return;
   }
 
   await Service.insertMany([
     {
-      title: "Web Development",
+      title: 'Web Development',
 
-      slug: generateSlug("Web Development"),
+      slug: generateSlug('Web Development'),
 
-      shortDescription: "Modern and scalable web applications.",
+      shortDescription: 'Modern and scalable web applications.',
 
       description:
-        "Building responsive, scalable, and high-performance web applications using React, TypeScript, Node.js, Express.js, Laravel, MongoDB, and MySQL.",
+        'Building responsive, scalable, and high-performance web applications using React, TypeScript, Node.js, Express.js, Laravel, MongoDB, and MySQL.',
 
-      icon: "code",
+      icon: 'code',
 
       sortOrder: 1,
 
@@ -36,16 +35,16 @@ export const seedServices = async (): Promise<void> => {
     },
 
     {
-      title: "Mobile App Development",
+      title: 'Mobile App Development',
 
-      slug: generateSlug("Mobile App Development"),
+      slug: generateSlug('Mobile App Development'),
 
-      shortDescription: "Cross-platform mobile applications.",
+      shortDescription: 'Cross-platform mobile applications.',
 
       description:
-        "Developing Android and iOS applications using Flutter with clean architecture, Firebase integration, Google Maps, payment gateways, and modern development practices.",
+        'Developing Android and iOS applications using Flutter with clean architecture, Firebase integration, Google Maps, payment gateways, and modern development practices.',
 
-      icon: "smartphone",
+      icon: 'smartphone',
 
       sortOrder: 2,
 
@@ -53,16 +52,16 @@ export const seedServices = async (): Promise<void> => {
     },
 
     {
-      title: "Backend Development",
+      title: 'Backend Development',
 
-      slug: generateSlug("Backend Development"),
+      slug: generateSlug('Backend Development'),
 
-      shortDescription: "Robust APIs and server-side solutions.",
+      shortDescription: 'Robust APIs and server-side solutions.',
 
       description:
-        "Designing secure, scalable, and maintainable REST APIs using Node.js, Express.js, Laravel, TypeScript, MongoDB, MySQL, JWT Authentication, and third-party integrations.",
+        'Designing secure, scalable, and maintainable REST APIs using Node.js, Express.js, Laravel, TypeScript, MongoDB, MySQL, JWT Authentication, and third-party integrations.',
 
-      icon: "server",
+      icon: 'server',
 
       sortOrder: 3,
 
@@ -70,16 +69,16 @@ export const seedServices = async (): Promise<void> => {
     },
 
     {
-      title: "Database Design",
+      title: 'Database Design',
 
-      slug: generateSlug("Database Design"),
+      slug: generateSlug('Database Design'),
 
-      shortDescription: "Efficient database architecture.",
+      shortDescription: 'Efficient database architecture.',
 
       description:
-        "Designing optimized MySQL and MongoDB database structures with proper indexing, validation, migrations, relationships, and performance tuning.",
+        'Designing optimized MySQL and MongoDB database structures with proper indexing, validation, migrations, relationships, and performance tuning.',
 
-      icon: "database",
+      icon: 'database',
 
       sortOrder: 4,
 
@@ -87,7 +86,7 @@ export const seedServices = async (): Promise<void> => {
     },
   ]);
 
-  console.info("Services seeded successfully.");
+  console.info('Services seeded successfully.');
 };
 
 export const runServicesSeeder = async (standalone = false): Promise<void> => {
@@ -98,9 +97,9 @@ export const runServicesSeeder = async (standalone = false): Promise<void> => {
 
     await seedServices();
 
-    console.info("Services seeding completed.");
+    console.info('Services seeding completed.');
   } catch (error) {
-    console.error("Failed to seed services.", error);
+    console.error('Failed to seed services.', error);
 
     throw error;
   } finally {
@@ -110,7 +109,7 @@ export const runServicesSeeder = async (standalone = false): Promise<void> => {
   }
 };
 
-if (process.argv[1]?.includes("services.seeder")) {
+if (process.argv[1]?.includes('services.seeder')) {
   void runServicesSeeder(true);
 }
 

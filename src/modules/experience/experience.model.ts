@@ -1,16 +1,31 @@
 // src/modules/experience/experience.model.ts
 
-import { model, Schema } from "mongoose";
+/* -------------------------------------------------------------------------- */
+/*                                 1. Imports                                 */
+/* -------------------------------------------------------------------------- */
 
-import { imageSchema } from "../../shared/schemas/image.schema.js";
+import { model, Schema } from 'mongoose';
+
+import { imageSchema } from '../../shared/schemas/index.js';
 
 import {
   EMPLOYMENT_TYPES,
   EXPERIENCE_DEFAULT,
+  EXPERIENCE_VALIDATION,
   WORK_MODES,
-} from "./experience.constant.js";
+} from './experience.constant.js';
 
-import type { IExperience, IExperienceModel } from "./experience.interface.js";
+import type { IExperience, IExperienceModel, TExperienceDocument } from './experience.types.js';
+
+/* -------------------------------------------------------------------------- */
+/*                               2. Sub Schemas                               */
+/* -------------------------------------------------------------------------- */
+
+// No sub schemas for this module.
+
+/* -------------------------------------------------------------------------- */
+/*                               3. Main Schema                               */
+/* -------------------------------------------------------------------------- */
 
 const experienceSchema = new Schema<IExperience, IExperienceModel>(
   {
@@ -18,7 +33,8 @@ const experienceSchema = new Schema<IExperience, IExperienceModel>(
       type: String,
       required: true,
       trim: true,
-      maxlength: 150,
+      minlength: EXPERIENCE_VALIDATION.COMPANY.MIN_LENGTH,
+      maxlength: EXPERIENCE_VALIDATION.COMPANY.MAX_LENGTH,
     },
 
     slug: {
@@ -27,6 +43,7 @@ const experienceSchema = new Schema<IExperience, IExperienceModel>(
       unique: true,
       trim: true,
       lowercase: true,
+      maxlength: EXPERIENCE_VALIDATION.COMPANY.MAX_LENGTH,
     },
 
     companyLogo: {
@@ -37,7 +54,8 @@ const experienceSchema = new Schema<IExperience, IExperienceModel>(
       type: String,
       required: true,
       trim: true,
-      maxlength: 150,
+      minlength: EXPERIENCE_VALIDATION.POSITION.MIN_LENGTH,
+      maxlength: EXPERIENCE_VALIDATION.POSITION.MAX_LENGTH,
     },
 
     employmentType: {
@@ -56,7 +74,8 @@ const experienceSchema = new Schema<IExperience, IExperienceModel>(
       type: String,
       required: true,
       trim: true,
-      maxlength: 150,
+      minlength: EXPERIENCE_VALIDATION.LOCATION.MIN_LENGTH,
+      maxlength: EXPERIENCE_VALIDATION.LOCATION.MAX_LENGTH,
     },
 
     startDate: {
@@ -71,7 +90,6 @@ const experienceSchema = new Schema<IExperience, IExperienceModel>(
 
     isCurrent: {
       type: Boolean,
-      required: true,
       default: EXPERIENCE_DEFAULT.IS_CURRENT,
     },
 
@@ -79,70 +97,217 @@ const experienceSchema = new Schema<IExperience, IExperienceModel>(
       type: String,
       required: true,
       trim: true,
-      maxlength: 2000,
+      minlength: EXPERIENCE_VALIDATION.SUMMARY.MIN_LENGTH,
+      maxlength: EXPERIENCE_VALIDATION.SUMMARY.MAX_LENGTH,
     },
 
     responsibilities: {
       type: [String],
+      default: [],
 
-      required: true,
+      validate: [
+        {
+          validator(responsibilities: string[]) {
+            return (
+              responsibilities.length > 0 &&
+              responsibilities.length <= EXPERIENCE_VALIDATION.RESPONSIBILITIES.MAX_COUNT
+            );
+          },
 
-      validate: {
-        validator(value: string[]): boolean {
-          return Array.isArray(value) && value.length > 0;
+          message: 'Responsibilities must contain between 1 and 50 items.',
         },
 
-        message: "At least one responsibility is required",
-      },
+        {
+          validator(responsibilities: string[]) {
+            return responsibilities.every(
+              (responsibility) =>
+                responsibility.trim().length > 0 &&
+                responsibility.length <= EXPERIENCE_VALIDATION.RESPONSIBILITIES.MAX_LENGTH,
+            );
+          },
+
+          message: 'Invalid responsibility.',
+        },
+
+        {
+          validator(responsibilities: string[]) {
+            return new Set(responsibilities).size === responsibilities.length;
+          },
+
+          message: 'Duplicate responsibilities are not allowed.',
+        },
+      ],
     },
 
     technologies: {
       type: [String],
+      default: [],
 
-      required: true,
+      validate: [
+        {
+          validator(technologies: string[]) {
+            return (
+              technologies.length > 0 &&
+              technologies.length <= EXPERIENCE_VALIDATION.TECHNOLOGIES.MAX_COUNT
+            );
+          },
 
-      validate: {
-        validator(value: string[]): boolean {
-          return Array.isArray(value) && value.length > 0;
+          message: 'Technologies must contain between 1 and 50 items.',
         },
 
-        message: "At least one technology is required",
-      },
-    },
+        {
+          validator(technologies: string[]) {
+            return technologies.every(
+              (technology) =>
+                technology.trim().length > 0 &&
+                technology.length <= EXPERIENCE_VALIDATION.TECHNOLOGIES.MAX_LENGTH,
+            );
+          },
 
+          message: 'Invalid technology.',
+        },
+
+        {
+          validator(technologies: string[]) {
+            return new Set(technologies).size === technologies.length;
+          },
+
+          message: 'Duplicate technologies are not allowed.',
+        },
+      ],
+    },
     companyWebsite: {
       type: String,
       trim: true,
-      maxlength: 500,
+      maxlength: EXPERIENCE_VALIDATION.COMPANY_WEBSITE.MAX_LENGTH,
     },
 
     sortOrder: {
       type: Number,
-      required: true,
-      min: 0,
       default: EXPERIENCE_DEFAULT.SORT_ORDER,
+      min: EXPERIENCE_VALIDATION.SORT_ORDER.MIN,
+      max: EXPERIENCE_VALIDATION.SORT_ORDER.MAX,
     },
 
     isActive: {
       type: Boolean,
-      required: true,
       default: EXPERIENCE_DEFAULT.IS_ACTIVE,
     },
   },
   {
     timestamps: true,
     versionKey: false,
+
+    toJSON: {
+      virtuals: true,
+    },
+
+    toObject: {
+      virtuals: true,
+    },
   },
 );
+/* -------------------------------------------------------------------------- */
+/*                              4. Query Indexes                              */
+/* -------------------------------------------------------------------------- */
 
 /**
- * ============================================================================
- * Indexes
- * ============================================================================
+ * Company lookup.
  */
+experienceSchema.index({
+  company: 1,
+});
 
 /**
- * Active experiences ordered for portfolio display
+ * Position lookup.
+ */
+experienceSchema.index({
+  position: 1,
+});
+
+/**
+ * Employment type filtering.
+ */
+experienceSchema.index({
+  employmentType: 1,
+});
+
+/**
+ * Work mode filtering.
+ */
+experienceSchema.index({
+  workMode: 1,
+});
+
+/**
+ * Location filtering.
+ */
+experienceSchema.index({
+  location: 1,
+});
+
+/**
+ * Current employment filtering.
+ */
+experienceSchema.index({
+  isCurrent: 1,
+});
+
+/**
+ * Active experiences.
+ */
+experienceSchema.index({
+  isActive: 1,
+});
+
+/**
+ * Technologies filtering.
+ */
+experienceSchema.index({
+  technologies: 1,
+});
+
+/**
+ * Portfolio ordering.
+ */
+experienceSchema.index({
+  sortOrder: 1,
+});
+
+/**
+ * Recent experiences.
+ */
+experienceSchema.index({
+  startDate: -1,
+});
+
+/**
+ * End date sorting.
+ */
+experienceSchema.index({
+  endDate: -1,
+});
+
+/**
+ * Recently created.
+ */
+experienceSchema.index({
+  createdAt: -1,
+});
+
+/**
+ * Recently updated.
+ */
+experienceSchema.index({
+  updatedAt: -1,
+});
+
+/* -------------------------------------------------------------------------- */
+/*                            5. Compound Indexes                             */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * Portfolio display ordering.
  */
 experienceSchema.index({
   isActive: 1,
@@ -150,7 +315,7 @@ experienceSchema.index({
 });
 
 /**
- * Company filtering
+ * Company listing.
  */
 experienceSchema.index({
   company: 1,
@@ -158,7 +323,7 @@ experienceSchema.index({
 });
 
 /**
- * Position filtering
+ * Position listing.
  */
 experienceSchema.index({
   position: 1,
@@ -166,7 +331,7 @@ experienceSchema.index({
 });
 
 /**
- * Employment type filtering
+ * Employment type listing.
  */
 experienceSchema.index({
   employmentType: 1,
@@ -174,7 +339,7 @@ experienceSchema.index({
 });
 
 /**
- * Work mode filtering
+ * Work mode listing.
  */
 experienceSchema.index({
   workMode: 1,
@@ -182,30 +347,7 @@ experienceSchema.index({
 });
 
 /**
- * Location filtering
- */
-experienceSchema.index({
-  location: 1,
-  isActive: 1,
-});
-
-/**
- * Technology filtering
- */
-experienceSchema.index({
-  technologies: 1,
-});
-
-/**
- * Date sorting
- */
-experienceSchema.index({
-  startDate: -1,
-  endDate: -1,
-});
-
-/**
- * Current experiences first
+ * Current employment.
  */
 experienceSchema.index({
   isCurrent: 1,
@@ -213,23 +355,117 @@ experienceSchema.index({
 });
 
 /**
- * Full-text search
+ * Employment timeline.
  */
 experienceSchema.index({
-  company: "text",
-  position: "text",
-  summary: "text",
-  technologies: "text",
-  location: "text",
+  startDate: -1,
+  endDate: -1,
 });
 
 /**
- * ============================================================================
- * Model
- * ============================================================================
+ * Company timeline.
  */
+experienceSchema.index({
+  company: 1,
+  startDate: -1,
+});
 
-export const Experience = model<IExperience, IExperienceModel>(
-  "Experience",
-  experienceSchema,
-);
+/**
+ * Technology search.
+ */
+experienceSchema.index({
+  technologies: 1,
+  isActive: 1,
+});
+
+/* -------------------------------------------------------------------------- */
+/*                           6. Full Text Search                              */
+/* -------------------------------------------------------------------------- */
+
+experienceSchema.index({
+  company: 'text',
+  position: 'text',
+  summary: 'text',
+  responsibilities: 'text',
+  technologies: 'text',
+  location: 'text',
+});
+/* -------------------------------------------------------------------------- */
+/*                               7. Middleware                                */
+/* -------------------------------------------------------------------------- */
+experienceSchema.pre('validate', function (this: TExperienceDocument) {
+  if (this.isCurrent) {
+    this.endDate = null;
+    return;
+  }
+
+  if (!this.endDate) {
+    this.invalidate('endDate', 'End date is required when the experience is not current.');
+
+    return;
+  }
+
+  if (this.endDate < this.startDate) {
+    this.invalidate('endDate', 'End date must be greater than or equal to the start date.');
+  }
+});
+/**
+ * Normalize experience data before saving.
+ */
+experienceSchema.pre('save', function (this: TExperienceDocument) {
+  if (this.isModified('responsibilities')) {
+    this.responsibilities = [
+      ...new Set(this.responsibilities.map((responsibility: string) => responsibility.trim())),
+    ];
+  }
+
+  if (this.isModified('technologies')) {
+    this.technologies = [
+      ...new Set(this.technologies.map((technology: string) => technology.trim())),
+    ];
+  }
+});
+
+/* -------------------------------------------------------------------------- */
+/*                                8. Virtuals                                 */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * Whether this experience is currently active.
+ */
+experienceSchema.virtual('isOngoing').get(function (this: TExperienceDocument) {
+  return this.isCurrent;
+});
+
+/**
+ * Total responsibilities.
+ */
+experienceSchema.virtual('responsibilityCount').get(function (this: TExperienceDocument) {
+  return this.responsibilities.length;
+});
+
+/**
+ * Total technologies.
+ */
+experienceSchema.virtual('technologyCount').get(function (this: TExperienceDocument) {
+  return this.technologies.length;
+});
+
+/**
+ * Total experience duration in months.
+ */
+experienceSchema.virtual('durationInMonths').get(function (this: TExperienceDocument) {
+  const endDate = this.endDate ?? new Date();
+
+  const months =
+    (endDate.getFullYear() - this.startDate.getFullYear()) * 12 +
+    (endDate.getMonth() - this.startDate.getMonth());
+
+  return Math.max(months, 0);
+});
+
+/* -------------------------------------------------------------------------- */
+/*                               9. Model Export                              */
+/* -------------------------------------------------------------------------- */
+
+export const Experience = model<IExperience, IExperienceModel>('Experience', experienceSchema);

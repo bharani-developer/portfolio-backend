@@ -1,18 +1,43 @@
-// src\modules\education\education.constant.ts
+// src/modules/education/education.constant.ts
+
+/**
+ * Education module constants.
+ *
+ * Structure:
+ * 1. Messages
+ * 2. Default values
+ * 3. Status
+ * 4. Categories
+ * 5. Priorities
+ * 6. Types
+ * 7. Searchable fields
+ * 8. Filterable fields
+ * 9. Sort fields
+ * 10. Select fields
+ * 11. Validation
+ */
+
+/* -------------------------------------------------------------------------- */
+/*                                  Messages                                  */
+/* -------------------------------------------------------------------------- */
 
 export const EDUCATION_MESSAGE = {
-  CREATED: "Education created successfully",
+  CREATED: 'Education created successfully',
 
-  RETRIEVED: "Education retrieved successfully",
+  RETRIEVED: 'Education retrieved successfully',
 
-  UPDATED: "Education updated successfully",
+  UPDATED: 'Education updated successfully',
 
-  DELETED: "Education deleted successfully",
+  DELETED: 'Education deleted successfully',
 
-  NOT_FOUND: "Education not found",
+  NOT_FOUND: 'Education not found',
 
-  ALREADY_EXISTS: "Education already exists",
+  ALREADY_EXISTS: 'Education already exists',
 } as const;
+
+/* -------------------------------------------------------------------------- */
+/*                              Default Values                                */
+/* -------------------------------------------------------------------------- */
 
 export const EDUCATION_DEFAULT = {
   IS_ACTIVE: true,
@@ -24,90 +49,235 @@ export const EDUCATION_DEFAULT = {
   CGPA_SCALE: 10,
 } as const;
 
+/* -------------------------------------------------------------------------- */
+/*                                   Status                                   */
+/* -------------------------------------------------------------------------- */
+
+// Not applicable for this module.
+
+/* -------------------------------------------------------------------------- */
+/*                                 Categories                                 */
+/* -------------------------------------------------------------------------- */
+
 export const EDUCATION_LEVEL = {
-  DOCTORATE: "Doctorate",
+  DOCTORATE: 'Doctorate',
 
-  MASTERS: "Masters",
+  MASTERS: 'Masters',
 
-  BACHELORS: "Bachelors",
+  BACHELORS: 'Bachelors',
 
-  DIPLOMA: "Diploma",
+  DIPLOMA: 'Diploma',
 
-  HIGHER_SECONDARY: "Higher Secondary",
+  HIGHER_SECONDARY: 'Higher Secondary',
 
-  SECONDARY: "Secondary",
+  SECONDARY: 'Secondary',
 
-  CERTIFICATION: "Certification",
+  CERTIFICATION: 'Certification',
 
-  OTHER: "Other",
+  OTHER: 'Other',
 } as const;
 
-export const EDUCATION_LEVELS = Object.values(EDUCATION_LEVEL);
+export const EDUCATION_LEVELS = Object.values(EDUCATION_LEVEL) as [string, ...string[]];
+
+export const EDUCATION_CATEGORIES = EDUCATION_LEVELS;
+/* -------------------------------------------------------------------------- */
+/*                                  Priorities                                */
+/* -------------------------------------------------------------------------- */
+
+// Not applicable for this module.
+
+/* -------------------------------------------------------------------------- */
+/*                                    Types                                   */
+/* -------------------------------------------------------------------------- */
 
 export const EDUCATION_TYPE = {
-  FULL_TIME: "Full Time",
+  FULL_TIME: 'Full Time',
 
-  PART_TIME: "Part Time",
+  PART_TIME: 'Part Time',
 
-  DISTANCE: "Distance",
+  DISTANCE: 'Distance',
 
-  ONLINE: "Online",
+  ONLINE: 'Online',
 } as const;
 
 export const EDUCATION_TYPES = Object.values(EDUCATION_TYPE);
 
+/* -------------------------------------------------------------------------- */
+/*                              Grade Types                                   */
+/* -------------------------------------------------------------------------- */
+
 export const GRADE_TYPE = {
-  CGPA: "CGPA",
+  NONE: 'None',
 
-  GPA: "GPA",
+  CGPA: 'CGPA',
 
-  PERCENTAGE: "Percentage",
+  GPA: 'GPA',
 
-  DIVISION: "Division",
+  PERCENTAGE: 'Percentage',
 
-  PASS: "Pass",
+  DIVISION: 'Division',
+
+  PASS: 'Pass',
 } as const;
 
-export const GRADE_TYPES = Object.values(GRADE_TYPE);
+export const GRADE_TYPES = Object.values(GRADE_TYPE) as [string, ...string[]];
+
+/* -------------------------------------------------------------------------- */
+/*                              Searchable Fields                             */
+/* -------------------------------------------------------------------------- */
 
 export const EDUCATION_SEARCHABLE_FIELDS = [
-  "institution",
+  'institution',
 
-  "degree",
+  'degree',
 
-  "fieldOfStudy",
+  'fieldOfStudy',
 
-  "location",
+  'location',
 
-  "description",
+  'description',
 
-  "skills",
+  'skills',
 ] as const;
+
+/* -------------------------------------------------------------------------- */
+/*                              Filterable Fields                             */
+/* -------------------------------------------------------------------------- */
 
 export const EDUCATION_FILTERABLE_FIELDS = [
-  "educationLevel",
+  'educationLevel',
 
-  "educationType",
+  'educationType',
 
-  "gradeType",
+  'gradeType',
 
-  "isCurrent",
+  'isCurrent',
 
-  "isActive",
+  'isActive',
 ] as const;
+
+/* -------------------------------------------------------------------------- */
+/*                                 Sort Fields                                */
+/* -------------------------------------------------------------------------- */
 
 export const EDUCATION_SORT_FIELDS = [
-  "institution",
+  'institution',
 
-  "degree",
+  'degree',
 
-  "startDate",
+  'startDate',
 
-  "endDate",
+  'endDate',
 
-  "sortOrder",
+  'sortOrder',
 
-  "createdAt",
+  'createdAt',
 
-  "updatedAt",
+  'updatedAt',
 ] as const;
+
+/* -------------------------------------------------------------------------- */
+/*                                Select Fields                               */
+/* -------------------------------------------------------------------------- */
+
+export const EDUCATION_SELECT_FIELDS = [
+  'institution',
+
+  'degree',
+
+  'fieldOfStudy',
+
+  'educationLevel',
+
+  'educationType',
+
+  'grade',
+
+  'gradeType',
+
+  'cgpaScale',
+
+  'location',
+
+  'description',
+
+  'skills',
+
+  'startDate',
+
+  'endDate',
+
+  'isCurrent',
+
+  'image',
+
+  'sortOrder',
+
+  'isActive',
+
+  'createdAt',
+
+  'updatedAt',
+] as const;
+
+/* -------------------------------------------------------------------------- */
+/*                                Validation                                  */
+/* -------------------------------------------------------------------------- */
+export const EDUCATION_VALIDATION = {
+  INSTITUTION: {
+    MIN_LENGTH: 2,
+    MAX_LENGTH: 200,
+  },
+
+  DEGREE: {
+    MIN_LENGTH: 2,
+    MAX_LENGTH: 150,
+  },
+
+  FIELD_OF_STUDY: {
+    MIN_LENGTH: 2,
+    MAX_LENGTH: 150,
+  },
+
+  LOCATION: {
+    MIN_LENGTH: 2,
+    MAX_LENGTH: 150,
+  },
+
+  DESCRIPTION: {
+    MAX_LENGTH: 3000,
+  },
+
+  GRADE: {
+    MAX_LENGTH: 50,
+  },
+
+  CGPA_SCALE: {
+    MIN: 4,
+    MAX: 10,
+  },
+
+  ACHIEVEMENTS: {
+    MAX_COUNT: 100,
+    MAX_LENGTH: 200,
+  },
+
+  SKILLS: {
+    MAX_COUNT: 50,
+    MAX_LENGTH: 100,
+  },
+
+  INSTITUTION_WEBSITE: {
+    MAX_LENGTH: 500,
+  },
+
+  IMAGE: {
+    URL_MAX_LENGTH: 500,
+    PUBLIC_ID_MAX_LENGTH: 255,
+  },
+
+  SORT_ORDER: {
+    MIN: 0,
+    MAX: 9999,
+  },
+} as const;

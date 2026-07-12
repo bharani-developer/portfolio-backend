@@ -1,118 +1,194 @@
 // src/modules/blogs/blogs.service.ts
 
-import httpStatus from "http-status";
+/* -------------------------------------------------------------------------- */
+/*                                 1. Imports                                 */
+/* -------------------------------------------------------------------------- */
 
-import { BaseCrudService } from "../../shared/base/index.js";
-import { generateSlug } from "../../shared/slug/index.js";
+import httpStatus from 'http-status';
 
-import AppError from "../../utils/AppError.js";
+import { BaseCrudService } from '../../shared/base/index.js';
 
 import {
+  BLOG_CATEGORIES,
   BLOG_MESSAGE,
   BLOG_SEARCHABLE_FIELDS,
   BLOG_STATUS,
-} from "./blogs.constant.js";
+} from './blogs.constant.js';
 
-import { Blog } from "./blogs.model.js";
+import { Blog } from './blogs.model.js';
 
-import type {
-  IBlog,
-  TCreateBlogPayload,
-  TUpdateBlogPayload,
-} from "./blogs.interface.js";
+import type { IBlog, TBlogCategory, TCreateBlogPayload, TUpdateBlogPayload } from './blogs.types.js';
 
-const baseService = new BaseCrudService<IBlog>(Blog, [
-  ...BLOG_SEARCHABLE_FIELDS,
-]);
+import { AppError, generateSlug } from '../../shared/utils/index.js';
 
+/* -------------------------------------------------------------------------- */
+/*                               2. Base Service                              */
+/* -------------------------------------------------------------------------- */
+
+const blogBaseService = new BaseCrudService<IBlog>(Blog, [...BLOG_SEARCHABLE_FIELDS]);
+
+/* -------------------------------------------------------------------------- */
+/*                                 3. Create                                  */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * Create a new blog.
+ */
 const createBlog = async (payload: TCreateBlogPayload) => {
   const title = payload.title.trim();
 
-  const existingBlog = await Blog.findOne({
-    title,
+  const author = payload.author.trim();
+
+  const slug = generateSlug(title);
+
+  const existingBlog = await blogBaseService.exists({
+    $or: [
+      {
+        slug,
+      },
+      {
+        title,
+      },
+    ],
   });
 
   if (existingBlog) {
     throw new AppError(httpStatus.CONFLICT, BLOG_MESSAGE.ALREADY_EXISTS);
   }
 
-  const slug = generateSlug(title);
-
   const blogPayload: Partial<IBlog> = {
     ...payload,
 
     title,
 
+    author,
+
     slug,
+
+    tags: payload.tags.map((tag) => tag.trim()),
+
+    seoKeywords: payload.seoKeywords.map((keyword) => keyword.trim()),
 
     isPublished: payload.status === BLOG_STATUS.PUBLISHED,
   };
 
   if (payload.status === BLOG_STATUS.PUBLISHED) {
     blogPayload.publishedAt = payload.publishedAt ?? new Date();
-  } else if (payload.publishedAt !== undefined) {
-    blogPayload.publishedAt = payload.publishedAt;
   }
 
-  return baseService.create(blogPayload);
-};
+  if (payload.status !== BLOG_STATUS.PUBLISHED) {
+    blogPayload.publishedAt = null;
+  }
 
-const getBlogs = async (query: Record<string, unknown>) => {
-  return baseService.getAll(query);
+  return blogBaseService.create(blogPayload);
 };
+/* -------------------------------------------------------------------------- */
+/*                                4. Get All                                  */
+/* -------------------------------------------------------------------------- */
 
-const getBlogById = async (id: string) => {
-  return baseService.getById(id);
-};
+/**
+ * Get all blogs.
+ */
+const getBlogs = async (query: Record<string, unknown>) => blogBaseService.getAll(query);
 
+/* -------------------------------------------------------------------------- */
+/*                               5. Get By Id                                 */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * Get a blog by ID.
+ */
+const getBlogById = async (id: string) => blogBaseService.getById(id);
+
+/* -------------------------------------------------------------------------- */
+/*                                 6. Update                                  */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * Update an existing blog.
+ */
 const updateBlog = async (id: string, payload: TUpdateBlogPayload) => {
-  const existingBlog = await Blog.findById(id);
-
-  if (!existingBlog) {
-    throw new AppError(httpStatus.NOT_FOUND, BLOG_MESSAGE.NOT_FOUND);
-  }
+  const existingBlog = await blogBaseService.getById(id);
 
   const title = payload.title?.trim() ?? existingBlog.title;
 
-  const duplicateBlog = await Blog.findOne({
-    title,
+  const author = payload.author?.trim() ?? existingBlog.author;
 
-    _id: {
-      $ne: existingBlog._id,
-    },
-  });
+  if (payload.title) {
+    const slug = generateSlug(title);
 
-  if (duplicateBlog) {
-    throw new AppError(httpStatus.CONFLICT, BLOG_MESSAGE.ALREADY_EXISTS);
+    const duplicateBlog = await Blog.findOne({
+      _id: {
+        $ne: existingBlog._id,
+      },
+
+      $or: [
+        {
+          title,
+        },
+        {
+          slug,
+        },
+      ],
+    });
+
+    if (duplicateBlog) {
+      throw new AppError(httpStatus.CONFLICT, BLOG_MESSAGE.ALREADY_EXISTS);
+    }
   }
 
-  const updatePayload: Record<string, unknown> = {
+  const updatePayload: Partial<IBlog> = {
     ...payload,
+
+    title,
+
+    author,
   };
 
   if (payload.title) {
     updatePayload.slug = generateSlug(title);
   }
 
-  if (payload.status === BLOG_STATUS.PUBLISHED && !existingBlog.publishedAt) {
-    updatePayload.publishedAt = new Date();
+  if (payload.tags) {
+    updatePayload.tags = payload.tags.map((tag) => tag.trim());
+  }
 
+  if (payload.seoKeywords) {
+    updatePayload.seoKeywords = payload.seoKeywords.map((keyword) => keyword.trim());
+  }
+
+  if (payload.status === BLOG_STATUS.PUBLISHED) {
     updatePayload.isPublished = true;
+
+    updatePayload.publishedAt = payload.publishedAt ?? existingBlog.publishedAt ?? new Date();
   }
 
-  if (payload.status === BLOG_STATUS.DRAFT) {
+  if (payload.status && payload.status !== BLOG_STATUS.PUBLISHED) {
     updatePayload.isPublished = false;
+
+    updatePayload.publishedAt = null;
   }
 
-  return baseService.update(id, updatePayload as Partial<IBlog>);
+  return blogBaseService.update(id, updatePayload);
 };
 
-const deleteBlog = async (id: string) => {
-  return baseService.delete(id);
-};
+/* -------------------------------------------------------------------------- */
+/*                                 7. Delete                                  */
+/* -------------------------------------------------------------------------- */
 
-const getActiveBlogs = async () => {
-  return Blog.find({
+/**
+ * Delete a blog.
+ */
+const deleteBlog = async (id: string) => blogBaseService.delete(id);
+/* -------------------------------------------------------------------------- */
+/*                             8. Custom Queries                              */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * Get all active blogs.
+ */
+const getActiveBlogs = async () =>
+  Blog.find({
     isActive: true,
   })
     .sort({
@@ -120,10 +196,12 @@ const getActiveBlogs = async () => {
       sortOrder: 1,
     })
     .lean();
-};
 
-const getPublishedBlogs = async () => {
-  return Blog.find({
+/**
+ * Get all published blogs.
+ */
+const getPublishedBlogs = async () =>
+  Blog.find({
     isPublished: true,
 
     isActive: true,
@@ -132,12 +210,15 @@ const getPublishedBlogs = async () => {
   })
     .sort({
       publishedAt: -1,
+      sortOrder: 1,
     })
     .lean();
-};
 
-const getFeaturedBlogs = async () => {
-  return Blog.find({
+/**
+ * Get all featured blogs.
+ */
+const getFeaturedBlogs = async () =>
+  Blog.find({
     isFeatured: true,
 
     isPublished: true,
@@ -146,10 +227,13 @@ const getFeaturedBlogs = async () => {
   })
     .sort({
       publishedAt: -1,
+      sortOrder: 1,
     })
     .lean();
-};
 
+/**
+ * Get a published blog by slug.
+ */
 const getBlogBySlug = async (slug: string) => {
   const result = await Blog.findOne({
     slug,
@@ -166,6 +250,9 @@ const getBlogBySlug = async (slug: string) => {
   return result;
 };
 
+/**
+ * Increment blog view count.
+ */
 const incrementViewCount = async (slug: string) => {
   const result = await Blog.findOneAndUpdate(
     {
@@ -182,6 +269,7 @@ const incrementViewCount = async (slug: string) => {
     },
     {
       new: true,
+      runValidators: true,
     },
   );
 
@@ -192,9 +280,20 @@ const incrementViewCount = async (slug: string) => {
   return result;
 };
 
-const getBlogsByCategory = async (category: IBlog["category"]) => {
+/**
+ * Get blogs by category.
+ */
+const getBlogsByCategory = async (category: string) => {
+  const normalizedCategory = category.trim();
+
+  if (!BLOG_CATEGORIES.includes(normalizedCategory as TBlogCategory)) {
+    throw new AppError(httpStatus.BAD_REQUEST, BLOG_MESSAGE.INVALID_CATEGORY);
+  }
+
+  const blogCategory: TBlogCategory = normalizedCategory as TBlogCategory;
+
   return Blog.find({
-    category,
+    category: blogCategory,
 
     isPublished: true,
 
@@ -202,12 +301,16 @@ const getBlogsByCategory = async (category: IBlog["category"]) => {
   })
     .sort({
       publishedAt: -1,
+
+      sortOrder: 1,
     })
     .lean();
 };
-
-const getBlogsByTag = async (tag: string) => {
-  return Blog.find({
+/**
+ * Get blogs by tag.
+ */
+const getBlogsByTag = async (tag: string) =>
+  Blog.find({
     tags: {
       $in: [tag],
     },
@@ -218,24 +321,71 @@ const getBlogsByTag = async (tag: string) => {
   })
     .sort({
       publishedAt: -1,
+      sortOrder: 1,
     })
     .lean();
-};
-
-const getPopularBlogs = async (limit = 10) => {
-  return Blog.find({
+/**
+ * Get most popular blogs.
+ */
+const getPopularBlogs = async (limit = 10) =>
+  Blog.find({
     isPublished: true,
 
     isActive: true,
   })
     .sort({
       viewCount: -1,
+
+      publishedAt: -1,
     })
     .limit(limit)
     .lean();
-};
 
-export const BlogService = {
+/**
+ * Get most recent published blogs.
+ */
+const getRecentBlogs = async (limit = 10) =>
+  Blog.find({
+    isPublished: true,
+
+    isActive: true,
+  })
+    .sort({
+      publishedAt: -1,
+
+      createdAt: -1,
+    })
+    .limit(limit)
+    .lean();
+
+/**
+ * Get related blogs.
+ */
+const getRelatedBlogs = async (slug: string, category: TBlogCategory, limit = 5) =>
+  Blog.find({
+    slug: {
+      $ne: slug,
+    },
+
+    category,
+
+    isPublished: true,
+
+    isActive: true,
+  })
+    .sort({
+      publishedAt: -1,
+
+      viewCount: -1,
+    })
+    .limit(limit)
+    .lean();
+
+/* -------------------------------------------------------------------------- */
+/*                                  9. Export                                 */
+/* -------------------------------------------------------------------------- */
+
+export const BlogService = Object.freeze({
   createBlog,
 
   getBlogs,
@@ -261,4 +411,8 @@ export const BlogService = {
   getBlogsByTag,
 
   getPopularBlogs,
-};
+
+  getRecentBlogs,
+
+  getRelatedBlogs,
+});

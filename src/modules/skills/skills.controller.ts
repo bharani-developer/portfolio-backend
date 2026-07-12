@@ -1,28 +1,38 @@
-// src\modules\skills\skills.controller.ts
+// src/modules/skills/skills.controller.ts
 
-import httpStatus from "http-status";
+/* -------------------------------------------------------------------------- */
+/*                                 1. Imports                                 */
+/* -------------------------------------------------------------------------- */
 
-import { SKILLS_MESSAGE } from "./skills.constant.js";
+import httpStatus from 'http-status';
 
-import AppError from "../../utils/AppError.js";
-import catchAsync from "../../utils/catchAsync.js";
-import sendResponse from "../../utils/sendResponse.js";
+import { SKILLS_MESSAGE } from './skills.constant.js';
+import { SkillsService } from './skills.service.js';
 
-import { SkillsService } from "./skills.service.js";
+import type { TCreateSkillPayload, TUpdateSkillPayload, TSkillCategory } from './skills.types.js';
 
-const getRequiredParam = (
-  value: string | string[] | undefined,
-  name: string,
-): string => {
-  if (typeof value !== "string" || !value.trim()) {
+import { AppError, catchAsync, sendResponse } from '../../shared/utils/index.js';
+
+/* -------------------------------------------------------------------------- */
+/*                              2. Helper Methods                             */
+/* -------------------------------------------------------------------------- */
+
+const getRequiredParam = (value: string | string[] | undefined, name: string): string => {
+  if (typeof value !== 'string' || !value.trim()) {
     throw new AppError(httpStatus.BAD_REQUEST, `${name} is required`);
   }
 
-  return value;
+  return value.trim();
 };
 
+/* -------------------------------------------------------------------------- */
+/*                               3. Create Skill                              */
+/* -------------------------------------------------------------------------- */
+
 const createSkill = catchAsync(async (req, res) => {
-  const result = await SkillsService.createSkill(req.body);
+  const payload = req.body as TCreateSkillPayload;
+
+  const result = await SkillsService.createSkill(payload);
 
   sendResponse(res, {
     statusCode: httpStatus.CREATED,
@@ -32,8 +42,12 @@ const createSkill = catchAsync(async (req, res) => {
   });
 });
 
+/* -------------------------------------------------------------------------- */
+/*                                4. Get Skills                               */
+/* -------------------------------------------------------------------------- */
+
 const getSkills = catchAsync(async (req, res) => {
-  const result = await SkillsService.getSkills(req.query);
+  const result = await SkillsService.getSkills(req.query as Record<string, unknown>);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -44,8 +58,12 @@ const getSkills = catchAsync(async (req, res) => {
   });
 });
 
+/* -------------------------------------------------------------------------- */
+/*                              5. Get Skill By Id                            */
+/* -------------------------------------------------------------------------- */
+
 const getSkillById = catchAsync(async (req, res) => {
-  const id = getRequiredParam(req.params.id, "Skill ID");
+  const id = getRequiredParam(req.params.id, 'Skill ID');
 
   const result = await SkillsService.getSkillById(id);
 
@@ -57,8 +75,12 @@ const getSkillById = catchAsync(async (req, res) => {
   });
 });
 
+/* -------------------------------------------------------------------------- */
+/*                           6. Get Skills By Category                        */
+/* -------------------------------------------------------------------------- */
+
 const getSkillsByCategory = catchAsync(async (req, res) => {
-  const category = getRequiredParam(req.params.category, "Category");
+  const category = getRequiredParam(req.params.category, 'Category') as TSkillCategory;
 
   const result = await SkillsService.getSkillsByCategory(category);
 
@@ -69,6 +91,10 @@ const getSkillsByCategory = catchAsync(async (req, res) => {
     data: result,
   });
 });
+
+/* -------------------------------------------------------------------------- */
+/*                             7. Get Active Skills                           */
+/* -------------------------------------------------------------------------- */
 
 const getActiveSkills = catchAsync(async (_req, res) => {
   const result = await SkillsService.getActiveSkills();
@@ -81,10 +107,16 @@ const getActiveSkills = catchAsync(async (_req, res) => {
   });
 });
 
-const updateSkill = catchAsync(async (req, res) => {
-  const id = getRequiredParam(req.params.id, "Skill ID");
+/* -------------------------------------------------------------------------- */
+/*                               8. Update Skill                              */
+/* -------------------------------------------------------------------------- */
 
-  const result = await SkillsService.updateSkill(id, req.body);
+const updateSkill = catchAsync(async (req, res) => {
+  const id = getRequiredParam(req.params.id, 'Skill ID');
+
+  const payload = req.body as TUpdateSkillPayload;
+
+  const result = await SkillsService.updateSkill(id, payload);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -94,8 +126,12 @@ const updateSkill = catchAsync(async (req, res) => {
   });
 });
 
+/* -------------------------------------------------------------------------- */
+/*                               9. Delete Skill                              */
+/* -------------------------------------------------------------------------- */
+
 const deleteSkill = catchAsync(async (req, res) => {
-  const id = getRequiredParam(req.params.id, "Skill ID");
+  const id = getRequiredParam(req.params.id, 'Skill ID');
 
   const result = await SkillsService.deleteSkill(id);
 
@@ -106,6 +142,10 @@ const deleteSkill = catchAsync(async (req, res) => {
     data: result,
   });
 });
+
+/* -------------------------------------------------------------------------- */
+/*                                 10. Export                                 */
+/* -------------------------------------------------------------------------- */
 
 export const SkillsController = {
   createSkill,

@@ -1,32 +1,55 @@
 // src/modules/hero/hero.service.ts
 
-import { BaseSingletonService } from "../../shared/base/baseSingleton.service.js";
+/* -------------------------------------------------------------------------- */
+/*                                   Imports                                  */
+/* -------------------------------------------------------------------------- */
 
-import { Hero } from "./hero.model.js";
+import { BaseSingletonService } from '../../shared/base/index.js';
 
-import type { IHero } from "./hero.interface.js";
+import { Hero } from './hero.model.js';
 
-const heroBaseService = new BaseSingletonService<IHero>(Hero, "Hero section");
+import type { IHero, TCreateHeroPayload, TUpdateHeroPayload } from './hero.types.js';
 
-const createHero = async (payload: Partial<IHero>) => {
-  return heroBaseService.create(payload);
-};
+/* -------------------------------------------------------------------------- */
+/*                           Base Singleton Service                           */
+/* -------------------------------------------------------------------------- */
 
-const getHero = async () => {
-  return heroBaseService.get();
-};
+const singletonService = new BaseSingletonService<IHero>(Hero, 'Hero section');
 
-const updateHero = async (payload: Partial<IHero>) => {
-  return heroBaseService.update(payload);
-};
+/* -------------------------------------------------------------------------- */
+/*                                   Create                                   */
+/* -------------------------------------------------------------------------- */
 
-const deleteHero = async () => {
-  return heroBaseService.delete();
-};
+const createHero = async (payload: TCreateHeroPayload) => singletonService.create(payload);
+
+/* -------------------------------------------------------------------------- */
+/*                                     Get                                    */
+/* -------------------------------------------------------------------------- */
+
+const getHero = async () => singletonService.get();
+
+/* -------------------------------------------------------------------------- */
+/*                                   Update                                   */
+/* -------------------------------------------------------------------------- */
+
+const updateHero = async (payload: TUpdateHeroPayload) => singletonService.update(payload);
+
+/* -------------------------------------------------------------------------- */
+/*                                   Delete                                   */
+/* -------------------------------------------------------------------------- */
+
+const deleteHero = async () => singletonService.delete();
+
+/* -------------------------------------------------------------------------- */
+/*                                   Export                                   */
+/* -------------------------------------------------------------------------- */
 
 export const HeroService = Object.freeze({
   createHero,
+
   getHero,
+
   updateHero,
+
   deleteHero,
 });

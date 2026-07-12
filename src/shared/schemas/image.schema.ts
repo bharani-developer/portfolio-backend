@@ -1,6 +1,6 @@
 // src\shared\schemas\image.schema.ts
 
-import { Schema } from "mongoose";
+import { Schema } from 'mongoose';
 
 export const imageSchema = new Schema(
   {

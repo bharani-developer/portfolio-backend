@@ -1,28 +1,39 @@
-// src\modules\certifications\certifications.service.ts
+// src/modules/certifications/certifications.service.ts
 
-import httpStatus from "http-status";
+/* -------------------------------------------------------------------------- */
+/*                                 1. Imports                                 */
+/* -------------------------------------------------------------------------- */
 
-import { BaseCrudService } from "../../shared/base/index.js";
-import { generateSlug } from "../../shared/slug/index.js";
+import httpStatus from 'http-status';
 
-import AppError from "../../utils/AppError.js";
+import { BaseCrudService } from '../../shared/base/index.js';
 
 import {
   CERTIFICATION_MESSAGE,
   CERTIFICATION_SEARCHABLE_FIELDS,
-} from "./certifications.constant.js";
+} from './certifications.constant.js';
 
-import { Certification } from "./certifications.model.js";
+import { Certification } from './certifications.model.js';
 
 import type {
   ICertification,
   TCreateCertificationPayload,
   TUpdateCertificationPayload,
-} from "./certifications.interface.js";
+} from './certifications.types.js';
 
-const baseService = new BaseCrudService<ICertification>(Certification, [
+import { AppError } from '../../shared/utils/index.js';
+import { generateSlug } from '../../shared/utils/generate-slug.js';
+
+/* -------------------------------------------------------------------------- */
+/*                               2. Base Service                              */
+/* -------------------------------------------------------------------------- */
+
+const certificationBaseService = new BaseCrudService<ICertification>(Certification, [
   ...CERTIFICATION_SEARCHABLE_FIELDS,
 ] as string[]);
+/* -------------------------------------------------------------------------- */
+/*                                  3. Create                                 */
+/* -------------------------------------------------------------------------- */
 
 const createCertification = async (payload: TCreateCertificationPayload) => {
   const title = payload.title.trim();
@@ -35,44 +46,41 @@ const createCertification = async (payload: TCreateCertificationPayload) => {
   });
 
   if (existingCertification) {
-    throw new AppError(
-      httpStatus.CONFLICT,
-      CERTIFICATION_MESSAGE.ALREADY_EXISTS,
-    );
+    throw new AppError(httpStatus.CONFLICT, CERTIFICATION_MESSAGE.ALREADY_EXISTS);
   }
 
-  const slug = generateSlug(`${title}-${issuer}`);
-
-  const certificationPayload = {
+  const certificationPayload: TCreateCertificationPayload & {
+    slug: string;
+  } = {
     ...payload,
 
     title,
 
     issuer,
 
-    slug,
+    slug: generateSlug(`${title}-${issuer}`),
   };
 
-  return baseService.create(certificationPayload);
+  return certificationBaseService.create(certificationPayload);
 };
+/* -------------------------------------------------------------------------- */
+/*                                 4. Get All                                 */
+/* -------------------------------------------------------------------------- */
 
-const getCertifications = async (query: Record<string, unknown>) => {
-  return baseService.getAll(query);
-};
+const getCertifications = async (query: Record<string, unknown>) =>
+  certificationBaseService.getAll(query);
 
-const getCertificationById = async (id: string) => {
-  return baseService.getById(id);
-};
+/* -------------------------------------------------------------------------- */
+/*                                5. Get By Id                                */
+/* -------------------------------------------------------------------------- */
 
-const updateCertification = async (
-  id: string,
-  payload: TUpdateCertificationPayload,
-) => {
-  const existingCertification = await Certification.findById(id);
+const getCertificationById = async (id: string) => certificationBaseService.getById(id);
+/* -------------------------------------------------------------------------- */
+/*                                  6. Update                                 */
+/* -------------------------------------------------------------------------- */
 
-  if (!existingCertification) {
-    throw new AppError(httpStatus.NOT_FOUND, CERTIFICATION_MESSAGE.NOT_FOUND);
-  }
+const updateCertification = async (id: string, payload: TUpdateCertificationPayload) => {
+  const existingCertification = await certificationBaseService.getById(id);
 
   const title = payload.title?.trim() ?? existingCertification.title;
 
@@ -88,33 +96,43 @@ const updateCertification = async (
   });
 
   if (duplicateCertification) {
-    throw new AppError(
-      httpStatus.CONFLICT,
-      CERTIFICATION_MESSAGE.ALREADY_EXISTS,
-    );
+    throw new AppError(httpStatus.CONFLICT, CERTIFICATION_MESSAGE.ALREADY_EXISTS);
   }
 
   const updatePayload: Partial<ICertification> = {
     ...payload,
 
+    ...(payload.title && {
+      title,
+    }),
+
+    ...(payload.issuer && {
+      issuer,
+    }),
+
     ...(payload.title || payload.issuer
       ? {
-          slug: generateSlug(`${title}-${issuer}`),
-        }
+        slug: generateSlug(`${title}-${issuer}`),
+      }
       : {}),
   };
 
-  return baseService.update(id, updatePayload);
-
-  return baseService.update(id, updatePayload);
+  return certificationBaseService.update(id, updatePayload);
 };
+/* -------------------------------------------------------------------------- */
+/*                                  7. Delete                                 */
+/* -------------------------------------------------------------------------- */
 
-const deleteCertification = async (id: string) => {
-  return baseService.delete(id);
-};
+const deleteCertification = async (id: string) => certificationBaseService.delete(id);
+/* -------------------------------------------------------------------------- */
+/*                              8. Custom Queries                             */
+/* -------------------------------------------------------------------------- */
 
-const getActiveCertifications = async () => {
-  return Certification.find({
+/**
+ * Get all active certifications.
+ */
+const getActiveCertifications = async () =>
+  Certification.find({
     isActive: true,
   })
     .sort({
@@ -122,11 +140,16 @@ const getActiveCertifications = async () => {
       issueDate: -1,
     })
     .lean();
-};
 
+/**
+ * Get certification by slug.
+ */
 const getCertificationBySlug = async (slug: string) => {
+  const normalizedSlug = slug.trim().toLowerCase();
+
   const result = await Certification.findOne({
-    slug,
+    slug: normalizedSlug,
+
     isActive: true,
   });
 
@@ -137,11 +160,12 @@ const getCertificationBySlug = async (slug: string) => {
   return result;
 };
 
-const getCertificationsBySkill = async (skill: string) => {
-  return Certification.find({
-    skills: {
-      $in: [skill],
-    },
+/**
+ * Get certifications by skill.
+ */
+const getCertificationsBySkill = async (skill: string) =>
+  Certification.find({
+    skills: skill.trim(),
 
     isActive: true,
   })
@@ -149,19 +173,20 @@ const getCertificationsBySkill = async (skill: string) => {
       issueDate: -1,
     })
     .lean();
-};
-
+/**
+ * Get expired certifications.
+ */
 const getExpiredCertifications = async () => {
   const today = new Date();
 
   return Certification.find({
+    isActive: true,
+
     neverExpires: false,
 
     expiryDate: {
       $lt: today,
     },
-
-    isActive: true,
   })
     .sort({
       expiryDate: -1,
@@ -169,6 +194,9 @@ const getExpiredCertifications = async () => {
     .lean();
 };
 
+/**
+ * Get valid certifications.
+ */
 const getValidCertifications = async () => {
   const today = new Date();
 
@@ -194,9 +222,12 @@ const getValidCertifications = async () => {
     .lean();
 };
 
-const getCertificationsByIssuer = async (issuer: string) => {
-  return Certification.find({
-    issuer,
+/**
+ * Get certifications by issuer.
+ */
+const getCertificationsByIssuer = async (issuer: string) =>
+  Certification.find({
+    issuer: issuer.trim(),
 
     isActive: true,
   })
@@ -204,9 +235,11 @@ const getCertificationsByIssuer = async (issuer: string) => {
       issueDate: -1,
     })
     .lean();
-};
+/* -------------------------------------------------------------------------- */
+/*                                  9. Export                                 */
+/* -------------------------------------------------------------------------- */
 
-export const CertificationService = {
+export const CertificationService = Object.freeze({
   createCertification,
 
   getCertifications,
@@ -228,4 +261,4 @@ export const CertificationService = {
   getValidCertifications,
 
   getCertificationsByIssuer,
-};
+});

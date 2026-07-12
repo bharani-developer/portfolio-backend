@@ -1,53 +1,80 @@
 // src/modules/about/about.validation.ts
 
-import { z } from "zod";
+/**
+ * About validation schemas.
+ *
+ * Structure:
+ * 1. Imports
+ * 2. Helper Schemas
+ * 3. Reusable Validators
+ * 4. Create Schema
+ * 5. Update Schema
+ * 6. Request Schemas
+ * 7. Export
+ * 8. Infer Types
+ */
 
-import { ABOUT_DEFAULT, ABOUT_LIMIT } from "./about.constant.js";
+/* -------------------------------------------------------------------------- */
+/*                                   Imports                                  */
+/* -------------------------------------------------------------------------- */
+
+import { z } from 'zod';
+
+import { ABOUT_DEFAULT, ABOUT_VALIDATION } from './about.constant.js';
 
 /* -------------------------------------------------------------------------- */
 /*                               Helper Schemas                               */
 /* -------------------------------------------------------------------------- */
 
-const imageValidationSchema = z
+/**
+ * Image schema.
+ */
+const imageSchema = z
   .object({
-    url: z.string().trim().url("Image URL must be a valid URL"),
+    url: z.string().trim().url('Image URL must be a valid URL'),
 
-    publicId: z.string().trim().min(1, "Image public ID is required"),
+    publicId: z.string().trim().min(1, 'Image public ID is required'),
   })
   .strict();
 
-const statValidationSchema = z
+/**
+ * About statistic schema.
+ */
+const statSchema = z
   .object({
     label: z
       .string()
       .trim()
-      .min(1, "Stat label is required")
+      .min(1, 'Stat label is required')
       .max(
-        ABOUT_LIMIT.STAT_LABEL,
-        `Stat label cannot exceed ${ABOUT_LIMIT.STAT_LABEL} characters`,
+        ABOUT_VALIDATION.STAT.LABEL_MAX_LENGTH,
+        `Stat label cannot exceed ${ABOUT_VALIDATION.STAT.LABEL_MAX_LENGTH} characters`,
       ),
 
     value: z
       .string()
       .trim()
-      .min(1, "Stat value is required")
+      .min(1, 'Stat value is required')
       .max(
-        ABOUT_LIMIT.STAT_VALUE,
-        `Stat value cannot exceed ${ABOUT_LIMIT.STAT_VALUE} characters`,
+        ABOUT_VALIDATION.STAT.VALUE_MAX_LENGTH,
+        `Stat value cannot exceed ${ABOUT_VALIDATION.STAT.VALUE_MAX_LENGTH} characters`,
       ),
   })
   .strict();
 
 /* -------------------------------------------------------------------------- */
-/*                             Reusable Validators                            */
+/*                            Reusable Validators                             */
 /* -------------------------------------------------------------------------- */
 
-const imagesValidationSchema = z
-  .array(imageValidationSchema)
-  .min(1, "At least one image is required")
+/**
+ * Gallery images.
+ */
+const imagesSchema = z
+  .array(imageSchema)
+  .min(1, 'At least one image is required')
   .max(
-    ABOUT_DEFAULT.MAX_IMAGES,
-    `Maximum ${ABOUT_DEFAULT.MAX_IMAGES} images are allowed`,
+    ABOUT_VALIDATION.IMAGE.MAX_COUNT,
+    `Maximum ${ABOUT_VALIDATION.IMAGE.MAX_COUNT} images are allowed`,
   )
   .superRefine((images, ctx) => {
     const publicIds = new Set<string>();
@@ -56,9 +83,9 @@ const imagesValidationSchema = z
     images.forEach((image, index) => {
       if (publicIds.has(image.publicId)) {
         ctx.addIssue({
-          code: "custom",
-          path: [index, "publicId"],
-          message: "Duplicate image public ID is not allowed",
+          code: 'custom',
+          path: [index, 'publicId'],
+          message: 'Duplicate image public ID is not allowed',
         });
       }
 
@@ -66,9 +93,9 @@ const imagesValidationSchema = z
 
       if (urls.has(image.url)) {
         ctx.addIssue({
-          code: "custom",
-          path: [index, "url"],
-          message: "Duplicate image URL is not allowed",
+          code: 'custom',
+          path: [index, 'url'],
+          message: 'Duplicate image URL is not allowed',
         });
       }
 
@@ -76,23 +103,26 @@ const imagesValidationSchema = z
     });
   });
 
-const statsValidationSchema = z
-  .array(statValidationSchema)
+/**
+ * Portfolio statistics.
+ */
+const statsSchema = z
+  .array(statSchema)
   .max(
-    ABOUT_DEFAULT.MAX_STATS,
-    `Maximum ${ABOUT_DEFAULT.MAX_STATS} stats are allowed`,
+    ABOUT_VALIDATION.STAT.MAX_COUNT,
+    `Maximum ${ABOUT_VALIDATION.STAT.MAX_COUNT} statistics are allowed`,
   )
   .superRefine((stats, ctx) => {
     const labels = new Set<string>();
 
     stats.forEach((stat, index) => {
-      const normalizedLabel = stat.label.toLowerCase();
+      const normalizedLabel = stat.label.trim().toLowerCase();
 
       if (labels.has(normalizedLabel)) {
         ctx.addIssue({
-          code: "custom",
-          path: [index, "label"],
-          message: "Duplicate stat labels are not allowed",
+          code: 'custom',
+          path: [index, 'label'],
+          message: 'Duplicate stat labels are not allowed',
         });
       }
 
@@ -100,117 +130,323 @@ const statsValidationSchema = z
     });
   });
 
-const emailValidationSchema = z
+/**
+ * Email validator.
+ */
+const emailSchema = z
   .string()
   .trim()
   .toLowerCase()
-  .email("Email must be a valid email address");
+  .max(
+    ABOUT_VALIDATION.EMAIL.MAX_LENGTH,
+    `Email cannot exceed ${ABOUT_VALIDATION.EMAIL.MAX_LENGTH} characters`,
+  )
+  .email('Email must be a valid email address');
 
-const resumeUrlValidationSchema = z
+/**
+ * Phone validator.
+ */
+const phoneSchema = z
   .string()
   .trim()
-  .refine((value) => value.startsWith("/") || /^https?:\/\/.+/i.test(value), {
-    message: "Resume URL must be a valid URL or relative path",
+  .regex(/^[+()0-9\s-]{7,20}$/, 'Phone number must be a valid phone number')
+  .max(
+    ABOUT_VALIDATION.PHONE.MAX_LENGTH,
+    `Phone number cannot exceed ${ABOUT_VALIDATION.PHONE.MAX_LENGTH} characters`,
+  );
+
+/**
+ * Resume URL validator.
+ *
+ * Supports:
+ * - Relative paths
+ * - HTTP URLs
+ * - HTTPS URLs
+ */
+const resumeUrlSchema = z
+  .string()
+  .trim()
+  .max(
+    ABOUT_VALIDATION.RESUME_URL.MAX_LENGTH,
+    `Resume URL cannot exceed ${ABOUT_VALIDATION.RESUME_URL.MAX_LENGTH} characters`,
+  )
+  .refine((value) => value.startsWith('/') || /^https?:\/\/.+$/i.test(value), {
+    message: 'Resume URL must be a valid URL or relative path',
   });
-
 /* -------------------------------------------------------------------------- */
-/*                             Base About Schema                              */
+/*                               Create Schema                                */
 /* -------------------------------------------------------------------------- */
 
-const aboutSchema = z
+const createAboutBodySchema = z
   .object({
-    profileImage: imageValidationSchema.optional(),
+    /**
+     * Primary profile image.
+     */
+    profileImage: imageSchema.optional(),
 
-    images: imagesValidationSchema,
+    /**
+     * Gallery images.
+     */
+    images: imagesSchema,
 
+    /**
+     * Full name.
+     */
     fullName: z
       .string()
       .trim()
-      .min(1, "Full name is required")
+      .min(
+        ABOUT_VALIDATION.FULL_NAME.MIN_LENGTH,
+        `Full name must be at least ${ABOUT_VALIDATION.FULL_NAME.MIN_LENGTH} characters`,
+      )
       .max(
-        ABOUT_LIMIT.FULL_NAME,
-        `Full name cannot exceed ${ABOUT_LIMIT.FULL_NAME} characters`,
+        ABOUT_VALIDATION.FULL_NAME.MAX_LENGTH,
+        `Full name cannot exceed ${ABOUT_VALIDATION.FULL_NAME.MAX_LENGTH} characters`,
       ),
 
+    /**
+     * Professional designation.
+     */
     designation: z
       .string()
       .trim()
-      .min(1, "Designation is required")
+      .min(
+        ABOUT_VALIDATION.DESIGNATION.MIN_LENGTH,
+        `Designation must be at least ${ABOUT_VALIDATION.DESIGNATION.MIN_LENGTH} characters`,
+      )
       .max(
-        ABOUT_LIMIT.DESIGNATION,
-        `Designation cannot exceed ${ABOUT_LIMIT.DESIGNATION} characters`,
+        ABOUT_VALIDATION.DESIGNATION.MAX_LENGTH,
+        `Designation cannot exceed ${ABOUT_VALIDATION.DESIGNATION.MAX_LENGTH} characters`,
       ),
 
+    /**
+     * Biography.
+     */
     bio: z
       .string()
       .trim()
-      .min(1, "Bio is required")
-      .max(ABOUT_LIMIT.BIO, `Bio cannot exceed ${ABOUT_LIMIT.BIO} characters`),
-
-    email: emailValidationSchema.optional(),
-
-    phone: z
-      .string()
-      .trim()
+      .min(ABOUT_VALIDATION.BIO.MIN_LENGTH, 'Bio is required')
       .max(
-        ABOUT_LIMIT.PHONE,
-        `Phone number cannot exceed ${ABOUT_LIMIT.PHONE} characters`,
-      )
-      .optional(),
+        ABOUT_VALIDATION.BIO.MAX_LENGTH,
+        `Bio cannot exceed ${ABOUT_VALIDATION.BIO.MAX_LENGTH} characters`,
+      ),
 
+    /**
+     * Email.
+     */
+    email: emailSchema.optional(),
+
+    /**
+     * Phone.
+     */
+    phone: phoneSchema.optional(),
+
+    /**
+     * Address.
+     */
     address: z
       .string()
       .trim()
       .max(
-        ABOUT_LIMIT.ADDRESS,
-        `Address cannot exceed ${ABOUT_LIMIT.ADDRESS} characters`,
+        ABOUT_VALIDATION.ADDRESS.MAX_LENGTH,
+        `Address cannot exceed ${ABOUT_VALIDATION.ADDRESS.MAX_LENGTH} characters`,
       )
       .optional(),
 
-    resumeUrl: resumeUrlValidationSchema.optional(),
+    /**
+     * Resume URL.
+     */
+    resumeUrl: resumeUrlSchema.optional(),
 
-    yearsOfExperience: z
+    /**
+     * Years of experience.
+     *
+     * z.coerce.number() allows:
+     * "5" -> 5
+     */
+    yearsOfExperience: z.coerce
       .number({
-        error: "Years of experience must be a number",
+        error: 'Years of experience must be a number',
       })
-      .int("Years of experience must be an integer")
-      .min(0, "Years of experience cannot be negative")
+      .int('Years of experience must be an integer')
+      .min(
+        ABOUT_VALIDATION.YEARS_OF_EXPERIENCE.MIN,
+        `Years of experience must be at least ${ABOUT_VALIDATION.YEARS_OF_EXPERIENCE.MIN}`,
+      )
       .max(
-        ABOUT_DEFAULT.MAX_YEARS_OF_EXPERIENCE,
-        `Years of experience cannot exceed ${ABOUT_DEFAULT.MAX_YEARS_OF_EXPERIENCE}`,
+        ABOUT_VALIDATION.YEARS_OF_EXPERIENCE.MAX,
+        `Years of experience cannot exceed ${ABOUT_VALIDATION.YEARS_OF_EXPERIENCE.MAX}`,
       )
       .optional(),
 
-    stats: statsValidationSchema.optional(),
+    /**
+     * Portfolio statistics.
+     */
+    stats: statsSchema.optional(),
 
+    /**
+     * Active status.
+     */
     isActive: z.boolean().default(ABOUT_DEFAULT.IS_ACTIVE),
   })
   .strict();
 
 /* -------------------------------------------------------------------------- */
-/*                              Create Validation                             */
+/*                               Update Schema                                */
 /* -------------------------------------------------------------------------- */
 
-const createAboutValidationSchema = z.object({
-  body: aboutSchema,
-});
+const updateAboutBodySchema = z
+  .object({
+    /**
+     * Primary profile image.
+     */
+    profileImage: imageSchema.optional(),
 
+    /**
+     * Gallery images.
+     */
+    images: imagesSchema.optional(),
+
+    /**
+     * Full name.
+     */
+    fullName: z
+      .string()
+      .trim()
+      .min(
+        ABOUT_VALIDATION.FULL_NAME.MIN_LENGTH,
+        `Full name must be at least ${ABOUT_VALIDATION.FULL_NAME.MIN_LENGTH} characters`,
+      )
+      .max(
+        ABOUT_VALIDATION.FULL_NAME.MAX_LENGTH,
+        `Full name cannot exceed ${ABOUT_VALIDATION.FULL_NAME.MAX_LENGTH} characters`,
+      )
+      .optional(),
+
+    /**
+     * Designation.
+     */
+    designation: z
+      .string()
+      .trim()
+      .min(
+        ABOUT_VALIDATION.DESIGNATION.MIN_LENGTH,
+        `Designation must be at least ${ABOUT_VALIDATION.DESIGNATION.MIN_LENGTH} characters`,
+      )
+      .max(
+        ABOUT_VALIDATION.DESIGNATION.MAX_LENGTH,
+        `Designation cannot exceed ${ABOUT_VALIDATION.DESIGNATION.MAX_LENGTH} characters`,
+      )
+      .optional(),
+
+    /**
+     * Biography.
+     */
+    bio: z
+      .string()
+      .trim()
+      .min(ABOUT_VALIDATION.BIO.MIN_LENGTH, 'Bio is required')
+      .max(
+        ABOUT_VALIDATION.BIO.MAX_LENGTH,
+        `Bio cannot exceed ${ABOUT_VALIDATION.BIO.MAX_LENGTH} characters`,
+      )
+      .optional(),
+
+    /**
+     * Email.
+     */
+    email: emailSchema.optional(),
+
+    /**
+     * Phone.
+     */
+    phone: phoneSchema.optional(),
+
+    /**
+     * Address.
+     */
+    address: z
+      .string()
+      .trim()
+      .max(
+        ABOUT_VALIDATION.ADDRESS.MAX_LENGTH,
+        `Address cannot exceed ${ABOUT_VALIDATION.ADDRESS.MAX_LENGTH} characters`,
+      )
+      .optional(),
+
+    /**
+     * Resume URL.
+     */
+    resumeUrl: resumeUrlSchema.optional(),
+
+    /**
+     * Years of experience.
+     */
+    yearsOfExperience: z.coerce
+      .number({
+        error: 'Years of experience must be a number',
+      })
+      .int('Years of experience must be an integer')
+      .min(
+        ABOUT_VALIDATION.YEARS_OF_EXPERIENCE.MIN,
+        `Years of experience must be at least ${ABOUT_VALIDATION.YEARS_OF_EXPERIENCE.MIN}`,
+      )
+      .max(
+        ABOUT_VALIDATION.YEARS_OF_EXPERIENCE.MAX,
+        `Years of experience cannot exceed ${ABOUT_VALIDATION.YEARS_OF_EXPERIENCE.MAX}`,
+      )
+      .optional(),
+
+    /**
+     * Portfolio statistics.
+     */
+    stats: statsSchema.optional(),
+
+    /**
+     * Active status.
+     */
+    isActive: z.boolean().optional(),
+  })
+  .strict();
 /* -------------------------------------------------------------------------- */
-/*                              Update Validation                             */
+/*                              Request Schemas                               */
 /* -------------------------------------------------------------------------- */
 
-const updateAboutValidationSchema = z.object({
-  body: aboutSchema.partial().extend({
-    images: imagesValidationSchema.optional(),
-  }),
-});
+const createAboutValidationSchema = z
+  .object({
+    body: createAboutBodySchema,
+  })
+  .strict();
+
+const updateAboutValidationSchema = z
+  .object({
+    body: updateAboutBodySchema,
+  })
+  .strict();
 
 /* -------------------------------------------------------------------------- */
 /*                                   Export                                   */
 /* -------------------------------------------------------------------------- */
 
-export const AboutValidation = {
+/**
+ * About validation schemas.
+ */
+export const AboutValidation = Object.freeze({
   createAboutValidationSchema,
 
   updateAboutValidationSchema,
-};
+});
+
+/* -------------------------------------------------------------------------- */
+/*                                    Types                                   */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * Create About request body.
+ */
+export type TCreateAboutInput = z.infer<typeof createAboutBodySchema>;
+
+/**
+ * Update About request body.
+ */
+export type TUpdateAboutInput = z.infer<typeof updateAboutBodySchema>;

@@ -1,40 +1,35 @@
 // src/modules/contact/contact.seeder.ts
 
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
-import { connectDatabase } from "../../config/database.js";
+import { connectDatabase } from '../../configs/database.config.js';
 
-import { Contact } from "./contact.model.js";
+import { Contact } from './contact.model.js';
 
-import {
-  CONTACT_PRIORITIES,
-  CONTACT_SOURCES,
-  CONTACT_STATUSES,
-} from "./contact.constant.js";
+import { CONTACT_PRIORITIES, CONTACT_SOURCES, CONTACT_STATUSES } from './contact.constant.js';
 
 export const seedContact = async (): Promise<void> => {
   const existingCount = await Contact.countDocuments();
 
   if (existingCount > 0) {
-    console.info("Contact messages already seeded.");
+    console.info('Contact messages already seeded.');
 
     return;
   }
 
   await Contact.insertMany([
     {
-      name: "Bharani Karthikeyan",
+      name: 'Bharani Karthikeyan',
 
-      email: "bharani.developer@gmail.com",
+      email: 'bharani.developer@gmail.com',
 
-      phone: "+91 9566935886",
+      phone: '+91 9566935886',
 
-      company: "Shalom InfoTech Ltd.",
+      company: 'Shalom InfoTech Ltd.',
 
-      subject: "Portfolio Website Development",
+      subject: 'Portfolio Website Development',
 
-      message:
-        "I would like to discuss a custom portfolio website project and get an estimate.",
+      message: 'I would like to discuss a custom portfolio website project and get an estimate.',
 
       status: CONTACT_STATUSES[0],
 
@@ -46,7 +41,7 @@ export const seedContact = async (): Promise<void> => {
 
       isReplied: false,
 
-      notes: "Potential freelance client.",
+      notes: 'Potential freelance client.',
 
       sortOrder: 1,
 
@@ -54,7 +49,7 @@ export const seedContact = async (): Promise<void> => {
     },
   ]);
 
-  console.info("Contact messages seeded successfully.");
+  console.info('Contact messages seeded successfully.');
 };
 
 export const runContactSeeder = async (standalone = false): Promise<void> => {
@@ -65,9 +60,9 @@ export const runContactSeeder = async (standalone = false): Promise<void> => {
 
     await seedContact();
 
-    console.info("Contact seeding completed.");
+    console.info('Contact seeding completed.');
   } catch (error) {
-    console.error("Failed to seed contact messages.", error);
+    console.error('Failed to seed contact messages.', error);
 
     throw error;
   } finally {
@@ -77,7 +72,7 @@ export const runContactSeeder = async (standalone = false): Promise<void> => {
   }
 };
 
-if (process.argv[1]?.includes("contact.seeder")) {
+if (process.argv[1]?.includes('contact.seeder')) {
   void runContactSeeder(true);
 }
 

@@ -1,41 +1,46 @@
 // src/modules/testimonials/testimonials.seeder.ts
 
-import mongoose from "mongoose";
+/* -------------------------------------------------------------------------- */
+/*                                   Imports                                  */
+/* -------------------------------------------------------------------------- */
 
-import { connectDatabase } from "../../config/database.js";
+import mongoose from 'mongoose';
 
-import {
-  TESTIMONIAL_CLIENT_TYPE,
-  TESTIMONIAL_DEFAULT,
-} from "./testimonials.constant.js";
+import { connectDatabase } from '../../configs/database.config.js';
 
-import { Testimonial } from "./testimonials.model.js";
+import { TESTIMONIAL_DEFAULT, TESTIMONIAL_TYPE } from './testimonials.constant.js';
+
+import { Testimonial } from './testimonials.model.js';
+
+/* -------------------------------------------------------------------------- */
+/*                              Seed Testimonials                             */
+/* -------------------------------------------------------------------------- */
 
 export const seedTestimonials = async (): Promise<void> => {
   const existingCount = await Testimonial.countDocuments();
 
   if (existingCount > 0) {
-    console.info("Testimonials already seeded.");
+    console.info('Testimonials already seeded.');
 
     return;
   }
 
   await Testimonial.insertMany([
     {
-      clientName: "Pending Verification",
+      clientName: 'Pending Verification',
 
-      clientPosition: "Former Manager",
+      clientPosition: 'Former Manager',
 
-      clientCompany: "Sirahu Technologies Pvt. Ltd.",
+      clientCompany: 'Sirahu Technologies Pvt. Ltd.',
 
-      projectName: "Enterprise Web Applications",
+      projectName: 'Enterprise Web Applications',
 
       review:
-        "Placeholder testimonial. Replace this with an actual recommendation from your former manager or colleague.",
+        'Placeholder testimonial. Replace this with an actual recommendation from your former manager or colleague.',
 
       rating: 5,
 
-      clientType: TESTIMONIAL_CLIENT_TYPE.COMPANY,
+      clientType: TESTIMONIAL_TYPE.COMPANY,
 
       isFeatured: true,
 
@@ -45,20 +50,20 @@ export const seedTestimonials = async (): Promise<void> => {
     },
 
     {
-      clientName: "Pending Verification",
+      clientName: 'Pending Verification',
 
-      clientPosition: "Project Manager",
+      clientPosition: 'Project Manager',
 
-      clientCompany: "Argick Software Ltd.",
+      clientCompany: 'Argick Software Ltd.',
 
-      projectName: "Learning Management System",
+      projectName: 'Learning Management System',
 
       review:
-        "Placeholder testimonial. Replace this with a genuine recommendation received from your project manager or client.",
+        'Placeholder testimonial. Replace this with a genuine recommendation received from your project manager or client.',
 
       rating: 5,
 
-      clientType: TESTIMONIAL_CLIENT_TYPE.COMPANY,
+      clientType: TESTIMONIAL_TYPE.COMPANY,
 
       isFeatured: true,
 
@@ -68,20 +73,20 @@ export const seedTestimonials = async (): Promise<void> => {
     },
 
     {
-      clientName: "Pending Verification",
+      clientName: 'Pending Verification',
 
-      clientPosition: "Technical Lead",
+      clientPosition: 'Technical Lead',
 
-      clientCompany: "Shalom InfoTech Ltd.",
+      clientCompany: 'Shalom InfoTech Ltd.',
 
-      projectName: "Enterprise Web & Mobile Applications",
+      projectName: 'Enterprise Web & Mobile Applications',
 
       review:
-        "Placeholder testimonial. Replace this with a genuine testimonial from your technical lead, manager, or customer.",
+        'Placeholder testimonial. Replace this with a genuine testimonial from your technical lead, manager, or customer.',
 
       rating: 5,
 
-      clientType: TESTIMONIAL_CLIENT_TYPE.COMPANY,
+      clientType: TESTIMONIAL_TYPE.COMPANY,
 
       isFeatured: true,
 
@@ -91,20 +96,20 @@ export const seedTestimonials = async (): Promise<void> => {
     },
 
     {
-      clientName: "Pending Verification",
+      clientName: 'Pending Verification',
 
-      clientPosition: "Freelance Client",
+      clientPosition: 'Freelance Client',
 
-      clientCompany: "Freelance Project",
+      clientCompany: 'Freelance Project',
 
-      projectName: "Custom Software Development",
+      projectName: 'Custom Software Development',
 
       review:
-        "Placeholder testimonial. Replace this with real feedback received from a freelance client after obtaining permission.",
+        'Placeholder testimonial. Replace this with real feedback received from a freelance client after obtaining permission.',
 
       rating: 5,
 
-      clientType: TESTIMONIAL_CLIENT_TYPE.FREELANCER,
+      clientType: TESTIMONIAL_TYPE.FREELANCER,
 
       isFeatured: false,
 
@@ -114,20 +119,20 @@ export const seedTestimonials = async (): Promise<void> => {
     },
 
     {
-      clientName: "Pending Verification",
+      clientName: 'Pending Verification',
 
-      clientPosition: "LinkedIn Recommendation",
+      clientPosition: 'LinkedIn Recommendation',
 
-      clientCompany: "Professional Network",
+      clientCompany: 'Professional Network',
 
-      projectName: "Professional Recommendation",
+      projectName: 'Professional Recommendation',
 
       review:
-        "Placeholder testimonial. Replace this with an actual LinkedIn recommendation after obtaining permission from the author.",
+        'Placeholder testimonial. Replace this with an actual LinkedIn recommendation after obtaining permission from the author.',
 
       rating: 5,
 
-      clientType: TESTIMONIAL_CLIENT_TYPE.ORGANIZATION,
+      clientType: TESTIMONIAL_TYPE.ORGANIZATION,
 
       isFeatured: false,
 
@@ -137,20 +142,20 @@ export const seedTestimonials = async (): Promise<void> => {
     },
 
     {
-      clientName: "Pending Verification",
+      clientName: 'Pending Verification',
 
-      clientPosition: "Client",
+      clientPosition: 'Client',
 
-      clientCompany: "Email Appreciation",
+      clientCompany: 'Email Appreciation',
 
-      projectName: "Completed Project",
+      projectName: 'Completed Project',
 
       review:
-        "Placeholder testimonial. Replace this with a real appreciation email or customer feedback after obtaining permission.",
+        'Placeholder testimonial. Replace this with real appreciation received from a client after obtaining permission.',
 
       rating: 5,
 
-      clientType: TESTIMONIAL_CLIENT_TYPE.INDIVIDUAL,
+      clientType: TESTIMONIAL_TYPE.INDIVIDUAL,
 
       isFeatured: false,
 
@@ -160,12 +165,14 @@ export const seedTestimonials = async (): Promise<void> => {
     },
   ]);
 
-  console.info("Testimonials seeded successfully.");
+  console.info('Testimonials seeded successfully.');
 };
 
-export const runTestimonialsSeeder = async (
-  standalone = false,
-): Promise<void> => {
+/* -------------------------------------------------------------------------- */
+/*                            Standalone Seeder                               */
+/* -------------------------------------------------------------------------- */
+
+export const runTestimonialsSeeder = async (standalone = false): Promise<void> => {
   try {
     if (standalone) {
       await connectDatabase();
@@ -173,7 +180,7 @@ export const runTestimonialsSeeder = async (
 
     await seedTestimonials();
 
-    console.info("Testimonials seeding completed.");
+    console.info('Testimonials seeding completed.');
   } finally {
     if (standalone) {
       await mongoose.connection.close();
@@ -181,8 +188,16 @@ export const runTestimonialsSeeder = async (
   }
 };
 
-if (process.argv[1]?.includes("testimonials.seeder")) {
+/* -------------------------------------------------------------------------- */
+/*                            Execute Directly                                */
+/* -------------------------------------------------------------------------- */
+
+if (process.argv[1]?.includes('testimonials.seeder')) {
   void runTestimonialsSeeder(true);
 }
+
+/* -------------------------------------------------------------------------- */
+/*                                   Export                                   */
+/* -------------------------------------------------------------------------- */
 
 export default seedTestimonials;

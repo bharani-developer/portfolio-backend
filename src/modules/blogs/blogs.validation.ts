@@ -1,198 +1,476 @@
-// src\modules\blogs\blogs.validation.ts
+/**
+ * Blog validation schemas.
+ *
+ * Structure:
+ * 1. Imports
+ * 2. Helper Schemas
+ * 3. Reusable Validators
+ * 4. Base Schema
+ * 5. Create Validation
+ * 6. Update Validation
+ * 7. Export
+ * 8. Infer Types
+ */
 
-import { z } from "zod";
+/* -------------------------------------------------------------------------- */
+/*                                   Imports                                  */
+/* -------------------------------------------------------------------------- */
+
+import { z } from 'zod';
 
 import {
   BLOG_CATEGORIES,
   BLOG_DEFAULT,
   BLOG_STATUSES,
   BLOG_STATUS,
-} from "./blogs.constant.js";
+  BLOG_VALIDATION,
+} from './blogs.constant.js';
 
-const imageSchema = z.object({
-  url: z.string().trim().url("Invalid image URL"),
+/* -------------------------------------------------------------------------- */
+/*                               Helper Schemas                               */
+/* -------------------------------------------------------------------------- */
 
-  publicId: z.string().trim().min(1, "Public ID is required"),
+const imageSchema = z
+  .object({
+    url: z
+      .string({
+        error: 'Featured image URL is required',
+      })
+      .trim()
+      .url('Featured image URL must be a valid URL')
+      .max(
+        BLOG_VALIDATION.FEATURED_IMAGE.URL_MAX_LENGTH,
+        `Featured image URL cannot exceed ${BLOG_VALIDATION.FEATURED_IMAGE.URL_MAX_LENGTH} characters`,
+      ),
+
+    publicId: z
+      .string({
+        error: 'Featured image public ID is required',
+      })
+      .trim()
+      .min(1, 'Featured image public ID is required')
+      .max(
+        BLOG_VALIDATION.FEATURED_IMAGE.PUBLIC_ID_MAX_LENGTH,
+        `Featured image public ID cannot exceed ${BLOG_VALIDATION.FEATURED_IMAGE.PUBLIC_ID_MAX_LENGTH} characters`,
+      ),
+  })
+  .strict();
+
+/* -------------------------------------------------------------------------- */
+/*                             Reusable Validators                            */
+/* -------------------------------------------------------------------------- */
+
+const titleSchema = z
+  .string({
+    error: 'Title is required',
+  })
+  .trim()
+  .min(
+    BLOG_VALIDATION.TITLE.MIN_LENGTH,
+    `Title must be at least ${BLOG_VALIDATION.TITLE.MIN_LENGTH} characters`,
+  )
+  .max(
+    BLOG_VALIDATION.TITLE.MAX_LENGTH,
+    `Title cannot exceed ${BLOG_VALIDATION.TITLE.MAX_LENGTH} characters`,
+  );
+
+const excerptSchema = z
+  .string({
+    error: 'Excerpt is required',
+  })
+  .trim()
+  .min(1, 'Excerpt is required')
+  .max(
+    BLOG_VALIDATION.EXCERPT.MAX_LENGTH,
+    `Excerpt cannot exceed ${BLOG_VALIDATION.EXCERPT.MAX_LENGTH} characters`,
+  );
+
+const contentSchema = z
+  .string({
+    error: 'Content is required',
+  })
+  .trim()
+  .min(
+    BLOG_VALIDATION.CONTENT.MIN_LENGTH,
+    `Content must be at least ${BLOG_VALIDATION.CONTENT.MIN_LENGTH} characters`,
+  );
+
+const categorySchema = z.enum(BLOG_CATEGORIES as [string, ...string[]], {
+  error: () => ({
+    message: 'Invalid blog category',
+  }),
 });
 
-const createBlogValidationSchema = z.object({
-  body: z
-    .object({
-      title: z
-        .string()
-        .trim()
-        .min(5, "Title must be at least 5 characters")
-        .max(200, "Title cannot exceed 200 characters"),
+const authorSchema = z
+  .string({
+    error: 'Author name is required',
+  })
+  .trim()
+  .min(2, 'Author name is required')
+  .max(
+    BLOG_VALIDATION.AUTHOR.MAX_LENGTH,
+    `Author name cannot exceed ${BLOG_VALIDATION.AUTHOR.MAX_LENGTH} characters`,
+  );
 
-      excerpt: z
-        .string()
-        .trim()
-        .min(20, "Excerpt must be at least 20 characters")
-        .max(500, "Excerpt cannot exceed 500 characters"),
+const tagsSchema = z
+  .array(
+    z
+      .string()
+      .trim()
+      .min(1, 'Tag cannot be empty')
+      .max(
+        BLOG_VALIDATION.TAGS.MAX_LENGTH,
+        `Each tag cannot exceed ${BLOG_VALIDATION.TAGS.MAX_LENGTH} characters`,
+      ),
+  )
+  .max(BLOG_VALIDATION.TAGS.MAX_COUNT, `Tags cannot exceed ${BLOG_VALIDATION.TAGS.MAX_COUNT} items`)
+  .default([])
+  .superRefine((tags, ctx) => {
+    const seen = new Set<string>();
 
-      content: z
-        .string()
-        .trim()
-        .min(50, "Content must be at least 50 characters"),
+    tags.forEach((tag, index) => {
+      const normalized = tag.trim().toLowerCase();
 
-      featuredImage: imageSchema.optional(),
-
-      category: z.enum(BLOG_CATEGORIES as [string, ...string[]], {
-        error: () => ({
-          message: "Invalid blog category",
-        }),
-      }),
-
-      tags: z
-        .array(z.string().trim().min(1))
-        .max(50, "Tags cannot exceed 50 items")
-        .default([]),
-
-      author: z
-        .string()
-        .trim()
-        .min(2, "Author name is required")
-        .max(100, "Author name cannot exceed 100 characters"),
-
-      status: z
-        .enum(BLOG_STATUSES as [string, ...string[]], {
-          error: () => ({
-            message: "Invalid blog status",
-          }),
-        })
-        .default(BLOG_STATUS.DRAFT),
-
-      readTime: z
-        .number()
-        .int()
-        .positive("Read time must be greater than zero")
-        .default(BLOG_DEFAULT.READ_TIME),
-
-      isFeatured: z.boolean().default(BLOG_DEFAULT.IS_FEATURED),
-
-      isPublished: z.boolean().default(BLOG_DEFAULT.IS_PUBLISHED),
-
-      publishedAt: z.union([z.coerce.date(), z.null()]).optional(),
-
-      seoTitle: z
-        .string()
-        .trim()
-        .max(70, "SEO title cannot exceed 70 characters")
-        .optional(),
-
-      seoDescription: z
-        .string()
-        .trim()
-        .max(160, "SEO description cannot exceed 160 characters")
-        .optional(),
-
-      seoKeywords: z
-        .array(z.string().trim().min(1))
-        .max(30, "SEO keywords cannot exceed 30 items")
-        .default([]),
-
-      canonicalUrl: z.string().trim().url("Invalid canonical URL").optional(),
-
-      sortOrder: z
-        .number()
-        .int()
-        .min(0, "Sort order cannot be negative")
-        .default(BLOG_DEFAULT.SORT_ORDER),
-
-      isActive: z.boolean().default(BLOG_DEFAULT.IS_ACTIVE),
-    })
-    .superRefine((data, ctx) => {
-      const isPublished =
-        data.status === BLOG_STATUS.PUBLISHED || data.isPublished;
-
-      if (isPublished && !data.publishedAt) {
+      if (seen.has(normalized)) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-
-          path: ["publishedAt"],
-
-          message: "Published blog must have a publication date",
+          path: [index],
+          message: 'Duplicate tags are not allowed',
         });
+
+        return;
       }
 
-      if (data.publishedAt && data.publishedAt > new Date()) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
+      seen.add(normalized);
+    });
+  });
 
-          path: ["publishedAt"],
-
-          message: "Published date cannot be in the future",
-        });
-      }
+const statusSchema = z
+  .enum(BLOG_STATUSES as [string, ...string[]], {
+    error: () => ({
+      message: 'Invalid blog status',
     }),
+  })
+  .default(BLOG_STATUS.DRAFT);
+
+const readTimeSchema = z
+  .number({
+    error: 'Read time must be a valid number',
+  })
+  .int('Read time must be an integer')
+  .min(
+    BLOG_VALIDATION.READ_TIME.MIN,
+    `Read time must be at least ${BLOG_VALIDATION.READ_TIME.MIN} minute`,
+  )
+  .max(
+    BLOG_VALIDATION.READ_TIME.MAX,
+    `Read time cannot exceed ${BLOG_VALIDATION.READ_TIME.MAX} minutes`,
+  )
+  .default(BLOG_DEFAULT.READ_TIME);
+
+const viewCountSchema = z
+  .number({
+    error: 'View count must be a valid number',
+  })
+  .int('View count must be an integer')
+  .min(BLOG_VALIDATION.VIEW_COUNT.MIN, 'View count cannot be negative')
+  .default(BLOG_DEFAULT.VIEW_COUNT);
+
+const isFeaturedSchema = z.boolean().default(BLOG_DEFAULT.IS_FEATURED);
+
+const isPublishedSchema = z.boolean().default(BLOG_DEFAULT.IS_PUBLISHED);
+
+const publishedAtSchema = z.union([z.coerce.date(), z.null()]).optional();
+
+const seoTitleSchema = z
+  .string()
+  .trim()
+  .max(
+    BLOG_VALIDATION.SEO_TITLE.MAX_LENGTH,
+    `SEO title cannot exceed ${BLOG_VALIDATION.SEO_TITLE.MAX_LENGTH} characters`,
+  )
+  .optional();
+
+const seoDescriptionSchema = z
+  .string()
+  .trim()
+  .max(
+    BLOG_VALIDATION.SEO_DESCRIPTION.MAX_LENGTH,
+    `SEO description cannot exceed ${BLOG_VALIDATION.SEO_DESCRIPTION.MAX_LENGTH} characters`,
+  )
+  .optional();
+
+const seoKeywordsSchema = z
+  .array(
+    z
+      .string()
+      .trim()
+      .min(1, 'SEO keyword cannot be empty')
+      .max(
+        BLOG_VALIDATION.SEO_KEYWORDS.MAX_LENGTH,
+        `SEO keyword cannot exceed ${BLOG_VALIDATION.SEO_KEYWORDS.MAX_LENGTH} characters`,
+      ),
+  )
+  .max(
+    BLOG_VALIDATION.SEO_KEYWORDS.MAX_COUNT,
+    `SEO keywords cannot exceed ${BLOG_VALIDATION.SEO_KEYWORDS.MAX_COUNT} items`,
+  )
+  .default([])
+  .superRefine((keywords, ctx) => {
+    const seen = new Set<string>();
+
+    keywords.forEach((keyword, index) => {
+      const normalized = keyword.trim().toLowerCase();
+
+      if (seen.has(normalized)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: [index],
+          message: 'Duplicate SEO keywords are not allowed',
+        });
+
+        return;
+      }
+
+      seen.add(normalized);
+    });
+  });
+
+const canonicalUrlSchema = z
+  .string()
+  .trim()
+  .refine((value) => value.startsWith('/') || /^https?:\/\/.+$/i.test(value), {
+    message: 'Canonical URL must be a valid URL or relative path',
+  })
+  .optional();
+
+const sortOrderSchema = z
+  .number({
+    error: 'Sort order must be a valid number',
+  })
+  .int('Sort order must be an integer')
+  .min(
+    BLOG_VALIDATION.SORT_ORDER.MIN,
+    `Sort order cannot be less than ${BLOG_VALIDATION.SORT_ORDER.MIN}`,
+  )
+  .max(BLOG_VALIDATION.SORT_ORDER.MAX, `Sort order cannot exceed ${BLOG_VALIDATION.SORT_ORDER.MAX}`)
+  .default(BLOG_DEFAULT.SORT_ORDER);
+
+const isActiveSchema = z.boolean().default(BLOG_DEFAULT.IS_ACTIVE);
+
+/* -------------------------------------------------------------------------- */
+/*                           Create Body Validation                           */
+/* -------------------------------------------------------------------------- */
+
+const createBlogBodySchema = z
+  .object({
+    title: titleSchema,
+
+    excerpt: excerptSchema,
+
+    content: contentSchema,
+
+    featuredImage: imageSchema.optional(),
+
+    category: categorySchema,
+
+    tags: tagsSchema,
+
+    author: authorSchema,
+
+    status: statusSchema,
+
+    readTime: readTimeSchema,
+
+    viewCount: viewCountSchema,
+
+    isFeatured: isFeaturedSchema,
+
+    isPublished: isPublishedSchema,
+
+    publishedAt: publishedAtSchema,
+
+    seoTitle: seoTitleSchema,
+
+    seoDescription: seoDescriptionSchema,
+
+    seoKeywords: seoKeywordsSchema,
+
+    canonicalUrl: canonicalUrlSchema,
+
+    sortOrder: sortOrderSchema,
+
+    isActive: isActiveSchema,
+  })
+  .strict()
+  .superRefine((data, ctx) => {
+    const shouldBePublished = data.status === BLOG_STATUS.PUBLISHED || data.isPublished === true;
+
+    if (shouldBePublished && !data.publishedAt) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['publishedAt'],
+        message: 'Published blog must have a publication date',
+      });
+    }
+
+    if (data.publishedAt && data.publishedAt.getTime() > Date.now()) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['publishedAt'],
+        message: 'Publication date cannot be in the future',
+      });
+    }
+
+    if (data.status === BLOG_STATUS.DRAFT && data.isPublished) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['isPublished'],
+        message: 'Draft blog cannot be marked as published',
+      });
+    }
+
+    if (data.status === BLOG_STATUS.ARCHIVED && data.isPublished) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['status'],
+        message: 'Archived blog cannot remain published',
+      });
+    }
+  });
+
+/* -------------------------------------------------------------------------- */
+/*                           Update Body Validation                           */
+/* -------------------------------------------------------------------------- */
+
+const updateBlogBodySchema = z
+  .object({
+    title: titleSchema.optional(),
+
+    excerpt: excerptSchema.optional(),
+
+    content: contentSchema.optional(),
+
+    featuredImage: imageSchema.optional(),
+
+    category: categorySchema.optional(),
+
+    tags: tagsSchema.optional(),
+
+    author: authorSchema.optional(),
+
+    status: statusSchema.optional(),
+
+    readTime: readTimeSchema.optional(),
+
+    viewCount: viewCountSchema.optional(),
+
+    isFeatured: isFeaturedSchema.optional(),
+
+    isPublished: isPublishedSchema.optional(),
+
+    publishedAt: publishedAtSchema,
+
+    seoTitle: seoTitleSchema,
+
+    seoDescription: seoDescriptionSchema,
+
+    seoKeywords: seoKeywordsSchema.optional(),
+
+    canonicalUrl: canonicalUrlSchema,
+
+    sortOrder: sortOrderSchema.optional(),
+
+    isActive: isActiveSchema.optional(),
+  })
+  .strict()
+  .superRefine((data, ctx) => {
+    if (data.publishedAt && data.publishedAt.getTime() > Date.now()) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['publishedAt'],
+        message: 'Publication date cannot be in the future',
+      });
+    }
+
+    if (data.status === BLOG_STATUS.DRAFT && data.isPublished === true) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['isPublished'],
+        message: 'Draft blog cannot be marked as published',
+      });
+    }
+
+    if (data.status === BLOG_STATUS.ARCHIVED && data.isPublished === true) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['status'],
+        message: 'Archived blog cannot remain published',
+      });
+    }
+
+    if (data.status === BLOG_STATUS.PUBLISHED && data.publishedAt === undefined) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['publishedAt'],
+        message: 'Publication date is required when publishing a blog',
+      });
+    }
+  });
+/* -------------------------------------------------------------------------- */
+/*                             Request Validation                             */
+/* -------------------------------------------------------------------------- */
+
+const createBlogValidationSchema = z.object({
+  body: createBlogBodySchema,
 });
 
 const updateBlogValidationSchema = z.object({
-  body: z
-    .object({
-      title: z.string().trim().min(5).max(200).optional(),
-
-      excerpt: z.string().trim().min(20).max(500).optional(),
-
-      content: z.string().trim().min(50).optional(),
-
-      featuredImage: imageSchema.optional(),
-
-      category: z
-        .enum(BLOG_CATEGORIES as [string, ...string[]], {
-          error: () => ({
-            message: "Invalid blog category",
-          }),
-        })
-        .optional(),
-
-      tags: z.array(z.string().trim().min(1)).max(50).optional(),
-
-      author: z.string().trim().min(2).max(100).optional(),
-
-      status: z
-        .enum(BLOG_STATUSES as [string, ...string[]], {
-          error: () => ({
-            message: "Invalid blog status",
-          }),
-        })
-        .optional(),
-
-      readTime: z.number().int().positive().optional(),
-
-      isFeatured: z.boolean().optional(),
-
-      isPublished: z.boolean().optional(),
-
-      publishedAt: z.union([z.coerce.date(), z.null()]).optional(),
-
-      seoTitle: z.string().trim().max(70).optional(),
-
-      seoDescription: z.string().trim().max(160).optional(),
-
-      seoKeywords: z.array(z.string().trim().min(1)).max(30).optional(),
-
-      canonicalUrl: z.string().trim().url("Invalid canonical URL").optional(),
-
-      sortOrder: z.number().int().min(0).optional(),
-
-      isActive: z.boolean().optional(),
-    })
-    .superRefine((data, ctx) => {
-      if (data.publishedAt && data.publishedAt > new Date()) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-
-          path: ["publishedAt"],
-
-          message: "Published date cannot be in the future",
-        });
-      }
-    }),
+  body: updateBlogBodySchema,
 });
 
-export const BlogValidation = {
+/* -------------------------------------------------------------------------- */
+/*                                   Export                                   */
+/* -------------------------------------------------------------------------- */
+
+export const BlogValidation = Object.freeze({
   createBlogValidationSchema,
 
   updateBlogValidationSchema,
+});
+
+/* -------------------------------------------------------------------------- */
+/*                                 Infer Types                                */
+/* -------------------------------------------------------------------------- */
+
+export type TCreateBlogInput = z.infer<typeof createBlogBodySchema>;
+
+export type TUpdateBlogInput = z.infer<typeof updateBlogBodySchema>;
+
+/* -------------------------------------------------------------------------- */
+/*                             Reusable Exports                               */
+/* -------------------------------------------------------------------------- */
+
+export {
+  imageSchema,
+  titleSchema,
+  excerptSchema,
+  contentSchema,
+  categorySchema,
+  authorSchema,
+  tagsSchema,
+  statusSchema,
+  readTimeSchema,
+  viewCountSchema,
+  isFeaturedSchema,
+  isPublishedSchema,
+  publishedAtSchema,
+  seoTitleSchema,
+  seoDescriptionSchema,
+  seoKeywordsSchema,
+  canonicalUrlSchema,
+  sortOrderSchema,
+  isActiveSchema,
+  createBlogBodySchema,
+  updateBlogBodySchema,
 };

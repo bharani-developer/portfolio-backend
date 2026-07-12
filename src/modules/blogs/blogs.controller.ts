@@ -1,13 +1,41 @@
-// src/modules/blogs/blogs.controller.ts
+/* -------------------------------------------------------------------------- */
+/*                                   Imports                                  */
+/* -------------------------------------------------------------------------- */
 
-import { MESSAGE, httpStatus } from "../../constants/index.js";
+// Express
+import type { Request, Response } from 'express';
 
-import { catchAsync, sendResponse } from "../../utils/index.js";
+// Third-party
+import httpStatus from 'http-status';
 
-import { BlogService } from "./blogs.service.js";
+// Constants
+import { MESSAGE } from '../../constants/index.js';
 
-const createBlog = catchAsync(async (req, res) => {
-  const result = await BlogService.createBlog(req.body);
+// Shared
+import { catchAsync, sendResponse } from '../../shared/utils/index.js';
+
+// Module
+import { BlogService } from './blogs.service.js';
+
+// Types
+import type { TCreateBlogPayload, TUpdateBlogPayload } from './blogs.types.js';
+
+/* -------------------------------------------------------------------------- */
+/*                              Helper Functions                              */
+/* -------------------------------------------------------------------------- */
+
+/* -------------------------------------------------------------------------- */
+/*                                Helper Types                                */
+/* -------------------------------------------------------------------------- */
+
+/* -------------------------------------------------------------------------- */
+/*                                   Create                                   */
+/* -------------------------------------------------------------------------- */
+
+const createBlog = catchAsync(async (req: Request, res: Response) => {
+  const payload: TCreateBlogPayload = req.body;
+
+  const result = await BlogService.createBlog(payload);
 
   sendResponse(res, {
     statusCode: httpStatus.CREATED,
@@ -20,7 +48,11 @@ const createBlog = catchAsync(async (req, res) => {
   });
 });
 
-const getBlogs = catchAsync(async (req, res) => {
+/* -------------------------------------------------------------------------- */
+/*                                  Get All                                   */
+/* -------------------------------------------------------------------------- */
+
+const getBlogs = catchAsync(async (req: Request, res: Response) => {
   const result = await BlogService.getBlogs(req.query);
 
   sendResponse(res, {
@@ -36,7 +68,11 @@ const getBlogs = catchAsync(async (req, res) => {
   });
 });
 
-const getBlogById = catchAsync(async (req, res) => {
+/* -------------------------------------------------------------------------- */
+/*                                  Get One                                   */
+/* -------------------------------------------------------------------------- */
+
+const getBlogById = catchAsync(async (req: Request, res: Response) => {
   const id = String(req.params.id);
 
   const result = await BlogService.getBlogById(id);
@@ -52,10 +88,31 @@ const getBlogById = catchAsync(async (req, res) => {
   });
 });
 
-const updateBlog = catchAsync(async (req, res) => {
+const getBlogBySlug = catchAsync(async (req: Request, res: Response) => {
+  const slug = String(req.params.slug);
+
+  const result = await BlogService.getBlogBySlug(slug);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+
+    success: true,
+
+    message: MESSAGE.RETRIEVED,
+
+    data: result,
+  });
+});
+/* -------------------------------------------------------------------------- */
+/*                                   Update                                   */
+/* -------------------------------------------------------------------------- */
+
+const updateBlog = catchAsync(async (req: Request, res: Response) => {
   const id = String(req.params.id);
 
-  const result = await BlogService.updateBlog(id, req.body);
+  const payload: TUpdateBlogPayload = req.body;
+
+  const result = await BlogService.updateBlog(id, payload);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -68,7 +125,11 @@ const updateBlog = catchAsync(async (req, res) => {
   });
 });
 
-const deleteBlog = catchAsync(async (req, res) => {
+/* -------------------------------------------------------------------------- */
+/*                                   Delete                                   */
+/* -------------------------------------------------------------------------- */
+
+const deleteBlog = catchAsync(async (req: Request, res: Response) => {
   const id = String(req.params.id);
 
   const result = await BlogService.deleteBlog(id);
@@ -84,7 +145,11 @@ const deleteBlog = catchAsync(async (req, res) => {
   });
 });
 
-const getActiveBlogs = catchAsync(async (_req, res) => {
+/* -------------------------------------------------------------------------- */
+/*                               Custom Queries                               */
+/* -------------------------------------------------------------------------- */
+
+const getActiveBlogs = catchAsync(async (_req: Request, res: Response) => {
   const result = await BlogService.getActiveBlogs();
 
   sendResponse(res, {
@@ -98,7 +163,7 @@ const getActiveBlogs = catchAsync(async (_req, res) => {
   });
 });
 
-const getPublishedBlogs = catchAsync(async (_req, res) => {
+const getPublishedBlogs = catchAsync(async (_req: Request, res: Response) => {
   const result = await BlogService.getPublishedBlogs();
 
   sendResponse(res, {
@@ -112,7 +177,7 @@ const getPublishedBlogs = catchAsync(async (_req, res) => {
   });
 });
 
-const getFeaturedBlogs = catchAsync(async (_req, res) => {
+const getFeaturedBlogs = catchAsync(async (_req: Request, res: Response) => {
   const result = await BlogService.getFeaturedBlogs();
 
   sendResponse(res, {
@@ -126,40 +191,8 @@ const getFeaturedBlogs = catchAsync(async (_req, res) => {
   });
 });
 
-const getBlogBySlug = catchAsync(async (req, res) => {
-  const slug = String(req.params.slug);
-
-  const result = await BlogService.getBlogBySlug(slug);
-
-  sendResponse(res, {
-    statusCode: httpStatus.OK,
-
-    success: true,
-
-    message: MESSAGE.RETRIEVED,
-
-    data: result,
-  });
-});
-
-const incrementViewCount = catchAsync(async (req, res) => {
-  const slug = String(req.params.slug);
-
-  const result = await BlogService.incrementViewCount(slug);
-
-  sendResponse(res, {
-    statusCode: httpStatus.OK,
-
-    success: true,
-
-    message: "View count updated successfully",
-
-    data: result,
-  });
-});
-
-const getBlogsByCategory = catchAsync(async (req, res) => {
-  const category = String(req.params.category) as never;
+const getBlogsByCategory = catchAsync(async (req: Request, res: Response) => {
+  const category = String(req.params.category);
 
   const result = await BlogService.getBlogsByCategory(category);
 
@@ -174,7 +207,7 @@ const getBlogsByCategory = catchAsync(async (req, res) => {
   });
 });
 
-const getBlogsByTag = catchAsync(async (req, res) => {
+const getBlogsByTag = catchAsync(async (req: Request, res: Response) => {
   const tag = String(req.params.tag);
 
   const result = await BlogService.getBlogsByTag(tag);
@@ -190,7 +223,7 @@ const getBlogsByTag = catchAsync(async (req, res) => {
   });
 });
 
-const getPopularBlogs = catchAsync(async (req, res) => {
+const getPopularBlogs = catchAsync(async (req: Request, res: Response) => {
   const limit = Number(req.query.limit) || 10;
 
   const result = await BlogService.getPopularBlogs(limit);
@@ -205,6 +238,29 @@ const getPopularBlogs = catchAsync(async (req, res) => {
     data: result,
   });
 });
+/* -------------------------------------------------------------------------- */
+/*                               Custom Actions                               */
+/* -------------------------------------------------------------------------- */
+
+const incrementViewCount = catchAsync(async (req: Request, res: Response) => {
+  const slug = String(req.params.slug);
+
+  const result = await BlogService.incrementViewCount(slug);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+
+    success: true,
+
+    message: MESSAGE.UPDATED,
+
+    data: result,
+  });
+});
+
+/* -------------------------------------------------------------------------- */
+/*                                   Export                                   */
+/* -------------------------------------------------------------------------- */
 
 export const BlogController = {
   createBlog,
@@ -212,6 +268,8 @@ export const BlogController = {
   getBlogs,
 
   getBlogById,
+
+  getBlogBySlug,
 
   updateBlog,
 
@@ -223,13 +281,11 @@ export const BlogController = {
 
   getFeaturedBlogs,
 
-  getBlogBySlug,
-
-  incrementViewCount,
-
   getBlogsByCategory,
 
   getBlogsByTag,
 
   getPopularBlogs,
+
+  incrementViewCount,
 };

@@ -1,85 +1,165 @@
 // src/modules/skills/skills.swagger.ts
 
-import {
-  SKILLS_CATEGORIES,
-  SKILLS_DEFAULT,
-  SKILLS_VALIDATION,
-} from "./skills.constant.js";
+/* -------------------------------------------------------------------------- */
+/*                                 1. Imports                                 */
+/* -------------------------------------------------------------------------- */
+
+import { SKILLS_CATEGORIES, SKILLS_DEFAULT, SKILLS_VALIDATION } from './skills.constant.js';
 
 /* -------------------------------------------------------------------------- */
-/*                               Reusable Enums                               */
+/*                               2. Reusable Enums                            */
 /* -------------------------------------------------------------------------- */
 
 const skillCategoryEnum = [...SKILLS_CATEGORIES];
 
 /* -------------------------------------------------------------------------- */
-/*                               Shared Schemas                               */
+/*                              3. Shared Schemas                             */
 /* -------------------------------------------------------------------------- */
 
 export const skillsSchemas = {
   Image: {
-    type: "object",
+    type: 'object',
 
-    required: ["url", "publicId"],
+    required: ['url', 'publicId'],
 
     properties: {
       url: {
-        type: "string",
-        format: "uri",
+        type: 'string',
+        format: 'uri',
         maxLength: SKILLS_VALIDATION.IMAGE.URL_MAX_LENGTH,
-        example:
-          "https://res.cloudinary.com/demo/image/upload/v1749800000/skills/react.png",
+        example: 'https://res.cloudinary.com/demo/image/upload/v1749800000/skills/react.png',
       },
 
       publicId: {
-        type: "string",
+        type: 'string',
         maxLength: SKILLS_VALIDATION.IMAGE.PUBLIC_ID_MAX_LENGTH,
-        example: "portfolio/skills/react",
+        example: 'portfolio/skills/react',
       },
     },
   },
 
+  PaginationMeta: {
+    type: 'object',
+
+    properties: {
+      page: {
+        type: 'integer',
+        example: 1,
+      },
+
+      limit: {
+        type: 'integer',
+        example: 10,
+      },
+
+      total: {
+        type: 'integer',
+        example: 50,
+      },
+
+      totalPage: {
+        type: 'integer',
+        example: 5,
+      },
+    },
+  },
+
+  ErrorResponse: {
+    type: 'object',
+
+    properties: {
+      success: {
+        type: 'boolean',
+        example: false,
+      },
+
+      statusCode: {
+        type: 'integer',
+        example: 400,
+      },
+
+      message: {
+        type: 'string',
+        example: 'Validation Error',
+      },
+    },
+  },
+
+  ValidationErrorResponse: {
+    allOf: [
+      {
+        $ref: '#/components/schemas/ErrorResponse',
+      },
+
+      {
+        type: 'object',
+
+        properties: {
+          errorMessages: {
+            type: 'array',
+
+            items: {
+              type: 'object',
+
+              properties: {
+                path: {
+                  type: 'string',
+                  example: 'name',
+                },
+
+                message: {
+                  type: 'string',
+                  example: 'Skill name is required',
+                },
+              },
+            },
+          },
+        },
+      },
+    ],
+  },
+
   Skill: {
-    type: "object",
+    type: 'object',
 
     required: [
-      "_id",
-      "name",
-      "slug",
-      "category",
-      "proficiency",
-      "sortOrder",
-      "isActive",
-      "createdAt",
-      "updatedAt",
+      '_id',
+      'name',
+      'slug',
+      'category',
+      'proficiency',
+      'sortOrder',
+      'isActive',
+      'createdAt',
+      'updatedAt',
     ],
 
     properties: {
       _id: {
-        type: "string",
-        example: "685b0d6c7e5e8d1a9a9a9a9a",
+        type: 'string',
+        example: '685b0d6c7e5e8d1a9a9a9a9a',
       },
 
       name: {
-        type: "string",
+        type: 'string',
         minLength: SKILLS_VALIDATION.NAME.MIN_LENGTH,
         maxLength: SKILLS_VALIDATION.NAME.MAX_LENGTH,
-        example: "React",
+        example: 'React',
       },
 
       slug: {
-        type: "string",
-        example: "react",
+        type: 'string',
+        example: 'react',
       },
 
       category: {
-        type: "string",
+        type: 'string',
         enum: skillCategoryEnum,
-        example: "Frontend",
+        example: 'Frontend',
       },
 
       proficiency: {
-        type: "integer",
+        type: 'integer',
         minimum: SKILLS_VALIDATION.PROFICIENCY.MIN,
         maximum: SKILLS_VALIDATION.PROFICIENCY.MAX,
         default: SKILLS_DEFAULT.PROFICIENCY,
@@ -89,21 +169,21 @@ export const skillsSchemas = {
       image: {
         allOf: [
           {
-            $ref: "#/components/schemas/Image",
+            $ref: '#/components/schemas/Image',
           },
         ],
+
         nullable: true,
       },
 
       description: {
-        type: "string",
+        type: 'string',
         maxLength: SKILLS_VALIDATION.DESCRIPTION.MAX_LENGTH,
-        example:
-          "Building modern, scalable and high-performance user interfaces using React, TypeScript and the latest ecosystem.",
+        example: 'Building scalable frontend applications using React, Next.js and TypeScript.',
       },
 
       sortOrder: {
-        type: "integer",
+        type: 'integer',
         minimum: SKILLS_VALIDATION.SORT_ORDER.MIN,
         maximum: SKILLS_VALIDATION.SORT_ORDER.MAX,
         default: SKILLS_DEFAULT.SORT_ORDER,
@@ -111,46 +191,76 @@ export const skillsSchemas = {
       },
 
       isActive: {
-        type: "boolean",
+        type: 'boolean',
         default: SKILLS_DEFAULT.IS_ACTIVE,
         example: true,
       },
 
       createdAt: {
-        type: "string",
-        format: "date-time",
-        example: "2026-06-26T10:15:30.000Z",
+        type: 'string',
+        format: 'date-time',
+        example: '2026-06-26T10:15:30.000Z',
       },
 
       updatedAt: {
-        type: "string",
-        format: "date-time",
-        example: "2026-06-26T10:15:30.000Z",
+        type: 'string',
+        format: 'date-time',
+        example: '2026-06-26T10:15:30.000Z',
+      },
+
+      isAdvanced: {
+        type: 'boolean',
+        readOnly: true,
+        example: true,
+      },
+
+      isIntermediate: {
+        type: 'boolean',
+        readOnly: true,
+        example: false,
+      },
+
+      isBeginner: {
+        type: 'boolean',
+        readOnly: true,
+        example: false,
+      },
+
+      proficiencyLevel: {
+        type: 'string',
+        readOnly: true,
+        example: 'Expert',
+      },
+
+      isVisible: {
+        type: 'boolean',
+        readOnly: true,
+        example: true,
       },
     },
   },
 
   CreateSkillRequest: {
-    type: "object",
+    type: 'object',
 
-    required: ["name", "category"],
+    required: ['name', 'category'],
 
     properties: {
       name: {
-        type: "string",
+        type: 'string',
         minLength: SKILLS_VALIDATION.NAME.MIN_LENGTH,
         maxLength: SKILLS_VALIDATION.NAME.MAX_LENGTH,
-        example: "React",
+        example: 'React',
       },
 
       category: {
-        type: "string",
+        type: 'string',
         enum: skillCategoryEnum,
-        example: "Frontend",
+        example: 'Frontend',
       },
 
       proficiency: {
-        type: "integer",
+        type: 'integer',
         minimum: SKILLS_VALIDATION.PROFICIENCY.MIN,
         maximum: SKILLS_VALIDATION.PROFICIENCY.MAX,
         default: SKILLS_DEFAULT.PROFICIENCY,
@@ -158,22 +268,17 @@ export const skillsSchemas = {
       },
 
       image: {
-        allOf: [
-          {
-            $ref: "#/components/schemas/Image",
-          },
-        ],
+        $ref: '#/components/schemas/Image',
       },
 
       description: {
-        type: "string",
+        type: 'string',
         maxLength: SKILLS_VALIDATION.DESCRIPTION.MAX_LENGTH,
-        example:
-          "Building scalable frontend applications using React, Next.js and TypeScript.",
+        example: 'Building scalable frontend applications using React, Next.js and TypeScript.',
       },
 
       sortOrder: {
-        type: "integer",
+        type: 'integer',
         minimum: SKILLS_VALIDATION.SORT_ORDER.MIN,
         maximum: SKILLS_VALIDATION.SORT_ORDER.MAX,
         default: SKILLS_DEFAULT.SORT_ORDER,
@@ -181,7 +286,7 @@ export const skillsSchemas = {
       },
 
       isActive: {
-        type: "boolean",
+        type: 'boolean',
         default: SKILLS_DEFAULT.IS_ACTIVE,
         example: true,
       },
@@ -189,339 +294,460 @@ export const skillsSchemas = {
   },
 
   UpdateSkillRequest: {
-    type: "object",
+    type: 'object',
 
     properties: {
       name: {
-        type: "string",
+        type: 'string',
         minLength: SKILLS_VALIDATION.NAME.MIN_LENGTH,
         maxLength: SKILLS_VALIDATION.NAME.MAX_LENGTH,
-        example: "Next.js",
+        example: 'Next.js',
       },
 
       category: {
-        type: "string",
+        type: 'string',
         enum: skillCategoryEnum,
-        example: "Frontend",
+        example: 'Frontend',
       },
 
       proficiency: {
-        type: "integer",
+        type: 'integer',
         minimum: SKILLS_VALIDATION.PROFICIENCY.MIN,
         maximum: SKILLS_VALIDATION.PROFICIENCY.MAX,
         example: 98,
       },
 
       image: {
-        allOf: [
-          {
-            $ref: "#/components/schemas/Image",
-          },
-        ],
+        $ref: '#/components/schemas/Image',
       },
 
       description: {
-        type: "string",
+        type: 'string',
         maxLength: SKILLS_VALIDATION.DESCRIPTION.MAX_LENGTH,
-        example:
-          "Updated skill description for the latest technologies and frameworks.",
+        example: 'Production-ready React framework for modern web applications.',
       },
 
       sortOrder: {
-        type: "integer",
+        type: 'integer',
         minimum: SKILLS_VALIDATION.SORT_ORDER.MIN,
         maximum: SKILLS_VALIDATION.SORT_ORDER.MAX,
         example: 2,
       },
 
       isActive: {
-        type: "boolean",
+        type: 'boolean',
         example: true,
       },
     },
   },
-
   SkillResponse: {
-    type: "object",
+    type: 'object',
 
     properties: {
       success: {
-        type: "boolean",
+        type: 'boolean',
         example: true,
       },
 
       statusCode: {
-        type: "integer",
+        type: 'integer',
         example: 200,
       },
 
       message: {
-        type: "string",
-        example: "Skill retrieved successfully",
+        type: 'string',
+        example: 'Skill retrieved successfully',
       },
 
       data: {
-        $ref: "#/components/schemas/Skill",
+        $ref: '#/components/schemas/Skill',
       },
     },
   },
 
   SkillsResponse: {
-    type: "object",
+    type: 'object',
 
     properties: {
       success: {
-        type: "boolean",
+        type: 'boolean',
         example: true,
       },
 
       statusCode: {
-        type: "integer",
+        type: 'integer',
         example: 200,
       },
 
       message: {
-        type: "string",
-        example: "Skill retrieved successfully",
+        type: 'string',
+        example: 'Skill retrieved successfully',
       },
 
       meta: {
-        type: "object",
-
-        properties: {
-          page: {
-            type: "integer",
-            example: 1,
-          },
-
-          limit: {
-            type: "integer",
-            example: 10,
-          },
-
-          total: {
-            type: "integer",
-            example: 50,
-          },
-
-          totalPage: {
-            type: "integer",
-            example: 5,
-          },
-        },
+        $ref: '#/components/schemas/PaginationMeta',
       },
 
       data: {
-        type: "array",
+        type: 'array',
 
         items: {
-          $ref: "#/components/schemas/Skill",
+          $ref: '#/components/schemas/Skill',
         },
       },
     },
   },
 
-  SkillDeleteResponse: {
-    type: "object",
+  ActiveSkillsResponse: {
+    type: 'object',
 
     properties: {
       success: {
-        type: "boolean",
+        type: 'boolean',
         example: true,
       },
 
       statusCode: {
-        type: "integer",
+        type: 'integer',
         example: 200,
       },
 
       message: {
-        type: "string",
-        example: "Skill deleted successfully",
+        type: 'string',
+        example: 'Skill retrieved successfully',
       },
 
       data: {
-        $ref: "#/components/schemas/Skill",
+        type: 'array',
+
+        items: {
+          $ref: '#/components/schemas/Skill',
+        },
+      },
+    },
+  },
+
+  DeleteSkillResponse: {
+    type: 'object',
+
+    properties: {
+      success: {
+        type: 'boolean',
+        example: true,
+      },
+
+      statusCode: {
+        type: 'integer',
+        example: 200,
+      },
+
+      message: {
+        type: 'string',
+        example: 'Skill deleted successfully',
+      },
+
+      data: {
+        $ref: '#/components/schemas/Skill',
+      },
+    },
+  },
+
+  UnauthorizedResponse: {
+    type: 'object',
+
+    properties: {
+      success: {
+        type: 'boolean',
+        example: false,
+      },
+
+      statusCode: {
+        type: 'integer',
+        example: 401,
+      },
+
+      message: {
+        type: 'string',
+        example: 'Unauthorized',
+      },
+    },
+  },
+
+  ForbiddenResponse: {
+    type: 'object',
+
+    properties: {
+      success: {
+        type: 'boolean',
+        example: false,
+      },
+
+      statusCode: {
+        type: 'integer',
+        example: 403,
+      },
+
+      message: {
+        type: 'string',
+        example: 'Forbidden',
+      },
+    },
+  },
+
+  NotFoundResponse: {
+    type: 'object',
+
+    properties: {
+      success: {
+        type: 'boolean',
+        example: false,
+      },
+
+      statusCode: {
+        type: 'integer',
+        example: 404,
+      },
+
+      message: {
+        type: 'string',
+        example: 'Skill not found',
+      },
+    },
+  },
+
+  ConflictResponse: {
+    type: 'object',
+
+    properties: {
+      success: {
+        type: 'boolean',
+        example: false,
+      },
+
+      statusCode: {
+        type: 'integer',
+        example: 409,
+      },
+
+      message: {
+        type: 'string',
+        example: 'Skill already exists',
+      },
+    },
+  },
+
+  InternalServerErrorResponse: {
+    type: 'object',
+
+    properties: {
+      success: {
+        type: 'boolean',
+        example: false,
+      },
+
+      statusCode: {
+        type: 'integer',
+        example: 500,
+      },
+
+      message: {
+        type: 'string',
+        example: 'Internal Server Error',
       },
     },
   },
 };
-export const skillsPaths = {
-  "/skills": {
-    get: {
-      tags: ["Skills"],
 
-      summary: "Get all skills",
+/* -------------------------------------------------------------------------- */
+/*                                  4. Paths                                  */
+/* -------------------------------------------------------------------------- */
+
+export const skillsPaths = {
+  '/skills': {
+    get: {
+      tags: ['Skills'],
+
+      operationId: 'getSkills',
+
+      summary: 'Get all skills',
 
       description:
-        "Retrieve a paginated list of skills with support for searching, filtering, sorting, pagination, and field selection.",
+        'Retrieve a paginated list of skills with support for searching, filtering, sorting, field selection and pagination.',
 
       parameters: [
         {
-          in: "query",
-          name: "searchTerm",
+          in: 'query',
+
+          name: 'searchTerm',
+
           required: false,
-          description: "Search by skill name or category.",
+
+          description: 'Search by skill name or category.',
+
           schema: {
-            type: "string",
-            example: "React",
+            type: 'string',
           },
+
+          example: 'React',
         },
 
         {
-          in: "query",
-          name: "page",
-          required: false,
-          description: "Page number.",
-          schema: {
-            type: "integer",
-            minimum: 1,
-            default: 1,
-            example: 1,
-          },
-        },
+          in: 'query',
 
-        {
-          in: "query",
-          name: "limit",
-          required: false,
-          description: "Number of records per page.",
-          schema: {
-            type: "integer",
-            minimum: 1,
-            maximum: 100,
-            default: 10,
-            example: 10,
-          },
-        },
+          name: 'category',
 
-        {
-          in: "query",
-          name: "sort",
           required: false,
-          description: "Sort fields. Prefix with '-' for descending order.",
-          schema: {
-            type: "string",
-            example: "-createdAt",
-          },
-        },
 
-        {
-          in: "query",
-          name: "fields",
-          required: false,
-          description: "Comma-separated list of fields to include.",
-          schema: {
-            type: "string",
-            example: "name,category,proficiency,image",
-          },
-        },
+          description: 'Filter by skill category.',
 
-        {
-          in: "query",
-          name: "category",
-          required: false,
-          description: "Filter by skill category.",
           schema: {
-            type: "string",
+            type: 'string',
+
             enum: skillCategoryEnum,
-            example: "Frontend",
           },
+
+          example: 'Frontend',
         },
 
         {
-          in: "query",
-          name: "isActive",
+          in: 'query',
+
+          name: 'isActive',
+
           required: false,
-          description: "Filter active/inactive skills.",
+
+          description: 'Filter by active status.',
+
           schema: {
-            type: "boolean",
-            example: true,
+            type: 'boolean',
           },
+
+          example: true,
+        },
+
+        {
+          in: 'query',
+
+          name: 'page',
+
+          required: false,
+
+          description: 'Page number.',
+
+          schema: {
+            type: 'integer',
+
+            minimum: 1,
+
+            default: 1,
+          },
+
+          example: 1,
+        },
+
+        {
+          in: 'query',
+
+          name: 'limit',
+
+          required: false,
+
+          description: 'Number of records per page.',
+
+          schema: {
+            type: 'integer',
+
+            minimum: 1,
+
+            maximum: 100,
+
+            default: 10,
+          },
+
+          example: 10,
+        },
+
+        {
+          in: 'query',
+
+          name: 'sort',
+
+          required: false,
+
+          description: 'Sort fields. Prefix with "-" for descending order.',
+
+          schema: {
+            type: 'string',
+          },
+
+          example: '-createdAt',
+        },
+
+        {
+          in: 'query',
+
+          name: 'fields',
+
+          required: false,
+
+          description: 'Comma separated fields to include in the response.',
+
+          schema: {
+            type: 'string',
+          },
+
+          example: 'name,category,proficiency,image,isAdvanced,proficiencyLevel',
         },
       ],
 
       responses: {
         200: {
-          description: "Skills retrieved successfully.",
+          description: 'Skills retrieved successfully.',
 
           content: {
-            "application/json": {
+            'application/json': {
               schema: {
-                $ref: "#/components/schemas/SkillsResponse",
-              },
-
-              examples: {
-                success: {
-                  summary: "Successful response",
-
-                  value: {
-                    success: true,
-
-                    statusCode: 200,
-
-                    message: "Skill retrieved successfully",
-
-                    meta: {
-                      page: 1,
-                      limit: 10,
-                      total: 18,
-                      totalPage: 2,
-                    },
-
-                    data: [
-                      {
-                        _id: "685b0d6c7e5e8d1a9a9a9a9a",
-
-                        name: "React",
-
-                        slug: "react",
-
-                        category: "Frontend",
-
-                        proficiency: 95,
-
-                        image: {
-                          url: "https://res.cloudinary.com/demo/image/upload/v1749800000/skills/react.png",
-
-                          publicId: "portfolio/skills/react",
-                        },
-
-                        description:
-                          "Building scalable user interfaces using React and TypeScript.",
-
-                        sortOrder: 1,
-
-                        isActive: true,
-
-                        createdAt: "2026-06-26T08:30:00.000Z",
-
-                        updatedAt: "2026-06-26T08:30:00.000Z",
-                      },
-                    ],
-                  },
-                },
+                $ref: '#/components/schemas/SkillsResponse',
               },
             },
           },
         },
 
         400: {
-          description: "Invalid query parameters.",
+          description: 'Invalid query parameters.',
+
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/ValidationErrorResponse',
+              },
+            },
+          },
         },
 
         500: {
-          description: "Internal server error.",
+          description: 'Internal server error.',
+
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/InternalServerErrorResponse',
+              },
+            },
+          },
         },
       },
     },
-    post: {
-      tags: ["Skills"],
 
-      summary: "Create a new skill",
+    post: {
+      tags: ['Skills'],
+
+      operationId: 'createSkill',
+
+      summary: 'Create a skill',
 
       description:
-        "Creates a new skill. Skill names must be unique. A slug is automatically generated from the skill name.",
+        'Create a new portfolio skill. Skill names must be unique. The slug is automatically generated from the name.',
 
       security: [
         {
@@ -533,30 +759,29 @@ export const skillsPaths = {
         required: true,
 
         content: {
-          "application/json": {
+          'application/json': {
             schema: {
-              $ref: "#/components/schemas/CreateSkillRequest",
+              $ref: '#/components/schemas/CreateSkillRequest',
             },
 
             examples: {
-              frontendSkill: {
-                summary: "Frontend Skill",
+              react: {
+                summary: 'Frontend Skill',
 
                 value: {
-                  name: "React",
+                  name: 'React',
 
-                  category: "Frontend",
+                  category: 'Frontend',
 
                   proficiency: 95,
 
                   image: {
-                    url: "https://res.cloudinary.com/demo/image/upload/v1749800000/skills/react.png",
+                    url: 'https://res.cloudinary.com/demo/image/upload/v1749800000/skills/react.png',
 
-                    publicId: "portfolio/skills/react",
+                    publicId: 'portfolio/skills/react',
                   },
 
-                  description:
-                    "Building scalable component-based user interfaces with React and TypeScript.",
+                  description: 'Building scalable user interfaces using React and TypeScript.',
 
                   sortOrder: 1,
 
@@ -564,24 +789,23 @@ export const skillsPaths = {
                 },
               },
 
-              backendSkill: {
-                summary: "Backend Skill",
+              node: {
+                summary: 'Backend Skill',
 
                 value: {
-                  name: "Node.js",
+                  name: 'Node.js',
 
-                  category: "Backend",
+                  category: 'Backend',
 
                   proficiency: 92,
 
                   image: {
-                    url: "https://res.cloudinary.com/demo/image/upload/v1749800000/skills/nodejs.png",
+                    url: 'https://res.cloudinary.com/demo/image/upload/v1749800000/skills/nodejs.png',
 
-                    publicId: "portfolio/skills/nodejs",
+                    publicId: 'portfolio/skills/nodejs',
                   },
 
-                  description:
-                    "Developing scalable REST APIs using Express.js and TypeScript.",
+                  description: 'Building scalable REST APIs with Express and TypeScript.',
 
                   sortOrder: 2,
 
@@ -595,143 +819,72 @@ export const skillsPaths = {
 
       responses: {
         201: {
-          description: "Skill created successfully.",
+          description: 'Skill created successfully.',
 
           content: {
-            "application/json": {
+            'application/json': {
               schema: {
-                $ref: "#/components/schemas/SkillResponse",
-              },
-
-              examples: {
-                success: {
-                  summary: "Successful creation",
-
-                  value: {
-                    success: true,
-
-                    statusCode: 201,
-
-                    message: "Skill created successfully",
-
-                    data: {
-                      _id: "685b0d6c7e5e8d1a9a9a9a9a",
-
-                      name: "React",
-
-                      slug: "react",
-
-                      category: "Frontend",
-
-                      proficiency: 95,
-
-                      image: {
-                        url: "https://res.cloudinary.com/demo/image/upload/v1749800000/skills/react.png",
-
-                        publicId: "portfolio/skills/react",
-                      },
-
-                      description:
-                        "Building scalable component-based user interfaces with React and TypeScript.",
-
-                      sortOrder: 1,
-
-                      isActive: true,
-
-                      createdAt: "2026-06-26T08:30:00.000Z",
-
-                      updatedAt: "2026-06-26T08:30:00.000Z",
-                    },
-                  },
-                },
+                $ref: '#/components/schemas/SkillResponse',
               },
             },
           },
         },
 
         400: {
-          description: "Validation failed.",
+          description: 'Validation failed.',
 
           content: {
-            "application/json": {
-              example: {
-                success: false,
-
-                statusCode: 400,
-
-                message: "Validation Error",
-
-                errorMessages: [
-                  {
-                    path: "name",
-
-                    message: "Skill name is required",
-                  },
-                ],
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/ValidationErrorResponse',
               },
             },
           },
         },
 
         401: {
-          description: "Authentication required.",
+          description: 'Authentication required.',
 
           content: {
-            "application/json": {
-              example: {
-                success: false,
-
-                statusCode: 401,
-
-                message: "Unauthorized",
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/UnauthorizedResponse',
               },
             },
           },
         },
 
         403: {
-          description: "Access denied.",
+          description: 'Forbidden.',
 
           content: {
-            "application/json": {
-              example: {
-                success: false,
-
-                statusCode: 403,
-
-                message: "Forbidden",
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/ForbiddenResponse',
               },
             },
           },
         },
 
         409: {
-          description: "Skill already exists.",
+          description: 'Skill already exists.',
 
           content: {
-            "application/json": {
-              example: {
-                success: false,
-
-                statusCode: 409,
-
-                message: "Skill already exists",
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/ConflictResponse',
               },
             },
           },
         },
 
         500: {
-          description: "Internal server error.",
+          description: 'Internal server error.',
 
           content: {
-            "application/json": {
-              example: {
-                success: false,
-
-                statusCode: 500,
-
-                message: "Internal Server Error",
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/InternalServerErrorResponse',
               },
             },
           },
@@ -739,93 +892,114 @@ export const skillsPaths = {
       },
     },
   },
-  "/skills/active": {
+  '/skills/active': {
     get: {
-      tags: ["Skills"],
+      tags: ['Skills'],
 
-      summary: "Get active skills",
+      operationId: 'getActiveSkills',
+
+      summary: 'Get active skills',
 
       description:
-        "Retrieve all active skills sorted by category and sort order.",
+        'Retrieve all active portfolio skills ordered by category, sort order and proficiency.',
 
       responses: {
         200: {
-          description: "Active skills retrieved successfully.",
+          description: 'Active skills retrieved successfully.',
 
           content: {
-            "application/json": {
+            'application/json': {
               schema: {
-                $ref: "#/components/schemas/SkillsResponse",
+                $ref: '#/components/schemas/ActiveSkillsResponse',
               },
 
               examples: {
                 success: {
-                  summary: "Active skills",
+                  summary: 'Active Skills',
 
                   value: {
                     success: true,
 
                     statusCode: 200,
 
-                    message: "Skill retrieved successfully",
+                    message: 'Skill retrieved successfully',
 
                     data: [
                       {
-                        _id: "685b0d6c7e5e8d1a9a9a9a9a",
+                        _id: '685b0d6c7e5e8d1a9a9a9a9a',
 
-                        name: "React",
+                        name: 'React',
 
-                        slug: "react",
+                        slug: 'react',
 
-                        category: "Frontend",
+                        category: 'Frontend',
 
                         proficiency: 95,
 
                         image: {
-                          url: "https://res.cloudinary.com/demo/image/upload/v1749800000/skills/react.png",
+                          url: 'https://res.cloudinary.com/demo/image/upload/v1749800000/skills/react.png',
 
-                          publicId: "portfolio/skills/react",
+                          publicId: 'portfolio/skills/react',
                         },
 
                         description:
-                          "Building scalable user interfaces using React and TypeScript.",
+                          'Building scalable user interfaces using React and TypeScript.',
 
                         sortOrder: 1,
 
                         isActive: true,
 
-                        createdAt: "2026-06-26T08:30:00.000Z",
+                        isAdvanced: true,
 
-                        updatedAt: "2026-06-26T08:30:00.000Z",
+                        isIntermediate: false,
+
+                        isBeginner: false,
+
+                        proficiencyLevel: 'Expert',
+
+                        isVisible: true,
+
+                        createdAt: '2026-06-26T08:30:00.000Z',
+
+                        updatedAt: '2026-06-26T08:30:00.000Z',
                       },
 
                       {
-                        _id: "685b0d6c7e5e8d1a9a9a9a9b",
+                        _id: '685b0d6c7e5e8d1a9a9a9a9b',
 
-                        name: "Node.js",
+                        name: 'Node.js',
 
-                        slug: "node-js",
+                        slug: 'node-js',
 
-                        category: "Backend",
+                        category: 'Backend',
 
                         proficiency: 92,
 
                         image: {
-                          url: "https://res.cloudinary.com/demo/image/upload/v1749800000/skills/nodejs.png",
+                          url: 'https://res.cloudinary.com/demo/image/upload/v1749800000/skills/nodejs.png',
 
-                          publicId: "portfolio/skills/nodejs",
+                          publicId: 'portfolio/skills/nodejs',
                         },
 
-                        description:
-                          "Building scalable REST APIs with Express and TypeScript.",
+                        description: 'Building scalable REST APIs with Express.js.',
 
                         sortOrder: 2,
 
                         isActive: true,
 
-                        createdAt: "2026-06-26T08:30:00.000Z",
+                        isAdvanced: true,
 
-                        updatedAt: "2026-06-26T08:30:00.000Z",
+                        isIntermediate: false,
+
+                        isBeginner: false,
+
+                        proficiencyLevel: 'Expert',
+
+                        isVisible: true,
+
+                        createdAt: '2026-06-26T08:30:00.000Z',
+
+                        updatedAt: '2026-06-26T08:30:00.000Z',
                       },
                     ],
                   },
@@ -836,16 +1010,12 @@ export const skillsPaths = {
         },
 
         500: {
-          description: "Internal server error.",
+          description: 'Internal server error.',
 
           content: {
-            "application/json": {
-              example: {
-                success: false,
-
-                statusCode: 500,
-
-                message: "Internal Server Error",
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/InternalServerErrorResponse',
               },
             },
           },
@@ -854,113 +1024,132 @@ export const skillsPaths = {
     },
   },
 
-  "/skills/category/{category}": {
+  '/skills/category/{category}': {
     get: {
-      tags: ["Skills"],
+      tags: ['Skills'],
 
-      summary: "Get skills by category",
+      operationId: 'getSkillsByCategory',
 
-      description:
-        "Retrieve all active skills belonging to a specific category.",
+      summary: 'Get skills by category',
+
+      description: 'Retrieve all active skills belonging to a specific category.',
 
       parameters: [
         {
-          in: "path",
+          in: 'path',
 
-          name: "category",
+          name: 'category',
 
           required: true,
 
-          description: "Skill category.",
+          description: 'Skill category.',
 
           schema: {
-            type: "string",
+            type: 'string',
 
             enum: skillCategoryEnum,
-
-            example: "Frontend",
           },
+
+          example: 'Frontend',
         },
       ],
 
       responses: {
         200: {
-          description: "Skills retrieved successfully.",
+          description: 'Skills retrieved successfully.',
 
           content: {
-            "application/json": {
+            'application/json': {
               schema: {
-                $ref: "#/components/schemas/SkillsResponse",
+                $ref: '#/components/schemas/ActiveSkillsResponse',
               },
 
               examples: {
-                success: {
-                  summary: "Frontend skills",
+                frontend: {
+                  summary: 'Frontend Skills',
 
                   value: {
                     success: true,
 
                     statusCode: 200,
 
-                    message: "Skill retrieved successfully",
+                    message: 'Skill retrieved successfully',
 
                     data: [
                       {
-                        _id: "685b0d6c7e5e8d1a9a9a9a9a",
+                        _id: '685b0d6c7e5e8d1a9a9a9a9a',
 
-                        name: "React",
+                        name: 'React',
 
-                        slug: "react",
+                        slug: 'react',
 
-                        category: "Frontend",
+                        category: 'Frontend',
 
                         proficiency: 95,
 
                         image: {
-                          url: "https://res.cloudinary.com/demo/image/upload/v1749800000/skills/react.png",
+                          url: 'https://res.cloudinary.com/demo/image/upload/v1749800000/skills/react.png',
 
-                          publicId: "portfolio/skills/react",
+                          publicId: 'portfolio/skills/react',
                         },
 
-                        description:
-                          "Building scalable user interfaces with React.",
+                        description: 'Building scalable React applications.',
 
                         sortOrder: 1,
 
                         isActive: true,
 
-                        createdAt: "2026-06-26T08:30:00.000Z",
+                        isAdvanced: true,
 
-                        updatedAt: "2026-06-26T08:30:00.000Z",
+                        isIntermediate: false,
+
+                        isBeginner: false,
+
+                        proficiencyLevel: 'Expert',
+
+                        isVisible: true,
+
+                        createdAt: '2026-06-26T08:30:00.000Z',
+
+                        updatedAt: '2026-06-26T08:30:00.000Z',
                       },
 
                       {
-                        _id: "685b0d6c7e5e8d1a9a9a9a9c",
+                        _id: '685b0d6c7e5e8d1a9a9a9a9c',
 
-                        name: "Next.js",
+                        name: 'Next.js',
 
-                        slug: "next-js",
+                        slug: 'next-js',
 
-                        category: "Frontend",
+                        category: 'Frontend',
 
                         proficiency: 93,
 
                         image: {
-                          url: "https://res.cloudinary.com/demo/image/upload/v1749800000/skills/nextjs.png",
+                          url: 'https://res.cloudinary.com/demo/image/upload/v1749800000/skills/nextjs.png',
 
-                          publicId: "portfolio/skills/nextjs",
+                          publicId: 'portfolio/skills/nextjs',
                         },
 
-                        description:
-                          "Developing production-grade React applications with Next.js.",
+                        description: 'Production-grade React framework.',
 
                         sortOrder: 2,
 
                         isActive: true,
 
-                        createdAt: "2026-06-26T08:30:00.000Z",
+                        isAdvanced: true,
 
-                        updatedAt: "2026-06-26T08:30:00.000Z",
+                        isIntermediate: false,
+
+                        isBeginner: false,
+
+                        proficiencyLevel: 'Expert',
+
+                        isVisible: true,
+
+                        createdAt: '2026-06-26T08:30:00.000Z',
+
+                        updatedAt: '2026-06-26T08:30:00.000Z',
                       },
                     ],
                   },
@@ -971,48 +1160,36 @@ export const skillsPaths = {
         },
 
         400: {
-          description: "Invalid category.",
+          description: 'Invalid category.',
 
           content: {
-            "application/json": {
-              example: {
-                success: false,
-
-                statusCode: 400,
-
-                message: "Invalid skill category",
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/ValidationErrorResponse',
               },
             },
           },
         },
 
         404: {
-          description: "No skills found.",
+          description: 'Skill not found.',
 
           content: {
-            "application/json": {
-              example: {
-                success: false,
-
-                statusCode: 404,
-
-                message: "Skill not found",
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/NotFoundResponse',
               },
             },
           },
         },
 
         500: {
-          description: "Internal server error.",
+          description: 'Internal server error.',
 
           content: {
-            "application/json": {
-              example: {
-                success: false,
-
-                statusCode: 500,
-
-                message: "Internal Server Error",
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/InternalServerErrorResponse',
               },
             },
           },
@@ -1020,102 +1197,82 @@ export const skillsPaths = {
       },
     },
   },
-  "/skills/{id}": {
+  '/skills/{id}': {
     get: {
-      tags: ["Skills"],
+      tags: ['Skills'],
 
-      summary: "Get skill by ID",
+      operationId: 'getSkillById',
 
-      description: "Retrieve a single skill using its unique MongoDB ObjectId.",
+      summary: 'Get skill by ID',
+
+      description: 'Retrieve a single skill using its MongoDB ObjectId.',
 
       parameters: [
         {
-          in: "path",
+          in: 'path',
 
-          name: "id",
+          name: 'id',
 
           required: true,
 
-          description: "MongoDB Skill ID.",
+          description: 'MongoDB Skill ID.',
 
           schema: {
-            type: "string",
-
-            example: "685b0d6c7e5e8d1a9a9a9a9a",
+            type: 'string',
           },
+
+          example: '685b0d6c7e5e8d1a9a9a9a9a',
         },
       ],
 
       responses: {
         200: {
-          description: "Skill retrieved successfully.",
+          description: 'Skill retrieved successfully.',
 
           content: {
-            "application/json": {
+            'application/json': {
               schema: {
-                $ref: "#/components/schemas/SkillResponse",
-              },
-
-              examples: {
-                success: {
-                  value: {
-                    success: true,
-
-                    statusCode: 200,
-
-                    message: "Skill retrieved successfully",
-
-                    data: {
-                      _id: "685b0d6c7e5e8d1a9a9a9a9a",
-
-                      name: "React",
-
-                      slug: "react",
-
-                      category: "Frontend",
-
-                      proficiency: 95,
-
-                      image: {
-                        url: "https://res.cloudinary.com/demo/image/upload/v1749800000/skills/react.png",
-
-                        publicId: "portfolio/skills/react",
-                      },
-
-                      description: "Building scalable React applications.",
-
-                      sortOrder: 1,
-
-                      isActive: true,
-
-                      createdAt: "2026-06-26T08:30:00.000Z",
-
-                      updatedAt: "2026-06-26T08:30:00.000Z",
-                    },
-                  },
-                },
+                $ref: '#/components/schemas/SkillResponse',
               },
             },
           },
         },
 
         404: {
-          description: "Skill not found.",
+          description: 'Skill not found.',
+
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/NotFoundResponse',
+              },
+            },
+          },
         },
 
         500: {
-          description: "Internal server error.",
+          description: 'Internal server error.',
+
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/InternalServerErrorResponse',
+              },
+            },
+          },
         },
       },
     },
 
     patch: {
-      tags: ["Skills"],
+      tags: ['Skills'],
 
-      summary: "Update skill",
+      operationId: 'updateSkill',
+
+      summary: 'Update skill',
 
       description:
-        "Update an existing skill. Only administrators are authorized to update skills.",
+        'Update an existing skill. Only administrators are authorized to perform this operation.',
 
       security: [
         {
@@ -1125,19 +1282,19 @@ export const skillsPaths = {
 
       parameters: [
         {
-          in: "path",
+          in: 'path',
 
-          name: "id",
+          name: 'id',
 
           required: true,
 
-          description: "MongoDB Skill ID.",
+          description: 'MongoDB Skill ID.',
 
           schema: {
-            type: "string",
-
-            example: "685b0d6c7e5e8d1a9a9a9a9a",
+            type: 'string',
           },
+
+          example: '685b0d6c7e5e8d1a9a9a9a9a',
         },
       ],
 
@@ -1145,30 +1302,32 @@ export const skillsPaths = {
         required: true,
 
         content: {
-          "application/json": {
+          'application/json': {
             schema: {
-              $ref: "#/components/schemas/UpdateSkillRequest",
+              $ref: '#/components/schemas/UpdateSkillRequest',
             },
 
             examples: {
               updateSkill: {
-                value: {
-                  name: "Next.js",
+                summary: 'Update React Skill',
 
-                  category: "Frontend",
+                value: {
+                  name: 'React',
+
+                  category: 'Frontend',
 
                   proficiency: 98,
 
                   image: {
-                    url: "https://res.cloudinary.com/demo/image/upload/v1749800000/skills/nextjs.png",
+                    url: 'https://res.cloudinary.com/demo/image/upload/v1749800000/skills/react.png',
 
-                    publicId: "portfolio/skills/nextjs",
+                    publicId: 'portfolio/skills/react',
                   },
 
                   description:
-                    "Production-ready React framework for modern web applications.",
+                    'Building enterprise-grade React applications using React 19, TypeScript and Next.js.',
 
-                  sortOrder: 2,
+                  sortOrder: 1,
 
                   isActive: true,
                 },
@@ -1180,50 +1339,100 @@ export const skillsPaths = {
 
       responses: {
         200: {
-          description: "Skill updated successfully.",
+          description: 'Skill updated successfully.',
 
           content: {
-            "application/json": {
+            'application/json': {
               schema: {
-                $ref: "#/components/schemas/SkillResponse",
+                $ref: '#/components/schemas/SkillResponse',
               },
             },
           },
         },
 
         400: {
-          description: "Validation failed.",
+          description: 'Validation failed.',
+
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/ValidationErrorResponse',
+              },
+            },
+          },
         },
 
         401: {
-          description: "Unauthorized.",
+          description: 'Unauthorized.',
+
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/UnauthorizedResponse',
+              },
+            },
+          },
         },
 
         403: {
-          description: "Forbidden.",
+          description: 'Forbidden.',
+
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/ForbiddenResponse',
+              },
+            },
+          },
         },
 
         404: {
-          description: "Skill not found.",
+          description: 'Skill not found.',
+
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/NotFoundResponse',
+              },
+            },
+          },
         },
 
         409: {
-          description: "Skill already exists.",
+          description: 'Skill already exists.',
+
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/ConflictResponse',
+              },
+            },
+          },
         },
 
         500: {
-          description: "Internal server error.",
+          description: 'Internal server error.',
+
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/InternalServerErrorResponse',
+              },
+            },
+          },
         },
       },
     },
 
     delete: {
-      tags: ["Skills"],
+      tags: ['Skills'],
 
-      summary: "Delete skill",
+      operationId: 'deleteSkill',
+
+      summary: 'Delete skill',
 
       description:
-        "Delete a skill by its MongoDB ObjectId. Only administrators are authorized to delete skills.",
+        'Delete a skill using its MongoDB ObjectId. Only administrators are authorized to delete skills.',
 
       security: [
         {
@@ -1233,89 +1442,81 @@ export const skillsPaths = {
 
       parameters: [
         {
-          in: "path",
+          in: 'path',
 
-          name: "id",
+          name: 'id',
 
           required: true,
 
-          description: "MongoDB Skill ID.",
+          description: 'MongoDB Skill ID.',
 
           schema: {
-            type: "string",
-
-            example: "685b0d6c7e5e8d1a9a9a9a9a",
+            type: 'string',
           },
+
+          example: '685b0d6c7e5e8d1a9a9a9a9a',
         },
       ],
 
       responses: {
         200: {
-          description: "Skill deleted successfully.",
+          description: 'Skill deleted successfully.',
 
           content: {
-            "application/json": {
+            'application/json': {
               schema: {
-                $ref: "#/components/schemas/SkillDeleteResponse",
-              },
-
-              examples: {
-                success: {
-                  value: {
-                    success: true,
-
-                    statusCode: 200,
-
-                    message: "Skill deleted successfully",
-
-                    data: {
-                      _id: "685b0d6c7e5e8d1a9a9a9a9a",
-
-                      name: "React",
-
-                      slug: "react",
-
-                      category: "Frontend",
-
-                      proficiency: 95,
-
-                      image: {
-                        url: "https://res.cloudinary.com/demo/image/upload/v1749800000/skills/react.png",
-
-                        publicId: "portfolio/skills/react",
-                      },
-
-                      description: "Building scalable React applications.",
-
-                      sortOrder: 1,
-
-                      isActive: true,
-
-                      createdAt: "2026-06-26T08:30:00.000Z",
-
-                      updatedAt: "2026-06-26T08:30:00.000Z",
-                    },
-                  },
-                },
+                $ref: '#/components/schemas/DeleteSkillResponse',
               },
             },
           },
         },
 
         401: {
-          description: "Unauthorized.",
+          description: 'Unauthorized.',
+
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/UnauthorizedResponse',
+              },
+            },
+          },
         },
 
         403: {
-          description: "Forbidden.",
+          description: 'Forbidden.',
+
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/ForbiddenResponse',
+              },
+            },
+          },
         },
 
         404: {
-          description: "Skill not found.",
+          description: 'Skill not found.',
+
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/NotFoundResponse',
+              },
+            },
+          },
         },
 
         500: {
-          description: "Internal server error.",
+          description: 'Internal server error.',
+
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/InternalServerErrorResponse',
+              },
+            },
+          },
         },
       },
     },

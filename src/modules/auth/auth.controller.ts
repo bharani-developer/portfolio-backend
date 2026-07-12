@@ -1,40 +1,41 @@
 // src/modules/auth/auth.controller.ts
 
-import httpStatus from "http-status";
-import { OAuth2Client } from "google-auth-library";
+import httpStatus from 'http-status';
+import type { CookieOptions } from 'express';
+import { OAuth2Client, type TokenPayload } from 'google-auth-library';
 
-import { env } from "../../config/env.js";
+import { env } from '../../configs/env.js';
+import AppError from '../../shared/utils/app-error.js';
+import catchAsync from '../../shared/utils/catch-async.js';
+import sendResponse from '../../shared/utils/send-response.js';
 
-import AppError from "../../utils/AppError.js";
-import catchAsync from "../../utils/catchAsync.js";
-import sendResponse from "../../utils/sendResponse.js";
-
-import {
-  AUTH_COOKIE,
-  AUTH_MESSAGE,
-} from "./auth.constant.js";
-
-import { AuthService } from "./auth.service.js";
-
-import type { IGooglePayload } from "./auth.interface.js";
+import { AUTH_COOKIE, AUTH_MESSAGE } from './auth.constant.js';
+import { AuthService } from './auth.service.js';
+import type { IGooglePayload } from './auth.types.js';
+import type { TChangePasswordInput, TGoogleLoginInput, TLoginInput } from './auth.validation.js';
 
 const googleClient = new OAuth2Client(env.GOOGLE_CLIENT_ID);
 
-const cookieOptions = {
+const cookieOptions: CookieOptions = {
   httpOnly: true,
-  secure: env.NODE_ENV === "production",
-  sameSite: "strict" as const,
-  maxAge: 30 * 24 * 60 * 60 * 1000,
+
+  secure: env.NODE_ENV === 'production',
+
+  sameSite: AUTH_COOKIE.SAME_SITE,
+
+  path: AUTH_COOKIE.PATH,
+
+  maxAge: AUTH_COOKIE.MAX_AGE,
+
+  priority: AUTH_COOKIE.PRIORITY,
 };
 
 const login = catchAsync(async (req, res) => {
-  const result = await AuthService.login(req.body);
+  const payload = req.body as TLoginInput;
 
-  res.cookie(
-    AUTH_COOKIE.REFRESH_TOKEN,
-    result.refreshToken,
-    cookieOptions,
-  );
+  const result = await AuthService.login(payload);
+
+  res.cookie(AUTH_COOKIE.REFRESH_TOKEN, result.refreshToken, cookieOptions);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -47,18 +48,13 @@ const login = catchAsync(async (req, res) => {
 });
 
 const googleLogin = catchAsync(async (req, res) => {
-  const { token } = req.body as {
-    token?: string;
-  };
+  const { token } = req.body as TGoogleLoginInput;
 
   if (!token) {
-    throw new AppError(
-      httpStatus.BAD_REQUEST,
-      AUTH_MESSAGE.INVALID_GOOGLE_TOKEN,
-    );
+    throw new AppError(httpStatus.BAD_REQUEST, AUTH_MESSAGE.INVALID_GOOGLE_TOKEN);
   }
 
-  let payload;
+  let payload: TokenPayload | undefined;
 
   try {
     const ticket = await googleClient.verifyIdToken({
@@ -68,47 +64,50 @@ const googleLogin = catchAsync(async (req, res) => {
 
     payload = ticket.getPayload();
   } catch {
-    throw new AppError(
-      httpStatus.UNAUTHORIZED,
-      AUTH_MESSAGE.INVALID_GOOGLE_TOKEN,
-    );
+    throw new AppError(httpStatus.UNAUTHORIZED, AUTH_MESSAGE.INVALID_GOOGLE_TOKEN);
   }
 
   if (!payload?.email) {
-    throw new AppError(
-      httpStatus.BAD_REQUEST,
-      AUTH_MESSAGE.GOOGLE_AUTH_FAILED,
-    );
+    throw new AppError(httpStatus.BAD_REQUEST, AUTH_MESSAGE.GOOGLE_AUTH_FAILED);
   }
 
   if (!payload.email_verified) {
-    throw new AppError(
-      httpStatus.UNAUTHORIZED,
-      AUTH_MESSAGE.EMAIL_NOT_VERIFIED,
-    );
+    throw new AppError(httpStatus.UNAUTHORIZED, AUTH_MESSAGE.EMAIL_NOT_VERIFIED);
   }
 
   const googlePayload: IGooglePayload = {
     sub: payload.sub,
     email: payload.email,
     email_verified: payload.email_verified,
-    name: payload.name,
-    given_name: payload.given_name,
-    family_name: payload.family_name,
-    picture: payload.picture,
-    locale: payload.locale,
-    hd: payload.hd,
+
+    ...(payload.name && {
+      name: payload.name,
+    }),
+
+    ...(payload.given_name && {
+      given_name: payload.given_name,
+    }),
+
+    ...(payload.family_name && {
+      family_name: payload.family_name,
+    }),
+
+    ...(payload.picture && {
+      picture: payload.picture,
+    }),
+
+    ...(payload.locale && {
+      locale: payload.locale,
+    }),
+
+    ...(payload.hd && {
+      hd: payload.hd,
+    }),
   };
 
-  const result = await AuthService.googleLogin(
-    googlePayload,
-  );
+  const result = await AuthService.googleLogin(googlePayload);
 
-  res.cookie(
-    AUTH_COOKIE.REFRESH_TOKEN,
-    result.refreshToken,
-    cookieOptions,
-  );
+  res.cookie(AUTH_COOKIE.REFRESH_TOKEN, result.refreshToken, cookieOptions);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -121,12 +120,12 @@ const googleLogin = catchAsync(async (req, res) => {
 });
 
 const refreshToken = catchAsync(async (req, res) => {
-  const token =
-    req.cookies?.[AUTH_COOKIE.REFRESH_TOKEN];
+  const token = req.cookies?.[AUTH_COOKIE.REFRESH_TOKEN];
 
-  const result =
-    await AuthService.refreshToken(token);
-
+  if (!token) {
+    throw new AppError(httpStatus.UNAUTHORIZED, AUTH_MESSAGE.REFRESH_TOKEN_REQUIRED);
+  }
+  const result = await AuthService.refreshToken(token);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
@@ -136,10 +135,7 @@ const refreshToken = catchAsync(async (req, res) => {
 });
 
 const getProfile = catchAsync(async (req, res) => {
-  const result =
-    await AuthService.getProfile(
-      req.user.userId.toString(),
-    );
+  const result = await AuthService.getProfile(req.user.userId.toString());
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -150,10 +146,9 @@ const getProfile = catchAsync(async (req, res) => {
 });
 
 const changePassword = catchAsync(async (req, res) => {
-  await AuthService.changePassword(
-    req.user.userId.toString(),
-    req.body,
-  );
+  const payload = req.body as TChangePasswordInput;
+
+  await AuthService.changePassword(req.user.userId.toString(), payload);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -164,10 +159,7 @@ const changePassword = catchAsync(async (req, res) => {
 });
 
 const logout = catchAsync(async (_req, res) => {
-  res.clearCookie(
-    AUTH_COOKIE.REFRESH_TOKEN,
-    cookieOptions,
-  );
+  res.clearCookie(AUTH_COOKIE.REFRESH_TOKEN, cookieOptions);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,

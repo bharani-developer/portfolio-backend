@@ -1,4 +1,25 @@
-// src\shared\cloudinary\index.ts
+// src/shared/cloudinary/index.ts
 
-export * from "./uploadToCloudinary.js";
-export * from "./deleteFromCloudinary.js";
+/**
+ * Cloudinary utilities.
+ *
+ * Centralized exports for Cloudinary operations.
+ *
+ * Responsibilities:
+ * - Upload assets
+ * - Delete assets
+ *
+ * This module contains no runtime logic.
+ */
+
+/* -------------------------------------------------------------------------- */
+/*                                   Upload                                   */
+/* -------------------------------------------------------------------------- */
+
+export * from './upload-to-cloudinary.js';
+
+/* -------------------------------------------------------------------------- */
+/*                                   Delete                                   */
+/* -------------------------------------------------------------------------- */
+
+export * from './delete-from-cloudinary.js';

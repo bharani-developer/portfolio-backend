@@ -1,46 +1,46 @@
 // src/modules/certifications/certifications.seeder.ts
 
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
-import { connectDatabase } from "../../config/database.js";
+import { connectDatabase } from '../../configs/database.config.js';
 
-import { generateSlug } from "../../shared/slug/index.js";
+import { CERTIFICATION_DEFAULT } from './certifications.constant.js';
 
-import { CERTIFICATION_DEFAULT } from "./certifications.constant.js";
+import { Certification } from './certifications.model.js';
 
-import { Certification } from "./certifications.model.js";
+import { generateSlug } from '../../shared/utils/index.js';
 
 export const seedCertifications = async (): Promise<void> => {
   const existingCount = await Certification.countDocuments();
 
   if (existingCount > 0) {
-    console.info("Certifications already seeded.");
+    console.info('Certifications already seeded.');
 
     return;
   }
 
   await Certification.insertMany([
     {
-      title: "Diploma in AutoCAD, Java and C++",
+      title: 'Diploma in AutoCAD, Java and C++',
 
-      slug: generateSlug("Diploma in AutoCAD Java and C++"),
+      slug: generateSlug('Diploma in AutoCAD Java and C++'),
 
-      issuer: "Professional Training Institute",
+      issuer: 'Professional Training Institute',
 
       credentialId: null,
 
-      credentialUrl: "",
+      credentialUrl: '',
 
-      issueDate: new Date("2013-05-15"),
+      issueDate: new Date('2013-05-15'),
 
       expiryDate: null,
 
       neverExpires: true,
 
       description:
-        "Completed professional training in AutoCAD, Core Java, and C++ programming fundamentals.",
+        'Completed professional training in AutoCAD, Core Java, and C++ programming fundamentals.',
 
-      skills: ["AutoCAD", "Java", "C++", "Programming"],
+      skills: ['AutoCAD', 'Java', 'C++', 'Programming'],
 
       sortOrder: 1,
 
@@ -48,26 +48,26 @@ export const seedCertifications = async (): Promise<void> => {
     },
 
     {
-      title: "In-Plant & Corporate Training",
+      title: 'In-Plant & Corporate Training',
 
-      slug: generateSlug("In Plant Training Code Bind Technologies"),
+      slug: generateSlug('In Plant Training Code Bind Technologies'),
 
-      issuer: "Code Bind Technologies, Chennai",
+      issuer: 'Code Bind Technologies, Chennai',
 
       credentialId: null,
 
-      credentialUrl: "",
+      credentialUrl: '',
 
-      issueDate: new Date("2015-02-20"),
+      issueDate: new Date('2015-02-20'),
 
       expiryDate: null,
 
       neverExpires: true,
 
       description:
-        "Successfully completed in-plant and corporate training focused on software development practices and real-world application development.",
+        'Successfully completed in-plant and corporate training focused on software development practices and real-world application development.',
 
-      skills: ["Software Development", "PHP", "Web Development"],
+      skills: ['Software Development', 'PHP', 'Web Development'],
 
       sortOrder: 2,
 
@@ -75,26 +75,26 @@ export const seedCertifications = async (): Promise<void> => {
     },
 
     {
-      title: "Networking - Switching & Routing",
+      title: 'Networking - Switching & Routing',
 
-      slug: generateSlug("Basics Concept of Networking Switching Routing"),
+      slug: generateSlug('Basics Concept of Networking Switching Routing'),
 
-      issuer: "CMS IT Training Institute",
+      issuer: 'CMS IT Training Institute',
 
       credentialId: null,
 
-      credentialUrl: "",
+      credentialUrl: '',
 
-      issueDate: new Date("2014-08-10"),
+      issueDate: new Date('2014-08-10'),
 
       expiryDate: null,
 
       neverExpires: true,
 
       description:
-        "Completed training covering networking fundamentals, switching, routing, and network infrastructure concepts.",
+        'Completed training covering networking fundamentals, switching, routing, and network infrastructure concepts.',
 
-      skills: ["Networking", "Switching", "Routing", "Network Infrastructure"],
+      skills: ['Networking', 'Switching', 'Routing', 'Network Infrastructure'],
 
       sortOrder: 3,
 
@@ -102,28 +102,26 @@ export const seedCertifications = async (): Promise<void> => {
     },
 
     {
-      title: "Android Application Development Training",
+      title: 'Android Application Development Training',
 
-      slug: generateSlug(
-        "Android Apps Development Training Gateway Finishing School",
-      ),
+      slug: generateSlug('Android Apps Development Training Gateway Finishing School'),
 
-      issuer: "Gateway Finishing School",
+      issuer: 'Gateway Finishing School',
 
       credentialId: null,
 
-      credentialUrl: "",
+      credentialUrl: '',
 
-      issueDate: new Date("2016-03-15"),
+      issueDate: new Date('2016-03-15'),
 
       expiryDate: null,
 
       neverExpires: true,
 
       description:
-        "Completed Android application development training covering mobile application fundamentals and Android development concepts.",
+        'Completed Android application development training covering mobile application fundamentals and Android development concepts.',
 
-      skills: ["Android", "Mobile Development", "Java"],
+      skills: ['Android', 'Mobile Development', 'Java'],
 
       sortOrder: 4,
 
@@ -131,12 +129,10 @@ export const seedCertifications = async (): Promise<void> => {
     },
   ]);
 
-  console.info("Certifications seeded successfully.");
+  console.info('Certifications seeded successfully.');
 };
 
-export const runCertificationsSeeder = async (
-  standalone = false,
-): Promise<void> => {
+export const runCertificationsSeeder = async (standalone = false): Promise<void> => {
   try {
     if (standalone) {
       await connectDatabase();
@@ -144,9 +140,9 @@ export const runCertificationsSeeder = async (
 
     await seedCertifications();
 
-    console.info("Certifications seeding completed.");
+    console.info('Certifications seeding completed.');
   } catch (error) {
-    console.error("Failed to seed certifications.", error);
+    console.error('Failed to seed certifications.', error);
 
     throw error;
   } finally {
@@ -156,7 +152,7 @@ export const runCertificationsSeeder = async (
   }
 };
 
-if (process.argv[1]?.includes("certifications.seeder")) {
+if (process.argv[1]?.includes('certifications.seeder')) {
   void runCertificationsSeeder(true);
 }
 

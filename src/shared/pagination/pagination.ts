@@ -4,7 +4,7 @@ export interface IPaginationOptions {
   page?: number;
   limit?: number;
   sortBy?: string;
-  sortOrder?: "asc" | "desc";
+  sortOrder?: 'asc' | 'desc';
 }
 
 export interface IPaginationResult {
@@ -14,9 +14,7 @@ export interface IPaginationResult {
   sortCondition: Record<string, 1 | -1>;
 }
 
-export const calculatePagination = (
-  options: IPaginationOptions,
-): IPaginationResult => {
+export const calculatePagination = (options: IPaginationOptions): IPaginationResult => {
   const page = Number(options.page) || 1;
 
   const limit = Number(options.limit) || 10;
@@ -26,7 +24,7 @@ export const calculatePagination = (
   const sortCondition: Record<string, 1 | -1> = {};
 
   if (options.sortBy && options.sortOrder) {
-    sortCondition[options.sortBy] = options.sortOrder === "asc" ? 1 : -1;
+    sortCondition[options.sortBy] = options.sortOrder === 'asc' ? 1 : -1;
   } else {
     sortCondition.createdAt = -1;
   }

@@ -1,79 +1,79 @@
 // src/modules/settings/settings.seeder.ts
 
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
-import { connectDatabase } from "../../config/database.js";
+import { connectDatabase } from '../../configs/database.config.js';
 
-import { Settings } from "./settings.model.js";
+import { Settings } from './settings.model.js';
 
 export const seedSettings = async (): Promise<void> => {
   const existingSettings = await Settings.findOne();
 
   if (existingSettings) {
-    console.info("Settings already seeded.");
+    console.info('Settings already seeded.');
 
     return;
   }
 
   await Settings.create({
-    siteTitle: "Bharani Karthikeyan | Senior Software Engineer",
+    siteTitle: 'Bharani Karthikeyan | Senior Software Engineer',
 
     siteDescription:
-      "Senior Software Engineer | Full Stack Developer specializing in React, Next.js, Node.js, Express.js, Laravel, Flutter, TypeScript, MongoDB, and MySQL.",
+      'Senior Software Engineer | Full Stack Developer specializing in React, Next.js, Node.js, Express.js, Laravel, Flutter, TypeScript, MongoDB, and MySQL.',
 
-    email: "bharani.developer@gmail.com",
+    email: 'bharani.developer@gmail.com',
 
-    phone: "+91 9566935886",
+    phone: '+91 9566935886',
 
-    address: "Pudukkottai, Tamil Nadu, India",
+    address: 'Pudukkottai, Tamil Nadu, India',
 
     socialLinks: {
-      github: "",
+      github: '',
 
-      linkedin: "",
+      linkedin: '',
 
-      twitter: "",
+      twitter: '',
 
-      facebook: "",
+      facebook: '',
 
-      instagram: "",
+      instagram: '',
 
-      youtube: "",
+      youtube: '',
 
-      leetcode: "",
+      leetcode: '',
 
-      hackerrank: "",
+      hackerrank: '',
 
-      stackoverflow: "",
+      stackoverflow: '',
     },
 
     seo: {
-      metaTitle: "Bharani Karthikeyan | Senior Software Engineer",
+      metaTitle: 'Bharani Karthikeyan | Senior Software Engineer',
 
       metaDescription:
-        "Portfolio of Bharani Karthikeyan, Senior Software Engineer and Full Stack Developer specializing in React, Next.js, Node.js, Express.js, Laravel, Flutter, TypeScript, MongoDB, and MySQL.",
+        'Portfolio of Bharani Karthikeyan, Senior Software Engineer and Full Stack Developer specializing in React, Next.js, Node.js, Express.js, Laravel, Flutter, TypeScript, MongoDB, and MySQL.',
 
       metaKeywords: [
-        "Bharani Karthikeyan",
-        "Senior Software Engineer",
-        "Full Stack Developer",
-        "React",
-        "Next.js",
-        "Node.js",
-        "Express.js",
-        "Laravel",
-        "Flutter",
-        "TypeScript",
-        "MongoDB",
-        "MySQL",
-        "Portfolio",
+        'Bharani Karthikeyan',
+        'Senior Software Engineer',
+        'Full Stack Developer',
+        'React',
+        'Next.js',
+        'Node.js',
+        'Express.js',
+        'Laravel',
+        'Flutter',
+        'TypeScript',
+        'MongoDB',
+        'MySQL',
+        'Portfolio',
       ],
 
-      siteUrl: "https://example.com",
+      siteUrl: 'https://example.com',
     },
   });
 
-  console.info("Settings seeded successfully.");
+  console.info('Settings seeded successfully.');
 };
 
 export const runSettingsSeeder = async (standalone = false): Promise<void> => {
@@ -84,9 +84,9 @@ export const runSettingsSeeder = async (standalone = false): Promise<void> => {
 
     await seedSettings();
 
-    console.info("Settings seeding completed.");
+    console.info('Settings seeding completed.');
   } catch (error) {
-    console.error("Failed to seed settings.", error);
+    console.error('Failed to seed settings.', error);
 
     throw error;
   } finally {
@@ -96,7 +96,7 @@ export const runSettingsSeeder = async (standalone = false): Promise<void> => {
   }
 };
 
-if (process.argv[1]?.includes("settings.seeder")) {
+if (process.argv[1]?.includes('settings.seeder')) {
   void runSettingsSeeder(true);
 }
 

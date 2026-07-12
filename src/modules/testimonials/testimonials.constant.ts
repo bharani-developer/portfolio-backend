@@ -1,18 +1,43 @@
 // src/modules/testimonials/testimonials.constant.ts
 
+/**
+ * Testimonials module constants.
+ *
+ * Structure:
+ * 1. Messages
+ * 2. Default values
+ * 3. Status
+ * 4. Categories
+ * 5. Priorities
+ * 6. Types
+ * 7. Searchable fields
+ * 8. Filterable fields
+ * 9. Sort fields
+ * 10. Select fields
+ * 11. Validation
+ */
+
+/* -------------------------------------------------------------------------- */
+/*                                  Messages                                  */
+/* -------------------------------------------------------------------------- */
+
 export const TESTIMONIAL_MESSAGE = {
-  CREATED: "Testimonial created successfully",
+  CREATED: 'Testimonial created successfully',
 
-  UPDATED: "Testimonial updated successfully",
+  RETRIEVED: 'Testimonial retrieved successfully',
 
-  DELETED: "Testimonial deleted successfully",
+  UPDATED: 'Testimonial updated successfully',
 
-  FETCHED: "Testimonials fetched successfully",
+  DELETED: 'Testimonial deleted successfully',
 
-  NOT_FOUND: "Testimonial not found",
+  NOT_FOUND: 'Testimonial not found',
 
-  ALREADY_EXISTS: "Testimonial already exists",
+  ALREADY_EXISTS: 'Testimonial already exists',
 } as const;
+
+/* -------------------------------------------------------------------------- */
+/*                              Default Values                                */
+/* -------------------------------------------------------------------------- */
 
 export const TESTIMONIAL_DEFAULT = {
   IS_ACTIVE: true,
@@ -23,26 +48,52 @@ export const TESTIMONIAL_DEFAULT = {
 
   RATING: 5,
 
-  CLIENT_TYPE: "Individual",
+  CLIENT_TYPE: 'Individual',
 } as const;
 
-export const TESTIMONIAL_CLIENT_TYPE = {
-  INDIVIDUAL: "Individual",
+/* -------------------------------------------------------------------------- */
+/*                                   Status                                   */
+/* -------------------------------------------------------------------------- */
 
-  FREELANCER: "Freelancer",
+// Not applicable for this module.
 
-  STARTUP: "Startup",
+/* -------------------------------------------------------------------------- */
+/*                                 Categories                                 */
+/* -------------------------------------------------------------------------- */
 
-  COMPANY: "Company",
+// Not applicable for this module.
 
-  AGENCY: "Agency",
+/* -------------------------------------------------------------------------- */
+/*                                  Priorities                                */
+/* -------------------------------------------------------------------------- */
 
-  ORGANIZATION: "Organization",
+// Not applicable for this module.
 
-  OTHER: "Other",
+/* -------------------------------------------------------------------------- */
+/*                                    Types                                   */
+/* -------------------------------------------------------------------------- */
+
+export const TESTIMONIAL_TYPE = {
+  INDIVIDUAL: 'Individual',
+
+  FREELANCER: 'Freelancer',
+
+  STARTUP: 'Startup',
+
+  COMPANY: 'Company',
+
+  AGENCY: 'Agency',
+
+  ORGANIZATION: 'Organization',
+
+  OTHER: 'Other',
 } as const;
 
-export const TESTIMONIAL_CLIENT_TYPES = Object.values(TESTIMONIAL_CLIENT_TYPE);
+export const TESTIMONIAL_TYPES = Object.values(TESTIMONIAL_TYPE);
+
+/* -------------------------------------------------------------------------- */
+/*                                   Ratings                                  */
+/* -------------------------------------------------------------------------- */
 
 export const TESTIMONIAL_RATING = {
   ONE: 1,
@@ -58,74 +109,139 @@ export const TESTIMONIAL_RATING = {
 
 export const TESTIMONIAL_RATINGS = Object.values(TESTIMONIAL_RATING);
 
+/* -------------------------------------------------------------------------- */
+/*                              Searchable Fields                             */
+/* -------------------------------------------------------------------------- */
+
 export const TESTIMONIAL_SEARCHABLE_FIELDS = [
-  "clientName",
+  'clientName',
 
-  "clientPosition",
+  'clientPosition',
 
-  "clientCompany",
+  'clientCompany',
 
-  "projectName",
+  'projectName',
 
-  "review",
+  'review',
 ] as const;
+
+/* -------------------------------------------------------------------------- */
+/*                              Filterable Fields                             */
+/* -------------------------------------------------------------------------- */
 
 export const TESTIMONIAL_FILTERABLE_FIELDS = [
-  "clientType",
+  'clientType',
 
-  "rating",
+  'rating',
 
-  "isFeatured",
+  'isFeatured',
 
-  "isActive",
+  'isActive',
 ] as const;
+
+/* -------------------------------------------------------------------------- */
+/*                                 Sort Fields                                */
+/* -------------------------------------------------------------------------- */
 
 export const TESTIMONIAL_SORT_FIELDS = [
-  "clientName",
+  'clientName',
 
-  "clientPosition",
+  'clientPosition',
 
-  "clientCompany",
+  'clientCompany',
 
-  "projectName",
+  'projectName',
 
-  "rating",
+  'rating',
 
-  "clientType",
+  'clientType',
 
-  "isFeatured",
+  'isFeatured',
 
-  "sortOrder",
+  'sortOrder',
 
-  "createdAt",
+  'createdAt',
 
-  "updatedAt",
+  'updatedAt',
 ] as const;
+
+/* -------------------------------------------------------------------------- */
+/*                                Select Fields                               */
+/* -------------------------------------------------------------------------- */
 
 export const TESTIMONIAL_SELECT_FIELDS = [
-  "clientName",
+  'clientName',
 
-  "clientPosition",
+  'clientPosition',
 
-  "clientCompany",
+  'clientCompany',
 
-  "clientWebsite",
+  'clientWebsite',
 
-  "projectName",
+  'clientImage',
 
-  "review",
+  'projectName',
 
-  "rating",
+  'review',
 
-  "clientType",
+  'rating',
 
-  "isFeatured",
+  'clientType',
 
-  "sortOrder",
+  'isFeatured',
 
-  "isActive",
+  'sortOrder',
 
-  "createdAt",
+  'isActive',
 
-  "updatedAt",
+  'createdAt',
+
+  'updatedAt',
 ] as const;
+
+/* -------------------------------------------------------------------------- */
+/*                                Validation                                  */
+/* -------------------------------------------------------------------------- */
+
+export const TESTIMONIAL_VALIDATION = {
+  CLIENT_NAME: {
+    MIN_LENGTH: 2,
+    MAX_LENGTH: 100,
+  },
+
+  CLIENT_POSITION: {
+    MAX_LENGTH: 100,
+  },
+
+  CLIENT_COMPANY: {
+    MAX_LENGTH: 150,
+  },
+
+  CLIENT_WEBSITE: {
+    MAX_LENGTH: 500,
+  },
+
+  PROJECT_NAME: {
+    MAX_LENGTH: 150,
+  },
+
+  REVIEW: {
+    MIN_LENGTH: 10,
+    MAX_LENGTH: 3000,
+  },
+
+  CLIENT_IMAGE: {
+    URL_MAX_LENGTH: 500,
+    PUBLIC_ID_MAX_LENGTH: 255,
+  },
+
+  RATING: {
+    MIN: 1,
+    MAX: 5,
+  },
+
+  SORT_ORDER: {
+    MIN: 0,
+    MAX: 9999,
+  },
+} as const;

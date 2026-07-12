@@ -1,48 +1,50 @@
 // src/modules/about/about.service.ts
 
-import { BaseSingletonService } from "../../shared/base/index.js";
-
-import type {
-  IAbout,
-  TCreateAboutPayload,
-  TUpdateAboutPayload,
-} from "./about.interface.js";
-import { About } from "./about.model.js";
-
 /* -------------------------------------------------------------------------- */
-/*                              Base Singleton                                */
+/*                                   Imports                                  */
 /* -------------------------------------------------------------------------- */
 
-const aboutBaseService = new BaseSingletonService<IAbout>(
-  About,
-  "About section",
-);
+import { BaseSingletonService } from '../../shared/base/index.js';
+
+import { About } from './about.model.js';
+
+import type { IAbout, TCreateAboutPayload, TUpdateAboutPayload } from './about.types.js';
 
 /* -------------------------------------------------------------------------- */
-/*                                  Service                                   */
+/*                           Base Singleton Service                           */
 /* -------------------------------------------------------------------------- */
 
-const createAbout = async (payload: TCreateAboutPayload) => {
-  return aboutBaseService.create(payload);
-};
+const singletonService = new BaseSingletonService<IAbout>(About, 'About section');
 
-const getAbout = async () => {
-  return aboutBaseService.get();
-};
+/* -------------------------------------------------------------------------- */
+/*                                   Create                                   */
+/* -------------------------------------------------------------------------- */
 
-const updateAbout = async (payload: TUpdateAboutPayload) => {
-  return aboutBaseService.update(payload);
-};
+const createAbout = async (payload: TCreateAboutPayload) => singletonService.create(payload);
 
-const deleteAbout = async () => {
-  return aboutBaseService.delete();
-};
+/* -------------------------------------------------------------------------- */
+/*                                     Get                                    */
+/* -------------------------------------------------------------------------- */
+
+const getAbout = async () => singletonService.get();
+
+/* -------------------------------------------------------------------------- */
+/*                                   Update                                   */
+/* -------------------------------------------------------------------------- */
+
+const updateAbout = async (payload: TUpdateAboutPayload) => singletonService.update(payload);
+
+/* -------------------------------------------------------------------------- */
+/*                                   Delete                                   */
+/* -------------------------------------------------------------------------- */
+
+const deleteAbout = async () => singletonService.delete();
 
 /* -------------------------------------------------------------------------- */
 /*                                   Export                                   */
 /* -------------------------------------------------------------------------- */
 
-export const AboutService = {
+export const AboutService = Object.freeze({
   createAbout,
 
   getAbout,
@@ -50,4 +52,4 @@ export const AboutService = {
   updateAbout,
 
   deleteAbout,
-} as const;
+});

@@ -1,19 +1,14 @@
 // src/modules/contact/contact.service.ts
 
-import httpStatus from "http-status";
+/* -------------------------------------------------------------------------- */
+/*                                 1. Imports                                 */
+/* -------------------------------------------------------------------------- */
 
-import { BaseCrudService } from "../../shared/base/index.js";
+import { BaseCrudService } from '../../shared/base/index.js';
 
-import AppError from "../../utils/AppError.js";
+import { CONTACT_PRIORITY, CONTACT_SEARCHABLE_FIELDS, CONTACT_STATUS } from './contact.constant.js';
 
-import {
-  CONTACT_MESSAGE,
-  CONTACT_PRIORITY,
-  CONTACT_SEARCHABLE_FIELDS,
-  CONTACT_STATUS,
-} from "./contact.constant.js";
-
-import { Contact } from "./contact.model.js";
+import { Contact } from './contact.model.js';
 
 import type {
   IContact,
@@ -21,27 +16,30 @@ import type {
   TContactStatus,
   TCreateContactPayload,
   TUpdateContactPayload,
-} from "./contact.interface.js";
+} from './contact.types.js';
 
-const baseService = new BaseCrudService<IContact>(Contact, [
+/* -------------------------------------------------------------------------- */
+/*                               2. Base Service                              */
+/* -------------------------------------------------------------------------- */
+
+const contactBaseService = new BaseCrudService<IContact>(Contact, [
   ...CONTACT_SEARCHABLE_FIELDS,
-]);
+] as string[]);
+/* -------------------------------------------------------------------------- */
+/*                                  3. Create                                 */
+/* -------------------------------------------------------------------------- */
 
 const createContact = async (payload: TCreateContactPayload) => {
-  const email = payload.email.trim().toLowerCase();
-
-  const subject = payload.subject.trim();
-
-  const message = payload.message.trim();
-
   const contactPayload: Partial<IContact> = {
     ...payload,
 
-    email,
+    name: payload.name.trim(),
 
-    subject,
+    email: payload.email.trim().toLowerCase(),
 
-    message,
+    subject: payload.subject.trim(),
+
+    message: payload.message.trim(),
 
     status: CONTACT_STATUS.NEW,
 
@@ -52,34 +50,75 @@ const createContact = async (payload: TCreateContactPayload) => {
     isReplied: false,
 
     repliedAt: null,
+
+    ...(payload.phone && {
+      phone: payload.phone.trim(),
+    }),
+
+    ...(payload.company && {
+      company: payload.company.trim(),
+    }),
   };
 
-  return baseService.create(contactPayload);
+  return contactBaseService.create(contactPayload);
 };
+/* -------------------------------------------------------------------------- */
+/*                                 4. Get All                                 */
+/* -------------------------------------------------------------------------- */
 
-const getContacts = async (query: Record<string, unknown>) => {
-  return baseService.getAll(query);
-};
+const getContacts = async (query: Record<string, unknown>) => contactBaseService.getAll(query);
 
-const getContactById = async (id: string) => {
-  return baseService.getById(id);
-};
+/* -------------------------------------------------------------------------- */
+/*                                5. Get By Id                                */
+/* -------------------------------------------------------------------------- */
+
+const getContactById = async (id: string) => contactBaseService.getById(id);
+/* -------------------------------------------------------------------------- */
+/*                                  6. Update                                 */
+/* -------------------------------------------------------------------------- */
 
 const updateContact = async (id: string, payload: TUpdateContactPayload) => {
-  const existingContact = await Contact.findById(id);
-
-  if (!existingContact) {
-    throw new AppError(httpStatus.NOT_FOUND, CONTACT_MESSAGE.NOT_FOUND);
-  }
+  await contactBaseService.getById(id);
 
   const updatePayload: Partial<IContact> = {
     ...payload,
+
+    ...(payload.name && {
+      name: payload.name.trim(),
+    }),
+
+    ...(payload.email && {
+      email: payload.email.trim().toLowerCase(),
+    }),
+
+    ...(payload.phone && {
+      phone: payload.phone.trim(),
+    }),
+
+    ...(payload.company && {
+      company: payload.company.trim(),
+    }),
+
+    ...(payload.subject && {
+      subject: payload.subject.trim(),
+    }),
+
+    ...(payload.message && {
+      message: payload.message.trim(),
+    }),
   };
 
+  /**
+   * Automatically set reply date when
+   * marking a contact as replied.
+   */
   if (payload.isReplied === true && !payload.repliedAt) {
     updatePayload.repliedAt = new Date();
   }
 
+  /**
+   * Keep replied status synchronized.
+   */
   if (payload.status === CONTACT_STATUS.REPLIED) {
     updatePayload.isRead = true;
 
@@ -88,61 +127,75 @@ const updateContact = async (id: string, payload: TUpdateContactPayload) => {
     updatePayload.repliedAt = payload.repliedAt ?? new Date();
   }
 
-  return baseService.update(id, updatePayload);
+  return contactBaseService.update(id, updatePayload);
 };
+/* -------------------------------------------------------------------------- */
+/*                                  7. Delete                                 */
+/* -------------------------------------------------------------------------- */
 
-const deleteContact = async (id: string) => {
-  return baseService.delete(id);
-};
+const deleteContact = async (id: string) => contactBaseService.delete(id);
+/* -------------------------------------------------------------------------- */
+/*                              8. Custom Queries                             */
+/* -------------------------------------------------------------------------- */
 
-const getActiveContacts = async () => {
-  return Contact.find({
+/**
+ * Get all active contact messages.
+ */
+const getActiveContacts = async () =>
+  Contact.find({
     isActive: true,
   })
     .sort({
       createdAt: -1,
     })
     .lean();
-};
 
-const getUnreadContacts = async () => {
-  return Contact.find({
+/**
+ * Get unread contact messages.
+ */
+const getUnreadContacts = async () =>
+  Contact.find({
+    isActive: true,
+
     isRead: false,
-
-    isActive: true,
   })
     .sort({
       createdAt: -1,
     })
     .lean();
-};
 
-const getReadContacts = async () => {
-  return Contact.find({
+/**
+ * Get read contact messages.
+ */
+const getReadContacts = async () =>
+  Contact.find({
+    isActive: true,
+
     isRead: true,
-
-    isActive: true,
   })
     .sort({
       createdAt: -1,
     })
     .lean();
-};
 
-const getRepliedContacts = async () => {
-  return Contact.find({
-    isReplied: true,
-
+/**
+ * Get replied contact messages.
+ */
+const getRepliedContacts = async () =>
+  Contact.find({
     isActive: true,
+
+    isReplied: true,
   })
     .sort({
       repliedAt: -1,
     })
     .lean();
-};
-
-const getContactsByStatus = async (status: TContactStatus) => {
-  return Contact.find({
+/**
+ * Get contacts by status.
+ */
+const getContactsByStatus = async (status: TContactStatus) =>
+  Contact.find({
     status,
 
     isActive: true,
@@ -151,10 +204,12 @@ const getContactsByStatus = async (status: TContactStatus) => {
       createdAt: -1,
     })
     .lean();
-};
 
-const getContactsByPriority = async (priority: TContactPriority) => {
-  return Contact.find({
+/**
+ * Get contacts by priority.
+ */
+const getContactsByPriority = async (priority: TContactPriority) =>
+  Contact.find({
     priority,
 
     isActive: true,
@@ -163,111 +218,91 @@ const getContactsByPriority = async (priority: TContactPriority) => {
       createdAt: -1,
     })
     .lean();
-};
 
+/**
+ * Mark a contact message as read.
+ */
 const markAsRead = async (id: string) => {
-  const contact = await Contact.findById(id);
+  await contactBaseService.getById(id);
 
-  if (!contact) {
-    throw new AppError(httpStatus.NOT_FOUND, CONTACT_MESSAGE.NOT_FOUND);
-  }
-
-  return Contact.findByIdAndUpdate(
-    id,
-    {
-      isRead: true,
-    },
-    {
-      new: true,
-      runValidators: true,
-    },
-  );
+  return contactBaseService.update(id, {
+    isRead: true,
+  });
 };
 
+/**
+ * Mark a contact message as replied.
+ */
 const markAsReplied = async (id: string) => {
-  const contact = await Contact.findById(id);
+  await contactBaseService.getById(id);
 
-  if (!contact) {
-    throw new AppError(httpStatus.NOT_FOUND, CONTACT_MESSAGE.NOT_FOUND);
-  }
+  return contactBaseService.update(id, {
+    status: CONTACT_STATUS.REPLIED,
 
-  return Contact.findByIdAndUpdate(
-    id,
-    {
-      status: CONTACT_STATUS.REPLIED,
+    isRead: true,
 
-      isRead: true,
+    isReplied: true,
 
-      isReplied: true,
-
-      repliedAt: new Date(),
-    },
-    {
-      new: true,
-      runValidators: true,
-    },
-  );
+    repliedAt: new Date(),
+  });
 };
 
+/**
+ * Get contact statistics.
+ */
 const getContactStats = async () => {
-  const [total, unread, read, replied, active] = await Promise.all([
-    Contact.countDocuments(),
+  const [total, active, unread, read, replied] = await Promise.all([
+    contactBaseService.count(),
 
-    Contact.countDocuments({
+    contactBaseService.count({
+      isActive: true,
+    }),
+
+    contactBaseService.count({
       isRead: false,
     }),
 
-    Contact.countDocuments({
+    contactBaseService.count({
       isRead: true,
     }),
 
-    Contact.countDocuments({
+    contactBaseService.count({
       isReplied: true,
-    }),
-
-    Contact.countDocuments({
-      isActive: true,
     }),
   ]);
 
   return {
     total,
 
+    active,
+
     unread,
 
     read,
 
     replied,
-
-    active,
   };
 };
+/* -------------------------------------------------------------------------- */
+/*                                   Export                                   */
+/* -------------------------------------------------------------------------- */
 
 export const ContactService = {
   createContact,
-
   getContacts,
-
   getContactById,
-
   updateContact,
-
   deleteContact,
 
   getActiveContacts,
-
   getUnreadContacts,
-
   getReadContacts,
-
   getRepliedContacts,
 
   getContactsByStatus,
-
   getContactsByPriority,
 
   markAsRead,
-
   markAsReplied,
 
   getContactStats,

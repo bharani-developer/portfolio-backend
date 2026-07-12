@@ -1,18 +1,45 @@
 // src/modules/blogs/blogs.constant.ts
 
+/**
+ * Blogs module constants.
+ *
+ * Structure:
+ * 1. Messages
+ * 2. Default values
+ * 3. Status
+ * 4. Categories
+ * 5. Priorities
+ * 6. Types
+ * 7. Searchable fields
+ * 8. Filterable fields
+ * 9. Sort fields
+ * 10. Select fields
+ * 11. Validation
+ */
+
+/* -------------------------------------------------------------------------- */
+/*                                  Messages                                  */
+/* -------------------------------------------------------------------------- */
+
 export const BLOG_MESSAGE = {
-  CREATED: "Blog created successfully",
+  CREATED: 'Blog created successfully',
 
-  RETRIEVED: "Blog retrieved successfully",
+  RETRIEVED: 'Blog retrieved successfully',
 
-  UPDATED: "Blog updated successfully",
+  UPDATED: 'Blog updated successfully',
 
-  DELETED: "Blog deleted successfully",
+  DELETED: 'Blog deleted successfully',
 
-  NOT_FOUND: "Blog not found",
+  NOT_FOUND: 'Blog not found',
 
-  ALREADY_EXISTS: "Blog already exists",
+  ALREADY_EXISTS: 'Blog already exists',
+
+  INVALID_CATEGORY: 'Invalid blog category',
 } as const;
+
+/* -------------------------------------------------------------------------- */
+/*                              Default Values                                */
+/* -------------------------------------------------------------------------- */
 
 export const BLOG_DEFAULT = {
   IS_ACTIVE: true,
@@ -28,118 +55,266 @@ export const BLOG_DEFAULT = {
   SORT_ORDER: 0,
 } as const;
 
+/* -------------------------------------------------------------------------- */
+/*                                   Status                                   */
+/* -------------------------------------------------------------------------- */
+
 export const BLOG_STATUS = {
-  DRAFT: "Draft",
+  DRAFT: 'Draft',
 
-  PUBLISHED: "Published",
+  PUBLISHED: 'Published',
 
-  ARCHIVED: "Archived",
+  ARCHIVED: 'Archived',
 } as const;
 
 export const BLOG_STATUSES = Object.values(BLOG_STATUS);
 
+/* -------------------------------------------------------------------------- */
+/*                                 Categories                                 */
+/* -------------------------------------------------------------------------- */
+
 export const BLOG_CATEGORY = {
-  WEB_DEVELOPMENT: "Web Development",
+  WEB_DEVELOPMENT: 'Web Development',
 
-  FRONTEND: "Frontend",
+  FRONTEND: 'Frontend',
 
-  BACKEND: "Backend",
+  BACKEND: 'Backend',
 
-  FULL_STACK: "Full Stack",
+  FULL_STACK: 'Full Stack',
 
-  MOBILE_DEVELOPMENT: "Mobile Development",
+  MOBILE_DEVELOPMENT: 'Mobile Development',
 
-  DEVOPS: "DevOps",
+  DEVOPS: 'DevOps',
 
-  CLOUD: "Cloud",
+  CLOUD: 'Cloud',
 
-  DATABASE: "Database",
+  DATABASE: 'Database',
 
-  SOFTWARE_ARCHITECTURE: "Software Architecture",
+  SOFTWARE_ARCHITECTURE: 'Software Architecture',
 
-  SYSTEM_DESIGN: "System Design",
+  SYSTEM_DESIGN: 'System Design',
 
-  API_DEVELOPMENT: "API Development",
+  API_DEVELOPMENT: 'API Development',
 
-  TYPESCRIPT: "TypeScript",
+  TYPESCRIPT: 'TypeScript',
 
-  JAVASCRIPT: "JavaScript",
+  JAVASCRIPT: 'JavaScript',
 
-  NODEJS: "Node.js",
+  NODEJS: 'Node.js',
 
-  EXPRESSJS: "Express.js",
+  EXPRESSJS: 'Express.js',
 
-  REACT: "React",
+  REACT: 'React',
 
-  NEXTJS: "Next.js",
+  NEXTJS: 'Next.js',
 
-  FLUTTER: "Flutter",
+  FLUTTER: 'Flutter',
 
-  PHP: "PHP",
+  PHP: 'PHP',
 
-  LARAVEL: "Laravel",
+  LARAVEL: 'Laravel',
 
-  MONGODB: "MongoDB",
+  MONGODB: 'MongoDB',
 
-  MYSQL: "MySQL",
+  MYSQL: 'MySQL',
 
-  CAREER: "Career",
+  CAREER: 'Career',
 
-  PRODUCTIVITY: "Productivity",
+  PRODUCTIVITY: 'Productivity',
 
-  TECHNOLOGY: "Technology",
+  TECHNOLOGY: 'Technology',
 
-  TUTORIAL: "Tutorial",
+  TUTORIAL: 'Tutorial',
 
-  OTHER: "Other",
+  OTHER: 'Other',
 } as const;
 
 export const BLOG_CATEGORIES = Object.values(BLOG_CATEGORY);
 
+/* -------------------------------------------------------------------------- */
+/*                                  Priorities                                */
+/* -------------------------------------------------------------------------- */
+
+// Not applicable for this module.
+
+/* -------------------------------------------------------------------------- */
+/*                                    Types                                   */
+/* -------------------------------------------------------------------------- */
+
+// Not applicable for this module.
+
+/* -------------------------------------------------------------------------- */
+/*                              Searchable Fields                             */
+/* -------------------------------------------------------------------------- */
+
 export const BLOG_SEARCHABLE_FIELDS = [
-  "title",
+  'title',
 
-  "excerpt",
+  'excerpt',
 
-  "content",
+  'content',
 
-  "category",
+  'category',
 
-  "tags",
+  'tags',
 
-  "author",
+  'author',
 
-  "seoTitle",
+  'seoTitle',
 
-  "seoDescription",
+  'seoDescription',
 ] as const;
+
+/* -------------------------------------------------------------------------- */
+/*                              Filterable Fields                             */
+/* -------------------------------------------------------------------------- */
 
 export const BLOG_FILTERABLE_FIELDS = [
-  "status",
+  'status',
 
-  "category",
+  'category',
 
-  "isFeatured",
+  'isFeatured',
 
-  "isPublished",
+  'isPublished',
 
-  "isActive",
+  'isActive',
 
-  "author",
+  'author',
 ] as const;
+
+/* -------------------------------------------------------------------------- */
+/*                                 Sort Fields                                */
+/* -------------------------------------------------------------------------- */
 
 export const BLOG_SORT_FIELDS = [
-  "title",
+  'title',
 
-  "publishedAt",
+  'publishedAt',
 
-  "viewCount",
+  'viewCount',
 
-  "readTime",
+  'readTime',
 
-  "sortOrder",
+  'sortOrder',
 
-  "createdAt",
+  'createdAt',
 
-  "updatedAt",
+  'updatedAt',
 ] as const;
+
+/* -------------------------------------------------------------------------- */
+/*                                Select Fields                               */
+/* -------------------------------------------------------------------------- */
+
+export const BLOG_SELECT_FIELDS = [
+  'title',
+
+  'slug',
+
+  'excerpt',
+
+  'featuredImage',
+
+  'category',
+
+  'tags',
+
+  'author',
+
+  'status',
+
+  'isFeatured',
+
+  'isPublished',
+
+  'publishedAt',
+
+  'viewCount',
+
+  'readTime',
+
+  'sortOrder',
+
+  'createdAt',
+
+  'updatedAt',
+] as const;
+
+/* -------------------------------------------------------------------------- */
+/*                                Validation                                  */
+/* -------------------------------------------------------------------------- */
+
+export const BLOG_VALIDATION = {
+  TITLE: {
+    MIN_LENGTH: 5,
+    MAX_LENGTH: 200,
+  },
+
+  SLUG: {
+    MAX_LENGTH: 500,
+  },
+
+  EXCERPT: {
+    MAX_LENGTH: 500,
+  },
+
+  CONTENT: {
+    MIN_LENGTH: 50,
+    MAX_LENGTH: 10000, // Missing
+  },
+
+  CATEGORY: {
+    MAX_LENGTH: 100,
+  },
+
+  TAGS: {
+    MAX_COUNT: 20,
+
+    MAX_LENGTH: 50,
+  },
+
+  AUTHOR: {
+    MAX_LENGTH: 100,
+  },
+  SEO_KEYWORDS: {
+    MAX_COUNT: 30, // Missing
+    MAX_LENGTH: 100, // Missing
+  },
+  CANONICAL_URL: {
+    MAX_LENGTH: 500, // Missing
+  },
+
+  IS_ACTIVE: {
+    DEFAULT: true, // Optional
+  },
+  SEO_TITLE: {
+    MAX_LENGTH: 70,
+  },
+
+  SEO_DESCRIPTION: {
+    MAX_LENGTH: 160,
+  },
+
+  FEATURED_IMAGE: {
+    URL_MAX_LENGTH: 500,
+
+    PUBLIC_ID_MAX_LENGTH: 255,
+  },
+
+  VIEW_COUNT: {
+    MIN: 0,
+  },
+
+  READ_TIME: {
+    MIN: 1,
+
+    MAX: 999,
+  },
+
+  SORT_ORDER: {
+    MIN: 0,
+
+    MAX: 9999,
+  },
+} as const;

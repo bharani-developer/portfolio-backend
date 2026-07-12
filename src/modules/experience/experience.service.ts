@@ -1,37 +1,44 @@
-// src\modules\experience\experience.service.ts
+// src/modules/experience/experience.service.ts
 
-import httpStatus from "http-status";
+/* -------------------------------------------------------------------------- */
+/*                                 1. Imports                                 */
+/* -------------------------------------------------------------------------- */
 
-import { BaseCrudService } from "../../shared/base/index.js";
-import { generateSlug } from "../../shared/slug/index.js";
+import httpStatus from 'http-status';
 
-import AppError from "../../utils/AppError.js";
+import { BaseCrudService } from '../../shared/base/index.js';
 
-import {
-  EXPERIENCE_MESSAGE,
-  EXPERIENCE_SEARCHABLE_FIELDS,
-} from "./experience.constant.js";
+import { EXPERIENCE_MESSAGE, EXPERIENCE_SEARCHABLE_FIELDS } from './experience.constant.js';
 
-import { Experience } from "./experience.model.js";
+import { Experience } from './experience.model.js';
 
-import type { IExperience } from "./experience.interface.js";
+import type {
+  IExperience,
+  TCreateExperiencePayload,
+  TUpdateExperiencePayload,
+  TExperienceDocument,
+} from './experience.types.js';
 
-const baseService = new BaseCrudService<IExperience>(Experience, [
+import { AppError, generateSlug } from '../../shared/utils/index.js';
+
+/* -------------------------------------------------------------------------- */
+/*                               2. Base Service                              */
+/* -------------------------------------------------------------------------- */
+
+const experienceBaseService = new BaseCrudService<IExperience>(Experience, [
   ...EXPERIENCE_SEARCHABLE_FIELDS,
-]);
+] as string[]);
 
-const createExperience = async (payload: Partial<IExperience>) => {
-  if (!payload.company) {
-    throw new AppError(httpStatus.BAD_REQUEST, "Company is required");
-  }
+/* -------------------------------------------------------------------------- */
+/*                                  3. Create                                 */
+/* -------------------------------------------------------------------------- */
 
-  if (!payload.position) {
-    throw new AppError(httpStatus.BAD_REQUEST, "Position is required");
-  }
+const createExperience = async (
+  payload: TCreateExperiencePayload,
+): Promise<TExperienceDocument> => {
+  const company = payload.company.trim();
 
-  const company = payload.company;
-
-  const position = payload.position;
+  const position = payload.position.trim();
 
   const existingExperience = await Experience.findOne({
     company,
@@ -42,58 +49,115 @@ const createExperience = async (payload: Partial<IExperience>) => {
     throw new AppError(httpStatus.CONFLICT, EXPERIENCE_MESSAGE.ALREADY_EXISTS);
   }
 
-  payload.slug = generateSlug(company);
+  const experiencePayload: Partial<IExperience> = {
+    ...payload,
 
-  return baseService.create(payload);
+    company,
+
+    position,
+
+    location: payload.location.trim(),
+
+    summary: payload.summary.trim(),
+
+    slug: generateSlug(`${company}-${position}`),
+
+    ...(payload.companyWebsite
+      ? {
+        companyWebsite: payload.companyWebsite.trim(),
+      }
+      : {}),
+  };
+
+  return experienceBaseService.create(experiencePayload);
 };
+/* -------------------------------------------------------------------------- */
+/*                                 4. Get All                                 */
+/* -------------------------------------------------------------------------- */
 
-const getExperiences = async (query: Record<string, unknown>) => {
-  return baseService.getAll(query);
-};
+const getExperiences = async (query: Record<string, unknown>) =>
+  experienceBaseService.getAll(query);
 
-const getExperienceById = async (id: string) => {
-  return baseService.getById(id);
-};
+/* -------------------------------------------------------------------------- */
+/*                                5. Get By Id                                */
+/* -------------------------------------------------------------------------- */
 
-const updateExperience = async (id: string, payload: Partial<IExperience>) => {
-  const existingExperience = await Experience.findById(id);
+const getExperienceById = async (id: string): Promise<TExperienceDocument> =>
+  experienceBaseService.getById(id);
+/* -------------------------------------------------------------------------- */
+/*                                  6. Update                                 */
+/* -------------------------------------------------------------------------- */
 
-  if (!existingExperience) {
-    throw new AppError(httpStatus.NOT_FOUND, EXPERIENCE_MESSAGE.NOT_FOUND);
+const updateExperience = async (
+  id: string,
+  payload: TUpdateExperiencePayload,
+): Promise<TExperienceDocument> => {
+  const existingExperience = await experienceBaseService.getById(id);
+
+  const company = payload.company?.trim() ?? existingExperience.company;
+
+  const position = payload.position?.trim() ?? existingExperience.position;
+
+  const duplicateExperience = await Experience.findOne({
+    company,
+    position,
+    _id: {
+      $ne: existingExperience._id,
+    },
+  });
+
+  if (duplicateExperience) {
+    throw new AppError(httpStatus.CONFLICT, EXPERIENCE_MESSAGE.ALREADY_EXISTS);
   }
 
-  if (payload.company) {
-    const company = payload.company;
+  const updatePayload: Partial<IExperience> = {
+    ...payload,
 
-    const position = payload.position ?? existingExperience.position;
-
-    const duplicateExperience = await Experience.findOne({
+    ...(payload.company && {
       company,
+    }),
+
+    ...(payload.position && {
       position,
-      _id: {
-        $ne: existingExperience._id,
-      },
-    });
+    }),
 
-    if (duplicateExperience) {
-      throw new AppError(
-        httpStatus.CONFLICT,
-        EXPERIENCE_MESSAGE.ALREADY_EXISTS,
-      );
-    }
+    ...(payload.location && {
+      location: payload.location.trim(),
+    }),
 
-    payload.slug = generateSlug(company);
-  }
+    ...(payload.summary && {
+      summary: payload.summary.trim(),
+    }),
 
-  return baseService.update(id, payload);
+    ...(payload.companyWebsite && {
+      companyWebsite: payload.companyWebsite.trim(),
+    }),
+
+    ...(payload.company || payload.position
+      ? {
+        slug: generateSlug(`${company}-${position}`),
+      }
+      : {}),
+  };
+
+  return experienceBaseService.update(id, updatePayload);
 };
+/* -------------------------------------------------------------------------- */
+/*                                  7. Delete                                 */
+/* -------------------------------------------------------------------------- */
 
-const deleteExperience = async (id: string) => {
-  return baseService.delete(id);
-};
+const deleteExperience = async (id: string): Promise<TExperienceDocument> =>
+  experienceBaseService.delete(id);
 
-const getActiveExperiences = async () => {
-  return Experience.find({
+/* -------------------------------------------------------------------------- */
+/*                              8. Custom Queries                             */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * Get all active experiences.
+ */
+const getActiveExperiences = async () =>
+  Experience.find({
     isActive: true,
   })
     .sort({
@@ -102,41 +166,23 @@ const getActiveExperiences = async () => {
       sortOrder: 1,
     })
     .lean();
-};
 
-const getCurrentExperiences = async () => {
-  return Experience.find({
-    isActive: true,
+/**
+ * Get current experiences.
+ */
+const getCurrentExperiences = async () =>
+  Experience.find({
     isCurrent: true,
-  })
-    .sort({
-      startDate: -1,
-    })
-    .lean();
-};
-
-const getExperiencesByTechnology = async (technology: string) => {
-  return Experience.find({
-    technologies: technology,
     isActive: true,
   })
     .sort({
       startDate: -1,
     })
     .lean();
-};
 
-const getExperiencesByCompany = async (company: string) => {
-  return Experience.find({
-    company,
-    isActive: true,
-  })
-    .sort({
-      startDate: -1,
-    })
-    .lean();
-};
-
+/**
+ * Get experience by slug.
+ */
 const getExperienceBySlug = async (slug: string) => {
   const result = await Experience.findOne({
     slug,
@@ -149,6 +195,90 @@ const getExperienceBySlug = async (slug: string) => {
 
   return result;
 };
+/**
+ * Get experiences by company.
+ */
+const getExperiencesByCompany = async (company: string) =>
+  Experience.find({
+    company: company.trim(),
+    isActive: true,
+  })
+    .sort({
+      isCurrent: -1,
+      startDate: -1,
+    })
+    .lean();
+
+/**
+ * Get experiences by technology.
+ */
+const getExperiencesByTechnology = async (technology: string) =>
+  Experience.find({
+    technologies: {
+      $in: [technology.trim()],
+    },
+    isActive: true,
+  })
+    .sort({
+      isCurrent: -1,
+      startDate: -1,
+    })
+    .lean();
+
+/**
+ * Get experiences by employment type.
+ */
+const getExperiencesByEmploymentType = async (employmentType: IExperience['employmentType']) =>
+  Experience.find({
+    employmentType,
+    isActive: true,
+  })
+    .sort({
+      isCurrent: -1,
+      startDate: -1,
+    })
+    .lean();
+
+/**
+ * Get experiences by work mode.
+ */
+const getExperiencesByWorkMode = async (workMode: IExperience['workMode']) =>
+  Experience.find({
+    workMode,
+    isActive: true,
+  })
+    .sort({
+      isCurrent: -1,
+      startDate: -1,
+    })
+    .lean();
+
+/**
+ * Get experience statistics.
+ */
+const getExperienceStats = async () => {
+  const [total, active, current] = await Promise.all([
+    experienceBaseService.count(),
+
+    experienceBaseService.count({
+      isActive: true,
+    }),
+
+    experienceBaseService.count({
+      isCurrent: true,
+    }),
+  ]);
+
+  return {
+    total,
+    active,
+    current,
+  };
+};
+
+/* -------------------------------------------------------------------------- */
+/*                                  9. Export                                 */
+/* -------------------------------------------------------------------------- */
 
 export const ExperienceService = {
   createExperience,
@@ -165,9 +295,15 @@ export const ExperienceService = {
 
   getCurrentExperiences,
 
-  getExperiencesByTechnology,
+  getExperienceBySlug,
 
   getExperiencesByCompany,
 
-  getExperienceBySlug,
+  getExperiencesByTechnology,
+
+  getExperiencesByEmploymentType,
+
+  getExperiencesByWorkMode,
+
+  getExperienceStats,
 };

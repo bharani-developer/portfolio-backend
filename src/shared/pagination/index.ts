@@ -1,3 +1,15 @@
-// src\shared\pagination\index.ts
+// src/shared/pagination/index.ts
 
-export * from "./pagination.js";
+/**
+ * Pagination utilities.
+ *
+ * Centralized exports for pagination helpers.
+ *
+ * Responsibilities:
+ * - Pagination calculation
+ * - Pagination types
+ *
+ * This module contains no runtime logic.
+ */
+
+export * from './pagination.js';

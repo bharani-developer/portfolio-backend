@@ -1,26 +1,109 @@
-// src\modules\testimonials\testimonials.controller.ts
+// src/modules/testimonials/testimonials.controller.ts
 
-import { MESSAGE, httpStatus } from "../../constants/index.js";
+/* -------------------------------------------------------------------------- */
+/*                                   Imports                                  */
+/* -------------------------------------------------------------------------- */
 
-import { catchAsync, sendResponse } from "../../utils/index.js";
+// Express
+import type { Request, Response } from 'express';
 
-import { TestimonialService } from "./testimonials.service.js";
+// Third-party
+import httpStatus from 'http-status';
 
-const createTestimonial = catchAsync(async (req, res) => {
-  const result = await TestimonialService.createTestimonial(req.body);
+// Constants
+import { MESSAGE } from '../../constants/index.js';
 
-  sendResponse(res, {
-    statusCode: httpStatus.CREATED,
+// Shared
+import { AppError, catchAsync, sendResponse } from '../../shared/utils/index.js';
 
-    success: true,
+// Module
+import { TestimonialService } from './testimonials.service.js';
 
-    message: MESSAGE.CREATED,
+// Types
+import type {
+  TCreateTestimonialPayload,
+  TUpdateTestimonialPayload,
+  TTestimonialClientType,
+  TTestimonialRating,
+} from './testimonials.types.js';
 
-    data: result,
-  });
-});
+/* -------------------------------------------------------------------------- */
+/*                              Helper Functions                              */
+/* -------------------------------------------------------------------------- */
 
-const getTestimonials = catchAsync(async (req, res) => {
+const getRequiredParam = (value: string | string[] | undefined, name: string): string => {
+  if (typeof value !== 'string' || value.trim().length === 0) {
+    throw new AppError(httpStatus.BAD_REQUEST, `${name} is required`);
+  }
+
+  return value.trim();
+};
+
+const getRequiredNumberParam = (value: string | string[] | undefined, name: string): number => {
+  const param = getRequiredParam(value, name);
+
+  const number = Number(param);
+
+  if (Number.isNaN(number)) {
+    throw new AppError(httpStatus.BAD_REQUEST, `${name} must be a valid number`);
+  }
+
+  return number;
+};
+
+/* -------------------------------------------------------------------------- */
+/*                                Helper Types                                */
+/* -------------------------------------------------------------------------- */
+
+type TIdParams = {
+  id: string;
+};
+
+type TRatingParams = {
+  rating: string;
+};
+
+type TClientTypeParams = {
+  clientType: string;
+};
+
+type TProjectParams = {
+  projectName: string;
+};
+
+type TCompanyParams = {
+  clientCompany: string;
+};
+
+type TClientParams = {
+  clientName: string;
+};
+
+/* -------------------------------------------------------------------------- */
+/*                                   Create                                   */
+/* -------------------------------------------------------------------------- */
+
+const createTestimonial = catchAsync(
+  async (req: Request<object, object, TCreateTestimonialPayload>, res: Response) => {
+    const result = await TestimonialService.createTestimonial(req.body);
+
+    sendResponse(res, {
+      statusCode: httpStatus.CREATED,
+
+      success: true,
+
+      message: MESSAGE.CREATED,
+
+      data: result,
+    });
+  },
+);
+
+/* -------------------------------------------------------------------------- */
+/*                                  Get All                                   */
+/* -------------------------------------------------------------------------- */
+
+const getTestimonials = catchAsync(async (req: Request, res: Response) => {
   const result = await TestimonialService.getTestimonials(req.query);
 
   sendResponse(res, {
@@ -36,8 +119,12 @@ const getTestimonials = catchAsync(async (req, res) => {
   });
 });
 
-const getTestimonialById = catchAsync(async (req, res) => {
-  const id = String(req.params.id);
+/* -------------------------------------------------------------------------- */
+/*                                  Get One                                   */
+/* -------------------------------------------------------------------------- */
+
+const getTestimonialById = catchAsync(async (req: Request<TIdParams>, res: Response) => {
+  const id = getRequiredParam(req.params.id, 'Testimonial ID');
 
   const result = await TestimonialService.getTestimonialById(id);
 
@@ -51,25 +138,34 @@ const getTestimonialById = catchAsync(async (req, res) => {
     data: result,
   });
 });
+/* -------------------------------------------------------------------------- */
+/*                                   Update                                   */
+/* -------------------------------------------------------------------------- */
 
-const updateTestimonial = catchAsync(async (req, res) => {
-  const id = String(req.params.id);
+const updateTestimonial = catchAsync(
+  async (req: Request<TIdParams, object, TUpdateTestimonialPayload>, res: Response) => {
+    const id = getRequiredParam(req.params.id, 'Testimonial ID');
 
-  const result = await TestimonialService.updateTestimonial(id, req.body);
+    const result = await TestimonialService.updateTestimonial(id, req.body);
 
-  sendResponse(res, {
-    statusCode: httpStatus.OK,
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
 
-    success: true,
+      success: true,
 
-    message: MESSAGE.UPDATED,
+      message: MESSAGE.UPDATED,
 
-    data: result,
-  });
-});
+      data: result,
+    });
+  },
+);
 
-const deleteTestimonial = catchAsync(async (req, res) => {
-  const id = String(req.params.id);
+/* -------------------------------------------------------------------------- */
+/*                                   Delete                                   */
+/* -------------------------------------------------------------------------- */
+
+const deleteTestimonial = catchAsync(async (req: Request<TIdParams>, res: Response) => {
+  const id = getRequiredParam(req.params.id, 'Testimonial ID');
 
   const result = await TestimonialService.deleteTestimonial(id);
 
@@ -84,7 +180,11 @@ const deleteTestimonial = catchAsync(async (req, res) => {
   });
 });
 
-const getActiveTestimonials = catchAsync(async (_req, res) => {
+/* -------------------------------------------------------------------------- */
+/*                               Custom Queries                               */
+/* -------------------------------------------------------------------------- */
+
+const getActiveTestimonials = catchAsync(async (_req: Request, res: Response) => {
   const result = await TestimonialService.getActiveTestimonials();
 
   sendResponse(res, {
@@ -98,7 +198,7 @@ const getActiveTestimonials = catchAsync(async (_req, res) => {
   });
 });
 
-const getFeaturedTestimonials = catchAsync(async (_req, res) => {
+const getFeaturedTestimonials = catchAsync(async (_req: Request, res: Response) => {
   const result = await TestimonialService.getFeaturedTestimonials();
 
   sendResponse(res, {
@@ -112,8 +212,8 @@ const getFeaturedTestimonials = catchAsync(async (_req, res) => {
   });
 });
 
-const getTestimonialsByRating = catchAsync(async (req, res) => {
-  const rating = Number(req.params.rating) as 1 | 2 | 3 | 4 | 5;
+const getTestimonialsByRating = catchAsync(async (req: Request<TRatingParams>, res: Response) => {
+  const rating = getRequiredNumberParam(req.params.rating, 'Rating') as TTestimonialRating;
 
   const result = await TestimonialService.getTestimonialsByRating(rating);
 
@@ -128,25 +228,29 @@ const getTestimonialsByRating = catchAsync(async (req, res) => {
   });
 });
 
-const getTestimonialsByClientType = catchAsync(async (req, res) => {
-  const clientType = String(req.params.clientType) as never;
+const getTestimonialsByClientType = catchAsync(
+  async (req: Request<TClientTypeParams>, res: Response) => {
+    const clientType = getRequiredParam(
+      req.params.clientType,
+      'Client Type',
+    ) as TTestimonialClientType;
 
-  const result =
-    await TestimonialService.getTestimonialsByClientType(clientType);
+    const result = await TestimonialService.getTestimonialsByClientType(clientType);
 
-  sendResponse(res, {
-    statusCode: httpStatus.OK,
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
 
-    success: true,
+      success: true,
 
-    message: MESSAGE.RETRIEVED,
+      message: MESSAGE.RETRIEVED,
 
-    data: result,
-  });
-});
+      data: result,
+    });
+  },
+);
 
-const getTestimonialsByProject = catchAsync(async (req, res) => {
-  const projectName = String(req.params.projectName);
+const getTestimonialsByProject = catchAsync(async (req: Request<TProjectParams>, res: Response) => {
+  const projectName = getRequiredParam(req.params.projectName, 'Project Name');
 
   const result = await TestimonialService.getTestimonialsByProject(projectName);
 
@@ -161,7 +265,39 @@ const getTestimonialsByProject = catchAsync(async (req, res) => {
   });
 });
 
-const getAverageRating = catchAsync(async (_req, res) => {
+const getTestimonialsByCompany = catchAsync(async (req: Request<TCompanyParams>, res: Response) => {
+  const clientCompany = getRequiredParam(req.params.clientCompany, 'Client Company');
+
+  const result = await TestimonialService.getTestimonialsByCompany(clientCompany);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+
+    success: true,
+
+    message: MESSAGE.RETRIEVED,
+
+    data: result,
+  });
+});
+
+const getTestimonialsByClient = catchAsync(async (req: Request<TClientParams>, res: Response) => {
+  const clientName = getRequiredParam(req.params.clientName, 'Client Name');
+
+  const result = await TestimonialService.getTestimonialsByClient(clientName);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+
+    success: true,
+
+    message: MESSAGE.RETRIEVED,
+
+    data: result,
+  });
+});
+
+const getAverageRating = catchAsync(async (_req: Request, res: Response) => {
   const result = await TestimonialService.getAverageRating();
 
   sendResponse(res, {
@@ -175,6 +311,23 @@ const getAverageRating = catchAsync(async (_req, res) => {
   });
 });
 
+const getTestimonialStats = catchAsync(async (_req: Request, res: Response) => {
+  const result = await TestimonialService.getTestimonialStats();
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+
+    success: true,
+
+    message: MESSAGE.RETRIEVED,
+
+    data: result,
+  });
+});
+/* -------------------------------------------------------------------------- */
+/*                                   Export                                   */
+/* -------------------------------------------------------------------------- */
+
 export const TestimonialController = {
   createTestimonial,
 
@@ -186,6 +339,8 @@ export const TestimonialController = {
 
   deleteTestimonial,
 
+  /* --------------------------- Custom Queries --------------------------- */
+
   getActiveTestimonials,
 
   getFeaturedTestimonials,
@@ -196,5 +351,11 @@ export const TestimonialController = {
 
   getTestimonialsByProject,
 
+  getTestimonialsByCompany,
+
+  getTestimonialsByClient,
+
   getAverageRating,
-};
+
+  getTestimonialStats,
+} as const;

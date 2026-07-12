@@ -1,119 +1,378 @@
-export const uploadSchemas = {
-  UploadResponse: {
-    type: "object",
+// src/modules/upload/upload.swagger.ts
 
-    required: ["url", "publicId"],
+/* -------------------------------------------------------------------------- */
+/*                                   Imports                                  */
+/* -------------------------------------------------------------------------- */
+
+import { UPLOAD_FOLDER, UPLOAD_VALIDATION } from './upload.constant.js';
+
+/* -------------------------------------------------------------------------- */
+/*                              Shared Constants                              */
+/* -------------------------------------------------------------------------- */
+
+const uploadFolderExamples = Object.values(UPLOAD_FOLDER);
+
+const allowedMimeTypes = UPLOAD_VALIDATION.FILE.ALLOWED_MIME_TYPES.join(', ');
+
+const maxFileSizeMB = UPLOAD_VALIDATION.FILE.MAX_SIZE / (1024 * 1024);
+
+/* -------------------------------------------------------------------------- */
+/*                             Component Schemas                              */
+/* -------------------------------------------------------------------------- */
+
+export const uploadSchemas = {
+  /* ---------------------------------------------------------------------- */
+  /* Upload Response                                                        */
+  /* ---------------------------------------------------------------------- */
+
+  UploadResponse: {
+    type: 'object',
+
+    description: 'Uploaded Cloudinary image information.',
+
+    required: ['url', 'publicId'],
 
     properties: {
       url: {
-        type: "string",
-        format: "uri",
+        type: 'string',
+
+        format: 'uri',
+
+        description: 'Public Cloudinary image URL.',
+
         example:
-          "https://res.cloudinary.com/demo/image/upload/v1749999999/portfolio/profile.webp",
+          'https://res.cloudinary.com/demo/image/upload/v1749999999/portfolio/projects/ecommerce-dashboard.webp',
       },
 
       publicId: {
-        type: "string",
-        example: "portfolio/profile",
+        type: 'string',
+
+        description: 'Cloudinary public identifier.',
+
+        example: 'portfolio/projects/ecommerce-dashboard',
       },
     },
   },
+
+  /* ---------------------------------------------------------------------- */
+  /* Upload Success Response                                                */
+  /* ---------------------------------------------------------------------- */
 
   UploadImageSuccessResponse: {
-    type: "object",
+    type: 'object',
+
+    required: ['success', 'statusCode', 'message', 'data'],
 
     properties: {
       success: {
-        type: "boolean",
+        type: 'boolean',
+
         example: true,
       },
 
+      statusCode: {
+        type: 'integer',
+
+        example: 200,
+      },
+
       message: {
-        type: "string",
-        example: "File uploaded successfully",
+        type: 'string',
+
+        example: 'File uploaded successfully',
       },
 
       data: {
-        $ref: "#/components/schemas/UploadResponse",
+        $ref: '#/components/schemas/UploadResponse',
       },
     },
   },
 
-  DeleteImageRequest: {
-    type: "object",
+  /* ---------------------------------------------------------------------- */
+  /* Delete Request                                                         */
+  /* ---------------------------------------------------------------------- */
 
-    required: ["publicId"],
+  DeleteImageRequest: {
+    type: 'object',
+
+    required: ['publicId'],
 
     properties: {
       publicId: {
-        type: "string",
-        example: "portfolio/profile",
+        type: 'string',
+
+        description: 'Cloudinary public ID.',
+
+        example: 'portfolio/projects/ecommerce-dashboard',
       },
     },
   },
 
-  DeleteImageResponse: {
-    type: "object",
+  /* ---------------------------------------------------------------------- */
+  /* Delete Success Response                                                */
+  /* ---------------------------------------------------------------------- */
+
+  DeleteImageSuccessResponse: {
+    type: 'object',
+
+    required: ['success', 'statusCode', 'message', 'data'],
 
     properties: {
       success: {
-        type: "boolean",
+        type: 'boolean',
+
         example: true,
       },
 
+      statusCode: {
+        type: 'integer',
+
+        example: 200,
+      },
+
       message: {
-        type: "string",
-        example: "File deleted successfully",
+        type: 'string',
+
+        example: 'File deleted successfully',
       },
 
       data: {
-        type: "null",
+        type: 'null',
+
+        example: null,
       },
     },
   },
+
+  /* ---------------------------------------------------------------------- */
+  /* Validation Error                                                       */
+  /* ---------------------------------------------------------------------- */
 
   UploadValidationError: {
-    type: "object",
+    type: 'object',
+
+    required: ['success', 'statusCode', 'message'],
 
     properties: {
       success: {
-        type: "boolean",
+        type: 'boolean',
+
         example: false,
       },
 
+      statusCode: {
+        type: 'integer',
+
+        example: 400,
+      },
+
       message: {
-        type: "string",
-        example: "File is required",
+        type: 'string',
+
+        example: 'File is required',
       },
     },
   },
 
+  /* ---------------------------------------------------------------------- */
+  /* Unauthorized                                                           */
+  /* ---------------------------------------------------------------------- */
+
   UploadUnauthorizedResponse: {
-    type: "object",
+    type: 'object',
+
+    required: ['success', 'statusCode', 'message'],
 
     properties: {
       success: {
-        type: "boolean",
+        type: 'boolean',
+
         example: false,
       },
 
+      statusCode: {
+        type: 'integer',
+
+        example: 401,
+      },
+
       message: {
-        type: "string",
-        example: "Unauthorized access",
+        type: 'string',
+
+        example: 'Unauthorized access',
+      },
+    },
+  },
+
+  /* ---------------------------------------------------------------------- */
+  /* Forbidden                                                              */
+  /* ---------------------------------------------------------------------- */
+
+  UploadForbiddenResponse: {
+    type: 'object',
+
+    required: ['success', 'statusCode', 'message'],
+
+    properties: {
+      success: {
+        type: 'boolean',
+
+        example: false,
+      },
+
+      statusCode: {
+        type: 'integer',
+
+        example: 403,
+      },
+
+      message: {
+        type: 'string',
+
+        example: 'Forbidden resource',
+      },
+    },
+  },
+
+  /* ---------------------------------------------------------------------- */
+  /* Not Found                                                              */
+  /* ---------------------------------------------------------------------- */
+
+  UploadNotFoundResponse: {
+    type: 'object',
+
+    required: ['success', 'statusCode', 'message'],
+
+    properties: {
+      success: {
+        type: 'boolean',
+
+        example: false,
+      },
+
+      statusCode: {
+        type: 'integer',
+
+        example: 404,
+      },
+
+      message: {
+        type: 'string',
+
+        example: 'File not found',
+      },
+    },
+  },
+
+  /* ---------------------------------------------------------------------- */
+  /* Payload Too Large                                                      */
+  /* ---------------------------------------------------------------------- */
+
+  UploadFileTooLargeResponse: {
+    type: 'object',
+
+    required: ['success', 'statusCode', 'message'],
+
+    properties: {
+      success: {
+        type: 'boolean',
+
+        example: false,
+      },
+
+      statusCode: {
+        type: 'integer',
+
+        example: 413,
+      },
+
+      message: {
+        type: 'string',
+
+        example: 'File size limit exceeded',
+      },
+    },
+  },
+
+  /* ---------------------------------------------------------------------- */
+  /* Unsupported Media Type                                                 */
+  /* ---------------------------------------------------------------------- */
+
+  UploadUnsupportedMediaTypeResponse: {
+    type: 'object',
+
+    required: ['success', 'statusCode', 'message'],
+
+    properties: {
+      success: {
+        type: 'boolean',
+
+        example: false,
+      },
+
+      statusCode: {
+        type: 'integer',
+
+        example: 415,
+      },
+
+      message: {
+        type: 'string',
+
+        example: 'Invalid file type',
+      },
+    },
+  },
+
+  /* ---------------------------------------------------------------------- */
+  /* Internal Server Error                                                  */
+  /* ---------------------------------------------------------------------- */
+
+  UploadInternalServerErrorResponse: {
+    type: 'object',
+
+    required: ['success', 'statusCode', 'message'],
+
+    properties: {
+      success: {
+        type: 'boolean',
+
+        example: false,
+      },
+
+      statusCode: {
+        type: 'integer',
+
+        example: 500,
+      },
+
+      message: {
+        type: 'string',
+
+        example: 'Something went wrong',
       },
     },
   },
 };
+/* -------------------------------------------------------------------------- */
+/*                                    Paths                                   */
+/* -------------------------------------------------------------------------- */
 
 export const uploadPaths = {
-  "/upload/image": {
-    post: {
-      tags: ["Upload"],
+  /* ---------------------------------------------------------------------- */
+  /* Upload Image                                                           */
+  /* ---------------------------------------------------------------------- */
 
-      summary: "Upload Image",
+  '/upload/image/{folder}': {
+    post: {
+      tags: ['Upload'],
+
+      operationId: 'uploadImage',
+
+      summary: 'Upload image',
 
       description:
-        "Upload an image to Cloudinary and receive the uploaded image URL and public ID.",
+        'Uploads an image to Cloudinary under the specified folder and returns the uploaded image URL along with its Cloudinary public ID.',
 
       security: [
         {
@@ -121,124 +380,304 @@ export const uploadPaths = {
         },
       ],
 
+      parameters: [
+        {
+          name: 'folder',
+
+          in: 'path',
+
+          required: true,
+
+          description: 'Destination upload folder.',
+
+          schema: {
+            type: 'string',
+
+            enum: uploadFolderExamples,
+
+            example: UPLOAD_FOLDER.PROJECTS,
+          },
+        },
+      ],
+
       requestBody: {
         required: true,
 
         content: {
-          "multipart/form-data": {
+          'multipart/form-data': {
             schema: {
-              type: "object",
+              type: 'object',
 
-              required: ["file"],
+              required: ['file'],
 
               properties: {
                 file: {
-                  type: "string",
-                  format: "binary",
-                  description:
-                    "Image file (jpeg, jpg, png, webp). Maximum size: 5 MB.",
+                  type: 'string',
+
+                  format: 'binary',
+
+                  description: `Supported image formats: ${allowedMimeTypes}. Maximum file size: ${maxFileSizeMB} MB.`,
+                },
+              },
+            },
+
+            encoding: {
+              file: {
+                contentType: 'image/jpeg, image/jpg, image/png, image/webp',
+              },
+            },
+          },
+        },
+      },
+
+      responses: {
+        200: {
+          description: 'Image uploaded successfully.',
+
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/UploadImageSuccessResponse',
+              },
+            },
+          },
+        },
+
+        400: {
+          description: 'Validation failed or folder is invalid.',
+
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/UploadValidationError',
+              },
+
+              examples: {
+                fileRequired: {
+                  summary: 'File missing',
+
+                  value: {
+                    success: false,
+
+                    statusCode: 400,
+
+                    message: 'File is required',
+                  },
+                },
+
+                invalidFolder: {
+                  summary: 'Invalid folder',
+
+                  value: {
+                    success: false,
+
+                    statusCode: 400,
+
+                    message: 'Invalid upload folder',
+                  },
                 },
               },
             },
           },
         },
-      },
-
-      responses: {
-        200: {
-          description: "File uploaded successfully",
-
-          content: {
-            "application/json": {
-              schema: {
-                $ref: "#/components/schemas/UploadImageSuccessResponse",
-              },
-            },
-          },
-        },
-
-        400: {
-          description: "File is required or invalid file uploaded",
-
-          content: {
-            "application/json": {
-              schema: {
-                $ref: "#/components/schemas/UploadValidationError",
-              },
-            },
-          },
-        },
 
         401: {
-          description: "Unauthorized",
+          description: 'Authentication required.',
 
           content: {
-            "application/json": {
+            'application/json': {
               schema: {
-                $ref: "#/components/schemas/UploadUnauthorizedResponse",
+                $ref: '#/components/schemas/UploadUnauthorizedResponse',
+              },
+            },
+          },
+        },
+
+        403: {
+          description: 'Authenticated but not authorized.',
+
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/UploadForbiddenResponse',
+              },
+            },
+          },
+        },
+
+        413: {
+          description: 'Uploaded file exceeds the maximum allowed size.',
+
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/UploadFileTooLargeResponse',
+              },
+            },
+          },
+        },
+
+        415: {
+          description: 'Unsupported file type.',
+
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/UploadUnsupportedMediaTypeResponse',
+              },
+            },
+          },
+        },
+
+        500: {
+          description: 'Internal server error.',
+
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/UploadInternalServerErrorResponse',
               },
             },
           },
         },
       },
     },
+    /* ---------------------------------------------------------------------- */
+    /* Delete Image                                                          */
+    /* ---------------------------------------------------------------------- */
 
-    delete: {
-      tags: ["Upload"],
+    '/upload/image': {
+      delete: {
+        tags: ['Upload'],
 
-      summary: "Delete Image",
+        operationId: 'deleteImage',
 
-      description: "Delete an uploaded Cloudinary image using its public ID.",
+        summary: 'Delete uploaded image',
 
-      security: [
-        {
-          bearerAuth: [],
-        },
-      ],
+        description: 'Deletes an existing Cloudinary image using its public ID.',
 
-      requestBody: {
-        required: true,
-
-        content: {
-          "application/json": {
-            schema: {
-              $ref: "#/components/schemas/DeleteImageRequest",
-            },
+        security: [
+          {
+            bearerAuth: [],
           },
-        },
-      },
+        ],
 
-      responses: {
-        200: {
-          description: "File deleted successfully",
+        requestBody: {
+          required: true,
 
           content: {
-            "application/json": {
+            'application/json': {
               schema: {
-                $ref: "#/components/schemas/DeleteImageResponse",
+                $ref: '#/components/schemas/DeleteImageRequest',
+              },
+
+              examples: {
+                projectImage: {
+                  summary: 'Delete project image',
+
+                  value: {
+                    publicId: 'portfolio/projects/ecommerce-dashboard',
+                  },
+                },
+
+                heroImage: {
+                  summary: 'Delete hero image',
+
+                  value: {
+                    publicId: 'portfolio/hero/profile-image',
+                  },
+                },
               },
             },
           },
         },
 
-        400: {
-          description: "Public ID is required",
-        },
+        responses: {
+          200: {
+            description: 'Image deleted successfully.',
 
-        401: {
-          description: "Unauthorized",
-
-          content: {
-            "application/json": {
-              schema: {
-                $ref: "#/components/schemas/UploadUnauthorizedResponse",
+            content: {
+              'application/json': {
+                schema: {
+                  $ref: '#/components/schemas/DeleteImageSuccessResponse',
+                },
               },
             },
           },
-        },
 
-        404: {
-          description: "File not found",
+          400: {
+            description: 'Invalid request.',
+
+            content: {
+              'application/json': {
+                schema: {
+                  $ref: '#/components/schemas/UploadValidationError',
+                },
+
+                examples: {
+                  missingPublicId: {
+                    summary: 'Missing public ID',
+
+                    value: {
+                      success: false,
+
+                      statusCode: 400,
+
+                      message: 'Public ID is required',
+                    },
+                  },
+                },
+              },
+            },
+          },
+
+          401: {
+            description: 'Authentication required.',
+
+            content: {
+              'application/json': {
+                schema: {
+                  $ref: '#/components/schemas/UploadUnauthorizedResponse',
+                },
+              },
+            },
+          },
+
+          403: {
+            description: 'Authenticated but not authorized.',
+
+            content: {
+              'application/json': {
+                schema: {
+                  $ref: '#/components/schemas/UploadForbiddenResponse',
+                },
+              },
+            },
+          },
+
+          404: {
+            description: 'Image not found.',
+
+            content: {
+              'application/json': {
+                schema: {
+                  $ref: '#/components/schemas/UploadNotFoundResponse',
+                },
+              },
+            },
+          },
+
+          500: {
+            description: 'Internal server error.',
+
+            content: {
+              'application/json': {
+                schema: {
+                  $ref: '#/components/schemas/UploadInternalServerErrorResponse',
+                },
+              },
+            },
+          },
         },
       },
     },

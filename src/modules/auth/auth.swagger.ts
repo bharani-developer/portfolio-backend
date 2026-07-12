@@ -1,187 +1,187 @@
 // src/modules/auth/auth.swagger.ts
 
-import type { OpenAPIV3_1 } from "openapi-types";
+import type { OpenAPIV3_1 } from 'openapi-types';
 
 export const authSchemas = {
   LoginRequest: {
-    type: "object",
-    required: ["email", "password"],
+    type: 'object',
+    required: ['email', 'password'],
     properties: {
       email: {
-        type: "string",
-        format: "email",
-        example: "bharani.developer@gmail.com",
+        type: 'string',
+        format: 'email',
+        example: 'bharani.developer@gmail.com',
       },
 
       password: {
-        type: "string",
-        format: "password",
-        example: "Admin@123",
+        type: 'string',
+        format: 'password',
+        example: 'Admin@123',
       },
     },
     additionalProperties: false,
   },
 
   GoogleLoginRequest: {
-    type: "object",
-    required: ["token"],
+    type: 'object',
+    required: ['token'],
     properties: {
       token: {
-        type: "string",
-        example: "eyJhbGciOiJSUzI1NiIsImtpZCI6IjExMjM0NTY3ODkw...",
+        type: 'string',
+        example: 'eyJhbGciOiJSUzI1NiIsImtpZCI6IjExMjM0NTY3ODkw...',
       },
     },
     additionalProperties: false,
   },
 
   ChangePasswordRequest: {
-    type: "object",
-    required: ["oldPassword", "newPassword"],
+    type: 'object',
+    required: ['oldPassword', 'newPassword'],
     properties: {
       oldPassword: {
-        type: "string",
-        example: "Admin@123",
+        type: 'string',
+        example: 'Admin@123',
       },
 
       newPassword: {
-        type: "string",
-        example: "NewAdmin@123",
+        type: 'string',
+        example: 'NewAdmin@123',
       },
     },
     additionalProperties: false,
   },
 
   Avatar: {
-    type: "object",
+    type: 'object',
     properties: {
       url: {
-        type: "string",
-        example: "https://lh3.googleusercontent.com/avatar.jpg",
+        type: 'string',
+        example: 'https://lh3.googleusercontent.com/avatar.jpg',
       },
 
       publicId: {
-        type: "string",
-        example: "",
+        type: 'string',
+        example: '',
       },
     },
   },
 
   UserProfile: {
-    type: "object",
+    type: 'object',
     properties: {
       _id: {
-        type: "string",
-        example: "6857e6d7a2a9f4c9b8f4d123",
+        type: 'string',
+        example: '6857e6d7a2a9f4c9b8f4d123',
       },
 
       name: {
-        type: "string",
-        example: "Bharani",
+        type: 'string',
+        example: 'Bharani',
       },
 
       email: {
-        type: "string",
-        format: "email",
-        example: "bharani.developer@gmail.com",
+        type: 'string',
+        format: 'email',
+        example: 'bharani.developer@gmail.com',
       },
 
       role: {
-        type: "string",
-        enum: ["admin", "viewer"],
-        example: "viewer",
+        type: 'string',
+        enum: ['admin', 'viewer'],
+        example: 'viewer',
       },
 
       authProvider: {
-        type: "string",
-        enum: ["LOCAL", "GOOGLE"],
-        example: "GOOGLE",
+        type: 'string',
+        enum: ['LOCAL', 'GOOGLE'],
+        example: 'GOOGLE',
       },
 
       googleId: {
-        type: "string",
-        example: "108394857392847592384",
+        type: 'string',
+        example: '108394857392847592384',
       },
 
       emailVerified: {
-        type: "boolean",
+        type: 'boolean',
         example: true,
       },
 
       givenName: {
-        type: "string",
-        example: "Bharani",
+        type: 'string',
+        example: 'Bharani',
       },
 
       familyName: {
-        type: "string",
-        example: "K",
+        type: 'string',
+        example: 'K',
       },
 
       locale: {
-        type: "string",
-        example: "en-IN",
+        type: 'string',
+        example: 'en-IN',
       },
 
       hostedDomain: {
-        type: "string",
-        example: "company.com",
+        type: 'string',
+        example: 'company.com',
       },
 
       avatar: {
-        $ref: "#/components/schemas/Avatar",
+        $ref: '#/components/schemas/Avatar',
       },
 
       isActive: {
-        type: "boolean",
+        type: 'boolean',
         example: true,
       },
 
       isDeleted: {
-        type: "boolean",
+        type: 'boolean',
         example: false,
       },
 
       lastLoginAt: {
-        type: "string",
-        format: "date-time",
+        type: 'string',
+        format: 'date-time',
       },
 
       createdAt: {
-        type: "string",
-        format: "date-time",
+        type: 'string',
+        format: 'date-time',
       },
 
       updatedAt: {
-        type: "string",
-        format: "date-time",
+        type: 'string',
+        format: 'date-time',
       },
     },
   },
 
   LoginResponse: {
-    type: "object",
+    type: 'object',
     properties: {
       success: {
-        type: "boolean",
+        type: 'boolean',
         example: true,
       },
 
       statusCode: {
-        type: "integer",
+        type: 'integer',
         example: 200,
       },
 
       message: {
-        type: "string",
-        example: "Login successful",
+        type: 'string',
+        example: 'Login successful',
       },
 
       data: {
-        type: "object",
+        type: 'object',
         properties: {
           accessToken: {
-            type: "string",
-            example: "jwt-access-token",
+            type: 'string',
+            example: 'jwt-access-token',
           },
         },
       },
@@ -189,29 +189,29 @@ export const authSchemas = {
   },
 
   RefreshTokenResponse: {
-    type: "object",
+    type: 'object',
     properties: {
       success: {
-        type: "boolean",
+        type: 'boolean',
         example: true,
       },
 
       statusCode: {
-        type: "integer",
+        type: 'integer',
         example: 200,
       },
 
       message: {
-        type: "string",
-        example: "Access token refreshed successfully",
+        type: 'string',
+        example: 'Access token refreshed successfully',
       },
 
       data: {
-        type: "object",
+        type: 'object',
         properties: {
           accessToken: {
-            type: "string",
-            example: "jwt-access-token",
+            type: 'string',
+            example: 'jwt-access-token',
           },
         },
       },
@@ -219,99 +219,99 @@ export const authSchemas = {
   },
 
   ProfileResponse: {
-    type: "object",
+    type: 'object',
     properties: {
       success: {
-        type: "boolean",
+        type: 'boolean',
         example: true,
       },
 
       statusCode: {
-        type: "integer",
+        type: 'integer',
         example: 200,
       },
 
       message: {
-        type: "string",
-        example: "Profile retrieved successfully",
+        type: 'string',
+        example: 'Profile retrieved successfully',
       },
 
       data: {
-        $ref: "#/components/schemas/UserProfile",
+        $ref: '#/components/schemas/UserProfile',
       },
     },
   },
 
   SuccessResponse: {
-    type: "object",
+    type: 'object',
     properties: {
       success: {
-        type: "boolean",
+        type: 'boolean',
         example: true,
       },
 
       statusCode: {
-        type: "integer",
+        type: 'integer',
         example: 200,
       },
 
       message: {
-        type: "string",
-        example: "Operation completed successfully",
+        type: 'string',
+        example: 'Operation completed successfully',
       },
 
       data: {
-        type: "object",
+        type: 'object',
         additionalProperties: true,
       },
     },
   },
 
   ErrorResponse: {
-    type: "object",
+    type: 'object',
     properties: {
       success: {
-        type: "boolean",
+        type: 'boolean',
         example: false,
       },
 
       statusCode: {
-        type: "integer",
+        type: 'integer',
         example: 400,
       },
 
       message: {
-        type: "string",
-        example: "Bad Request",
+        type: 'string',
+        example: 'Bad Request',
       },
     },
   },
 } satisfies Record<string, OpenAPIV3_1.SchemaObject>;
 
 export const authPaths: OpenAPIV3_1.PathsObject = {
-  "/auth/login": {
+  '/auth/login': {
     post: {
-      tags: ["Auth"],
-      summary: "Login using email and password",
+      tags: ['Auth'],
+      summary: 'Login using email and password',
 
       requestBody: {
         required: true,
         content: {
-          "application/json": {
+          'application/json': {
             schema: {
-              $ref: "#/components/schemas/LoginRequest",
+              $ref: '#/components/schemas/LoginRequest',
             },
           },
         },
       },
 
       responses: {
-        "200": {
-          description: "Login successful",
+        '200': {
+          description: 'Login successful',
           content: {
-            "application/json": {
+            'application/json': {
               schema: {
-                $ref: "#/components/schemas/LoginResponse",
+                $ref: '#/components/schemas/LoginResponse',
               },
             },
           },
@@ -320,34 +320,34 @@ export const authPaths: OpenAPIV3_1.PathsObject = {
     },
   },
 
-  "/auth/google": {
+  '/auth/google': {
     post: {
-      tags: ["Auth"],
+      tags: ['Auth'],
 
-      summary: "Authenticate with Google",
+      summary: 'Authenticate with Google',
 
-      description: "Send Google ID Token received from Google Sign-In SDK.",
+      description: 'Send Google ID Token received from Google Sign-In SDK.',
 
       requestBody: {
         required: true,
 
         content: {
-          "application/json": {
+          'application/json': {
             schema: {
-              $ref: "#/components/schemas/GoogleLoginRequest",
+              $ref: '#/components/schemas/GoogleLoginRequest',
             },
           },
         },
       },
 
       responses: {
-        "200": {
-          description: "Google login successful",
+        '200': {
+          description: 'Google login successful',
 
           content: {
-            "application/json": {
+            'application/json': {
               schema: {
-                $ref: "#/components/schemas/LoginResponse",
+                $ref: '#/components/schemas/LoginResponse',
               },
             },
           },
@@ -356,20 +356,20 @@ export const authPaths: OpenAPIV3_1.PathsObject = {
     },
   },
 
-  "/auth/refresh-token": {
+  '/auth/refresh-token': {
     post: {
-      tags: ["Auth"],
+      tags: ['Auth'],
 
-      summary: "Refresh access token",
+      summary: 'Refresh access token',
 
       responses: {
-        "200": {
-          description: "Token refreshed",
+        '200': {
+          description: 'Token refreshed',
 
           content: {
-            "application/json": {
+            'application/json': {
               schema: {
-                $ref: "#/components/schemas/RefreshTokenResponse",
+                $ref: '#/components/schemas/RefreshTokenResponse',
               },
             },
           },
@@ -378,11 +378,11 @@ export const authPaths: OpenAPIV3_1.PathsObject = {
     },
   },
 
-  "/auth/profile": {
+  '/auth/profile': {
     get: {
-      tags: ["Auth"],
+      tags: ['Auth'],
 
-      summary: "Get current user profile",
+      summary: 'Get current user profile',
 
       security: [
         {
@@ -391,13 +391,13 @@ export const authPaths: OpenAPIV3_1.PathsObject = {
       ],
 
       responses: {
-        "200": {
-          description: "Profile retrieved",
+        '200': {
+          description: 'Profile retrieved',
 
           content: {
-            "application/json": {
+            'application/json': {
               schema: {
-                $ref: "#/components/schemas/ProfileResponse",
+                $ref: '#/components/schemas/ProfileResponse',
               },
             },
           },
@@ -406,11 +406,11 @@ export const authPaths: OpenAPIV3_1.PathsObject = {
     },
   },
 
-  "/auth/change-password": {
+  '/auth/change-password': {
     post: {
-      tags: ["Auth"],
+      tags: ['Auth'],
 
-      summary: "Change account password",
+      summary: 'Change account password',
 
       security: [
         {
@@ -422,27 +422,27 @@ export const authPaths: OpenAPIV3_1.PathsObject = {
         required: true,
 
         content: {
-          "application/json": {
+          'application/json': {
             schema: {
-              $ref: "#/components/schemas/ChangePasswordRequest",
+              $ref: '#/components/schemas/ChangePasswordRequest',
             },
           },
         },
       },
 
       responses: {
-        "200": {
-          description: "Password changed successfully",
+        '200': {
+          description: 'Password changed successfully',
         },
       },
     },
   },
 
-  "/auth/logout": {
+  '/auth/logout': {
     post: {
-      tags: ["Auth"],
+      tags: ['Auth'],
 
-      summary: "Logout authenticated user",
+      summary: 'Logout authenticated user',
 
       security: [
         {
@@ -451,8 +451,8 @@ export const authPaths: OpenAPIV3_1.PathsObject = {
       ],
 
       responses: {
-        "200": {
-          description: "Logout successful",
+        '200': {
+          description: 'Logout successful',
         },
       },
     },

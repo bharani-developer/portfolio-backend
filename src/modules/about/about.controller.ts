@@ -1,21 +1,27 @@
 // src/modules/about/about.controller.ts
 
-import type { Request, Response } from "express";
+/* -------------------------------------------------------------------------- */
+/*                                   Imports                                  */
+/* -------------------------------------------------------------------------- */
 
-import httpStatus from "http-status";
+// Express
+import type { Request, Response } from 'express';
 
-import catchAsync from "../../utils/catchAsync.js";
-import sendResponse from "../../utils/sendResponse.js";
+// Third-party
+import httpStatus from 'http-status';
 
-import { ABOUT_MESSAGE } from "./about.constant.js";
-import type {
-  TCreateAboutPayload,
-  TUpdateAboutPayload,
-} from "./about.interface.js";
-import { AboutService } from "./about.service.js";
+// Shared
+import { catchAsync, sendResponse } from '../../shared/utils/index.js';
+
+// Module
+import { ABOUT_MESSAGE } from './about.constant.js';
+import { AboutService } from './about.service.js';
+
+// Types
+import type { TCreateAboutPayload, TUpdateAboutPayload } from './about.types.js';
 
 /* -------------------------------------------------------------------------- */
-/*                               Create About                                 */
+/*                                   Create                                   */
 /* -------------------------------------------------------------------------- */
 
 const createAbout = catchAsync(
@@ -32,7 +38,7 @@ const createAbout = catchAsync(
 );
 
 /* -------------------------------------------------------------------------- */
-/*                                Get About                                   */
+/*                                    Get                                     */
 /* -------------------------------------------------------------------------- */
 
 const getAbout = catchAsync(async (_req: Request, res: Response) => {
@@ -47,7 +53,7 @@ const getAbout = catchAsync(async (_req: Request, res: Response) => {
 });
 
 /* -------------------------------------------------------------------------- */
-/*                              Update About                                  */
+/*                                   Update                                   */
 /* -------------------------------------------------------------------------- */
 
 const updateAbout = catchAsync(
@@ -64,7 +70,7 @@ const updateAbout = catchAsync(
 );
 
 /* -------------------------------------------------------------------------- */
-/*                              Delete About                                  */
+/*                                   Delete                                   */
 /* -------------------------------------------------------------------------- */
 
 const deleteAbout = catchAsync(async (_req: Request, res: Response) => {

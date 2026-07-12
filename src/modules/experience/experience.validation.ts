@@ -1,179 +1,358 @@
-// src\modules\experience\experience.validation.ts
+/**
+ * Experience validation schemas.
+ *
+ * Compatible with:
+ * - Zod v4
+ * - TypeScript 5+
+ * - Node.js 24+
+ * - Express 5
+ *
+ * Structure
+ * 1. Imports
+ * 2. Helper Schemas
+ * 3. Primitive Validators
+ * 4. Array Validators
+ * 5. Base Schema
+ * 6. Shared Business Validation
+ * 7. Create Validation
+ * 8. Update Validation
+ * 9. Export
+ * 10. Infer Types
+ */
 
-import { z } from "zod";
+/* -------------------------------------------------------------------------- */
+/*                                   Imports                                  */
+/* -------------------------------------------------------------------------- */
+
+import { z } from 'zod';
 
 import {
   EMPLOYMENT_TYPES,
-  EXPERIENCE_DEFAULT,
   WORK_MODES,
-} from "./experience.constant.js";
+  EXPERIENCE_DEFAULT,
+  EXPERIENCE_VALIDATION,
+} from './experience.constant.js';
 
-const imageSchema = z.object({
-  url: z.string().trim().url("Invalid image URL"),
+/* -------------------------------------------------------------------------- */
+/*                               Helper Schemas                               */
+/* -------------------------------------------------------------------------- */
 
-  publicId: z.string().trim().min(1, "Public ID is required"),
+const imageSchema = z
+  .object({
+    url: z
+      .string()
+      .trim()
+      .url('Company logo URL must be a valid URL')
+      .max(
+        EXPERIENCE_VALIDATION.IMAGE.URL_MAX_LENGTH,
+        `Company logo URL cannot exceed ${EXPERIENCE_VALIDATION.IMAGE.URL_MAX_LENGTH} characters`,
+      ),
+
+    publicId: z
+      .string()
+      .trim()
+      .min(1, 'Company logo public ID is required')
+      .max(
+        EXPERIENCE_VALIDATION.IMAGE.PUBLIC_ID_MAX_LENGTH,
+        `Company logo public ID cannot exceed ${EXPERIENCE_VALIDATION.IMAGE.PUBLIC_ID_MAX_LENGTH} characters`,
+      ),
+  })
+  .strict();
+/* -------------------------------------------------------------------------- */
+/*                            Primitive Validators                            */
+/* -------------------------------------------------------------------------- */
+
+const companySchema = z
+  .string()
+  .trim()
+  .min(
+    EXPERIENCE_VALIDATION.COMPANY.MIN_LENGTH,
+    `Company must be at least ${EXPERIENCE_VALIDATION.COMPANY.MIN_LENGTH} characters`,
+  )
+  .max(
+    EXPERIENCE_VALIDATION.COMPANY.MAX_LENGTH,
+    `Company cannot exceed ${EXPERIENCE_VALIDATION.COMPANY.MAX_LENGTH} characters`,
+  );
+
+const positionSchema = z
+  .string()
+  .trim()
+  .min(
+    EXPERIENCE_VALIDATION.POSITION.MIN_LENGTH,
+    `Position must be at least ${EXPERIENCE_VALIDATION.POSITION.MIN_LENGTH} characters`,
+  )
+  .max(
+    EXPERIENCE_VALIDATION.POSITION.MAX_LENGTH,
+    `Position cannot exceed ${EXPERIENCE_VALIDATION.POSITION.MAX_LENGTH} characters`,
+  );
+
+const employmentTypeSchema = z.enum(EMPLOYMENT_TYPES as [string, ...string[]], {
+  error: () => ({
+    message: 'Invalid employment type',
+  }),
 });
 
-const createExperienceValidationSchema = z.object({
-  body: z
-    .object({
-      company: z
-        .string()
-        .trim()
-        .min(1, "Company is required")
-        .max(150, "Company cannot exceed 150 characters"),
+const workModeSchema = z.enum(WORK_MODES as [string, ...string[]], {
+  error: () => ({
+    message: 'Invalid work mode',
+  }),
+});
 
-      position: z
-        .string()
-        .trim()
-        .min(1, "Position is required")
-        .max(150, "Position cannot exceed 150 characters"),
+const locationSchema = z
+  .string()
+  .trim()
+  .min(
+    EXPERIENCE_VALIDATION.LOCATION.MIN_LENGTH,
+    `Location must be at least ${EXPERIENCE_VALIDATION.LOCATION.MIN_LENGTH} characters`,
+  )
+  .max(
+    EXPERIENCE_VALIDATION.LOCATION.MAX_LENGTH,
+    `Location cannot exceed ${EXPERIENCE_VALIDATION.LOCATION.MAX_LENGTH} characters`,
+  );
 
-      companyLogo: imageSchema.optional(),
+const startDateSchema = z.coerce.date({
+  error: () => ({
+    message: 'Invalid start date',
+  }),
+});
 
-      employmentType: z.enum(EMPLOYMENT_TYPES as [string, ...string[]], {
-        error: () => ({
-          message: "Invalid employment type",
-        }),
-      }),
+const endDateSchema = z.coerce
+  .date({
+    error: () => ({
+      message: 'Invalid end date',
+    }),
+  })
+  .nullable();
 
-      workMode: z.enum(WORK_MODES as [string, ...string[]], {
-        error: () => ({
-          message: "Invalid work mode",
-        }),
-      }),
+const summarySchema = z
+  .string()
+  .trim()
+  .min(
+    EXPERIENCE_VALIDATION.SUMMARY.MIN_LENGTH,
+    `Summary must be at least ${EXPERIENCE_VALIDATION.SUMMARY.MIN_LENGTH} characters`,
+  )
+  .max(
+    EXPERIENCE_VALIDATION.SUMMARY.MAX_LENGTH,
+    `Summary cannot exceed ${EXPERIENCE_VALIDATION.SUMMARY.MAX_LENGTH} characters`,
+  );
 
-      location: z
-        .string()
-        .trim()
-        .min(1, "Location is required")
-        .max(150, "Location cannot exceed 150 characters"),
+const companyWebsiteSchema = z
+  .string()
+  .trim()
+  .url('Company website must be a valid URL')
+  .max(
+    EXPERIENCE_VALIDATION.COMPANY_WEBSITE.MAX_LENGTH,
+    `Company website cannot exceed ${EXPERIENCE_VALIDATION.COMPANY_WEBSITE.MAX_LENGTH} characters`,
+  );
 
-      startDate: z.coerce.date({
-        error: () => ({
-          message: "Invalid start date",
-        }),
-      }),
+const sortOrderSchema = z.coerce
+  .number({
+    error: () => ({
+      message: 'Sort order must be a valid number',
+    }),
+  })
+  .int('Sort order must be an integer')
+  .min(
+    EXPERIENCE_VALIDATION.SORT_ORDER.MIN,
+    `Sort order cannot be less than ${EXPERIENCE_VALIDATION.SORT_ORDER.MIN}`,
+  )
+  .max(
+    EXPERIENCE_VALIDATION.SORT_ORDER.MAX,
+    `Sort order cannot exceed ${EXPERIENCE_VALIDATION.SORT_ORDER.MAX}`,
+  );
+/* -------------------------------------------------------------------------- */
+/*                              Array Validators                              */
+/* -------------------------------------------------------------------------- */
 
-      endDate: z.union([z.coerce.date(), z.null()]).optional(),
+const responsibilitySchema = z
+  .string()
+  .trim()
+  .min(1, 'Responsibility cannot be empty')
+  .max(
+    EXPERIENCE_VALIDATION.RESPONSIBILITIES.MAX_LENGTH,
+    `Responsibility cannot exceed ${EXPERIENCE_VALIDATION.RESPONSIBILITIES.MAX_LENGTH} characters`,
+  );
 
-      isCurrent: z.boolean().default(EXPERIENCE_DEFAULT.IS_CURRENT),
+const responsibilitiesSchema = z
+  .array(responsibilitySchema)
+  .min(1, 'At least one responsibility is required')
+  .max(
+    EXPERIENCE_VALIDATION.RESPONSIBILITIES.MAX_COUNT,
+    `Responsibilities cannot exceed ${EXPERIENCE_VALIDATION.RESPONSIBILITIES.MAX_COUNT} items`,
+  )
+  .superRefine((responsibilities, ctx) => {
+    const uniqueResponsibilities = new Set<string>();
 
-      summary: z
-        .string()
-        .trim()
-        .min(1, "Summary is required")
-        .max(2000, "Summary cannot exceed 2000 characters"),
+    responsibilities.forEach((responsibility, index) => {
+      const normalized = responsibility.trim().toLowerCase();
 
-      responsibilities: z
-        .array(z.string().trim().min(1))
-        .min(1, "At least one responsibility is required")
-        .max(50, "Responsibilities cannot exceed 50 items"),
-
-      technologies: z
-        .array(z.string().trim().min(1))
-        .min(1, "At least one technology is required")
-        .max(50, "Technologies cannot exceed 50 items"),
-
-      companyWebsite: z
-        .string()
-        .trim()
-        .url("Invalid company website URL")
-        .optional(),
-
-      sortOrder: z
-        .number()
-        .int()
-        .min(0, "Sort order cannot be negative")
-        .default(EXPERIENCE_DEFAULT.SORT_ORDER),
-
-      isActive: z.boolean().default(EXPERIENCE_DEFAULT.IS_ACTIVE),
-    })
-    .superRefine((data, ctx) => {
-      if (data.isCurrent && data.endDate) {
+      if (uniqueResponsibilities.has(normalized)) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          path: ["endDate"],
-          message: "Current experience cannot have an end date",
+          path: [index],
+          message: 'Duplicate responsibilities are not allowed',
+        });
+        return;
+      }
+
+      uniqueResponsibilities.add(normalized);
+    });
+  });
+
+const technologySchema = z
+  .string()
+  .trim()
+  .min(1, 'Technology cannot be empty')
+  .max(
+    EXPERIENCE_VALIDATION.TECHNOLOGIES.MAX_LENGTH,
+    `Technology cannot exceed ${EXPERIENCE_VALIDATION.TECHNOLOGIES.MAX_LENGTH} characters`,
+  );
+
+const technologiesSchema = z
+  .array(technologySchema)
+  .min(1, 'At least one technology is required')
+  .max(
+    EXPERIENCE_VALIDATION.TECHNOLOGIES.MAX_COUNT,
+    `Technologies cannot exceed ${EXPERIENCE_VALIDATION.TECHNOLOGIES.MAX_COUNT} items`,
+  )
+  .superRefine((technologies, ctx) => {
+    const uniqueTechnologies = new Set<string>();
+
+    technologies.forEach((technology, index) => {
+      const normalized = technology.trim().toLowerCase();
+
+      if (uniqueTechnologies.has(normalized)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: [index],
+          message: 'Duplicate technologies are not allowed',
+        });
+        return;
+      }
+
+      uniqueTechnologies.add(normalized);
+    });
+  });
+/* -------------------------------------------------------------------------- */
+/*                                Base Schema                                 */
+/* -------------------------------------------------------------------------- */
+
+const experienceBaseSchema = z
+  .object({
+    company: companySchema,
+
+    position: positionSchema,
+
+    companyLogo: imageSchema.optional(),
+
+    employmentType: employmentTypeSchema,
+
+    workMode: workModeSchema,
+
+    location: locationSchema,
+
+    startDate: startDateSchema,
+
+    endDate: endDateSchema.optional(),
+
+    isCurrent: z.boolean().default(EXPERIENCE_DEFAULT.IS_CURRENT),
+
+    summary: summarySchema,
+
+    responsibilities: responsibilitiesSchema,
+
+    technologies: technologiesSchema,
+
+    companyWebsite: companyWebsiteSchema.optional(),
+
+    sortOrder: sortOrderSchema.default(EXPERIENCE_DEFAULT.SORT_ORDER),
+
+    isActive: z.boolean().default(EXPERIENCE_DEFAULT.IS_ACTIVE),
+  })
+  .strict();
+/* -------------------------------------------------------------------------- */
+/*                         Shared Business Validation                          */
+/* -------------------------------------------------------------------------- */
+
+const validateExperience = (
+  data: z.infer<typeof experienceBaseSchema>,
+  ctx: z.RefinementCtx,
+): void => {
+  /*
+   * Current experience cannot have an end date.
+   */
+  if (data.isCurrent && data.endDate !== undefined && data.endDate !== null) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['endDate'],
+      message: 'Current experience cannot have an end date',
+    });
+  }
+
+  /*
+   * Previous experience must have a valid date range.
+   */
+  if (!data.isCurrent && data.endDate && data.endDate < data.startDate) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['endDate'],
+      message: 'End date cannot be earlier than start date',
+    });
+  }
+};
+/* -------------------------------------------------------------------------- */
+/*                              Create Validation                             */
+/* -------------------------------------------------------------------------- */
+
+const createExperienceValidationSchema = z
+  .object({
+    body: experienceBaseSchema.superRefine(validateExperience),
+  })
+  .strict();
+/* -------------------------------------------------------------------------- */
+/*                              Update Validation                             */
+/* -------------------------------------------------------------------------- */
+
+const updateExperienceValidationSchema = z
+  .object({
+    body: experienceBaseSchema.partial().superRefine((data, ctx) => {
+      /*
+       * Current experience cannot have an end date.
+       */
+      if (data.isCurrent === true && data.endDate !== undefined && data.endDate !== null) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['endDate'],
+          message: 'Current experience cannot have an end date',
         });
       }
 
-      if (!data.isCurrent && data.endDate && data.endDate < data.startDate) {
+      /*
+       * Validate date range only when both dates are supplied.
+       */
+      if (data.startDate && data.endDate && data.endDate < data.startDate) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          path: ["endDate"],
-          message: "End date cannot be earlier than start date",
+          path: ['endDate'],
+          message: 'End date cannot be earlier than start date',
         });
       }
     }),
-});
-
-const updateExperienceValidationSchema = z.object({
-  body: z
-    .object({
-      company: z.string().trim().min(1).max(150).optional(),
-
-      position: z.string().trim().min(1).max(150).optional(),
-
-      companyLogo: imageSchema.optional(),
-
-      employmentType: z
-        .enum(EMPLOYMENT_TYPES as [string, ...string[]], {
-          error: () => ({
-            message: "Invalid employment type",
-          }),
-        })
-        .optional(),
-
-      workMode: z
-        .enum(WORK_MODES as [string, ...string[]], {
-          error: () => ({
-            message: "Invalid work mode",
-          }),
-        })
-        .optional(),
-
-      location: z.string().trim().min(1).max(150).optional(),
-
-      startDate: z.coerce.date().optional(),
-
-      endDate: z.union([z.coerce.date(), z.null()]).optional(),
-
-      isCurrent: z.boolean().optional(),
-
-      summary: z.string().trim().min(1).max(2000).optional(),
-
-      responsibilities: z.array(z.string().trim().min(1)).max(50).optional(),
-
-      technologies: z.array(z.string().trim().min(1)).max(50).optional(),
-
-      companyWebsite: z
-        .string()
-        .trim()
-        .url("Invalid company website URL")
-        .optional(),
-
-      sortOrder: z.number().int().min(0).optional(),
-
-      isActive: z.boolean().optional(),
-    })
-    .refine(
-      (data) => {
-        if (data.isCurrent === true && data.endDate) {
-          return false;
-        }
-
-        return true;
-      },
-      {
-        message: "Current experience cannot have an end date",
-        path: ["endDate"],
-      },
-    ),
-});
+  })
+  .strict();
+/* -------------------------------------------------------------------------- */
+/*                                   Export                                   */
+/* -------------------------------------------------------------------------- */
 
 export const ExperienceValidation = {
   createExperienceValidationSchema,
 
   updateExperienceValidationSchema,
-};
+} as const;
+/* -------------------------------------------------------------------------- */
+/*                                 Infer Types                                */
+/* -------------------------------------------------------------------------- */
+
+export type TCreateExperienceInput = z.infer<typeof createExperienceValidationSchema.shape.body>;
+
+export type TUpdateExperienceInput = z.infer<typeof updateExperienceValidationSchema.shape.body>;

@@ -1,37 +1,35 @@
 // src/modules/blogs/blogs.seeder.ts
 
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
-import { connectDatabase } from "../../config/database.js";
+import { connectDatabase } from '../../configs/database.config.js';
 
-import { Blog } from "./blogs.model.js";
+import { Blog } from './blogs.model.js';
 
-import { BLOG_CATEGORY, BLOG_STATUS } from "./blogs.constant.js";
+import { BLOG_CATEGORY, BLOG_STATUS } from './blogs.constant.js';
 
-import { generateSlug } from "../../shared/slug/index.js";
-
-import { logger } from "../../shared/logger/index.js";
+import { logger } from '../../shared/logger/index.js';
+import { generateSlug } from '../../shared/utils/generate-slug.js';
 
 export const seedBlogs = async (): Promise<void> => {
   const existingCount = await Blog.countDocuments();
 
   if (existingCount > 0) {
-    logger.info("Blogs already seeded.");
+    logger.info('Blogs already seeded.');
 
     return;
   }
 
   const blogs = [
     {
-      title:
-        "Building a Production Ready Portfolio Backend with Express and TypeScript",
+      title: 'Building a Production Ready Portfolio Backend with Express and TypeScript',
 
       slug: generateSlug(
-        "Building a Production Ready Portfolio Backend with Express and TypeScript",
+        'Building a Production Ready Portfolio Backend with Express and TypeScript',
       ),
 
       excerpt:
-        "Learn how to build a scalable portfolio backend using Express 5, TypeScript, MongoDB, Zod, and Mongoose.",
+        'Learn how to build a scalable portfolio backend using Express 5, TypeScript, MongoDB, Zod, and Mongoose.',
 
       content: `
 # Building a Production Ready Portfolio Backend
@@ -60,9 +58,9 @@ This setup is highly scalable and production ready.
 
       category: BLOG_CATEGORY.BACKEND,
 
-      tags: ["Node.js", "Express", "TypeScript", "MongoDB"],
+      tags: ['Node.js', 'Express', 'TypeScript', 'MongoDB'],
 
-      author: "Bharani",
+      author: 'Bharani',
 
       status: BLOG_STATUS.PUBLISHED,
 
@@ -74,14 +72,14 @@ This setup is highly scalable and production ready.
 
       isPublished: true,
 
-      publishedAt: new Date("2026-01-10"),
+      publishedAt: new Date('2026-01-10'),
 
-      seoTitle: "Production Ready Express TypeScript Backend",
+      seoTitle: 'Production Ready Express TypeScript Backend',
 
       seoDescription:
-        "Build a scalable Express and TypeScript backend with MongoDB and modern best practices.",
+        'Build a scalable Express and TypeScript backend with MongoDB and modern best practices.',
 
-      seoKeywords: ["express", "typescript", "mongodb", "backend"],
+      seoKeywords: ['express', 'typescript', 'mongodb', 'backend'],
 
       sortOrder: 1,
 
@@ -89,12 +87,12 @@ This setup is highly scalable and production ready.
     },
 
     {
-      title: "Advanced MongoDB Query Optimization Techniques",
+      title: 'Advanced MongoDB Query Optimization Techniques',
 
-      slug: generateSlug("Advanced MongoDB Query Optimization Techniques"),
+      slug: generateSlug('Advanced MongoDB Query Optimization Techniques'),
 
       excerpt:
-        "Improve MongoDB performance using indexes, aggregation pipelines, and query optimization strategies.",
+        'Improve MongoDB performance using indexes, aggregation pipelines, and query optimization strategies.',
 
       content: `
 # Advanced MongoDB Query Optimization
@@ -111,9 +109,9 @@ This article explores practical optimization techniques used in production syste
 
       category: BLOG_CATEGORY.DATABASE,
 
-      tags: ["MongoDB", "Database", "Performance", "Indexing"],
+      tags: ['MongoDB', 'Database', 'Performance', 'Indexing'],
 
-      author: "Bharani",
+      author: 'Bharani',
 
       status: BLOG_STATUS.PUBLISHED,
 
@@ -125,14 +123,13 @@ This article explores practical optimization techniques used in production syste
 
       isPublished: true,
 
-      publishedAt: new Date("2026-02-15"),
+      publishedAt: new Date('2026-02-15'),
 
-      seoTitle: "MongoDB Query Optimization Guide",
+      seoTitle: 'MongoDB Query Optimization Guide',
 
-      seoDescription:
-        "Learn MongoDB indexing and performance optimization techniques.",
+      seoDescription: 'Learn MongoDB indexing and performance optimization techniques.',
 
-      seoKeywords: ["mongodb", "database", "indexing", "performance"],
+      seoKeywords: ['mongodb', 'database', 'indexing', 'performance'],
 
       sortOrder: 2,
 
@@ -140,12 +137,11 @@ This article explores practical optimization techniques used in production syste
     },
 
     {
-      title: "React and TypeScript Best Practices in 2026",
+      title: 'React and TypeScript Best Practices in 2026',
 
-      slug: generateSlug("React and TypeScript Best Practices in 2026"),
+      slug: generateSlug('React and TypeScript Best Practices in 2026'),
 
-      excerpt:
-        "A practical guide to building maintainable React applications with TypeScript.",
+      excerpt: 'A practical guide to building maintainable React applications with TypeScript.',
 
       content: `
 # React and TypeScript Best Practices
@@ -163,9 +159,9 @@ These practices help create scalable frontend applications.
 
       category: BLOG_CATEGORY.FRONTEND,
 
-      tags: ["React", "TypeScript", "Frontend"],
+      tags: ['React', 'TypeScript', 'Frontend'],
 
-      author: "Bharani",
+      author: 'Bharani',
 
       status: BLOG_STATUS.PUBLISHED,
 
@@ -177,14 +173,13 @@ These practices help create scalable frontend applications.
 
       isPublished: true,
 
-      publishedAt: new Date("2026-03-05"),
+      publishedAt: new Date('2026-03-05'),
 
-      seoTitle: "React TypeScript Best Practices",
+      seoTitle: 'React TypeScript Best Practices',
 
-      seoDescription:
-        "Learn modern React and TypeScript architecture patterns.",
+      seoDescription: 'Learn modern React and TypeScript architecture patterns.',
 
-      seoKeywords: ["react", "typescript", "frontend"],
+      seoKeywords: ['react', 'typescript', 'frontend'],
 
       sortOrder: 3,
 
@@ -192,12 +187,12 @@ These practices help create scalable frontend applications.
     },
 
     {
-      title: "Complete Full Stack Developer Roadmap",
+      title: 'Complete Full Stack Developer Roadmap',
 
-      slug: generateSlug("Complete Full Stack Developer Roadmap"),
+      slug: generateSlug('Complete Full Stack Developer Roadmap'),
 
       excerpt:
-        "A structured roadmap covering frontend, backend, databases, DevOps, and deployment.",
+        'A structured roadmap covering frontend, backend, databases, DevOps, and deployment.',
 
       content: `
 # Full Stack Developer Roadmap
@@ -218,9 +213,9 @@ Follow this path to become a modern full stack developer.
 
       category: BLOG_CATEGORY.FULL_STACK,
 
-      tags: ["Career", "Roadmap", "Full Stack"],
+      tags: ['Career', 'Roadmap', 'Full Stack'],
 
-      author: "Bharani",
+      author: 'Bharani',
 
       status: BLOG_STATUS.PUBLISHED,
 
@@ -232,14 +227,13 @@ Follow this path to become a modern full stack developer.
 
       isPublished: true,
 
-      publishedAt: new Date("2026-04-20"),
+      publishedAt: new Date('2026-04-20'),
 
-      seoTitle: "Full Stack Developer Roadmap 2026",
+      seoTitle: 'Full Stack Developer Roadmap 2026',
 
-      seoDescription:
-        "Learn the complete path to becoming a full stack developer.",
+      seoDescription: 'Learn the complete path to becoming a full stack developer.',
 
-      seoKeywords: ["full stack", "roadmap", "career"],
+      seoKeywords: ['full stack', 'roadmap', 'career'],
 
       sortOrder: 4,
 
@@ -247,12 +241,11 @@ Follow this path to become a modern full stack developer.
     },
 
     {
-      title: "Getting Started with DevOps for Developers",
+      title: 'Getting Started with DevOps for Developers',
 
-      slug: generateSlug("Getting Started with DevOps for Developers"),
+      slug: generateSlug('Getting Started with DevOps for Developers'),
 
-      excerpt:
-        "Understand CI/CD, Docker, GitHub Actions, and cloud deployment fundamentals.",
+      excerpt: 'Understand CI/CD, Docker, GitHub Actions, and cloud deployment fundamentals.',
 
       content: `
 # DevOps for Developers
@@ -269,9 +262,9 @@ This guide introduces the core concepts and tools.
 
       category: BLOG_CATEGORY.DEVOPS,
 
-      tags: ["DevOps", "Docker", "CI/CD"],
+      tags: ['DevOps', 'Docker', 'CI/CD'],
 
-      author: "Bharani",
+      author: 'Bharani',
 
       status: BLOG_STATUS.DRAFT,
 
@@ -285,12 +278,11 @@ This guide introduces the core concepts and tools.
 
       publishedAt: null,
 
-      seoTitle: "DevOps Beginner Guide",
+      seoTitle: 'DevOps Beginner Guide',
 
-      seoDescription:
-        "Learn DevOps fundamentals for modern software development.",
+      seoDescription: 'Learn DevOps fundamentals for modern software development.',
 
-      seoKeywords: ["devops", "docker", "cicd"],
+      seoKeywords: ['devops', 'docker', 'cicd'],
 
       sortOrder: 5,
 
@@ -311,13 +303,13 @@ export const runBlogsSeeder = async (standalone = false): Promise<void> => {
 
     await seedBlogs();
 
-    logger.info("Blogs seeding completed.");
+    logger.info('Blogs seeding completed.');
   } catch (error) {
     logger.error(
       {
         error,
       },
-      "Failed to seed blogs.",
+      'Failed to seed blogs.',
     );
 
     throw error;
@@ -328,6 +320,6 @@ export const runBlogsSeeder = async (standalone = false): Promise<void> => {
   }
 };
 
-if (process.argv[1]?.includes("blogs.seeder")) {
+if (process.argv[1]?.includes('blogs.seeder')) {
   void runBlogsSeeder(true);
 }

@@ -1,5 +1,5 @@
 // src\shared\base\index.ts
 
-export * from "./baseCrud.service.js";
+export * from './base-crud.service.js';
 
-export * from "./baseSingleton.service.js";
+export * from './base-singleton.service.js';

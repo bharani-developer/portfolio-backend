@@ -1,157 +1,239 @@
-// src\modules\certifications\certifications.controller.ts
+/* -------------------------------------------------------------------------- */
+/*                                   Imports                                  */
+/* -------------------------------------------------------------------------- */
 
-import { MESSAGE, httpStatus } from "../../constants/index.js";
+// Express
+import type { Request, Response } from 'express';
 
-import { catchAsync, sendResponse } from "../../utils/index.js";
+// Third-party
+import httpStatus from 'http-status';
 
-import AppError from "../../utils/AppError.js";
+// Constants
+import { MESSAGE } from '../../constants/index.js';
 
-import { CertificationService } from "./certifications.service.js";
+// Shared
+import { catchAsync, sendResponse } from '../../shared/utils/index.js';
 
-const getParam = (
-  value: string | string[] | undefined,
-  name: string,
-): string => {
-  if (!value || Array.isArray(value)) {
-    throw new AppError(httpStatus.BAD_REQUEST, `${name} is required`);
-  }
+// Module
+import { CertificationService } from './certifications.service.js';
 
-  return value;
-};
+// Types
+import type {
+  TCreateCertificationPayload,
+  TUpdateCertificationPayload,
+} from './certifications.types.js';
 
-const createCertification = catchAsync(async (req, res) => {
-  const result = await CertificationService.createCertification(req.body);
+/* -------------------------------------------------------------------------- */
+/*                              Helper Functions                              */
+/* -------------------------------------------------------------------------- */
+
+/* -------------------------------------------------------------------------- */
+/*                                Helper Types                                */
+/* -------------------------------------------------------------------------- */
+
+/* -------------------------------------------------------------------------- */
+/*                                   Create                                   */
+/* -------------------------------------------------------------------------- */
+
+const createCertification = catchAsync(async (req: Request, res: Response) => {
+  const payload: TCreateCertificationPayload = req.body;
+
+  const result = await CertificationService.createCertification(payload);
 
   sendResponse(res, {
     statusCode: httpStatus.CREATED,
+
     success: true,
+
     message: MESSAGE.CREATED,
+
     data: result,
   });
 });
 
-const getCertifications = catchAsync(async (req, res) => {
+/* -------------------------------------------------------------------------- */
+/*                                  Get All                                   */
+/* -------------------------------------------------------------------------- */
+
+const getCertifications = catchAsync(async (req: Request, res: Response) => {
   const result = await CertificationService.getCertifications(req.query);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
+
     success: true,
+
     message: MESSAGE.RETRIEVED,
+
     meta: result.meta,
+
     data: result.result,
   });
 });
+/* -------------------------------------------------------------------------- */
+/*                                  Get One                                   */
+/* -------------------------------------------------------------------------- */
 
-const getCertificationById = catchAsync(async (req, res) => {
-  const id = getParam(req.params.id, "Certification ID");
+const getCertificationById = catchAsync(async (req: Request, res: Response) => {
+  const id = String(req.params.id);
 
   const result = await CertificationService.getCertificationById(id);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
+
     success: true,
+
     message: MESSAGE.RETRIEVED,
+
     data: result,
   });
 });
 
-const updateCertification = catchAsync(async (req, res) => {
-  const id = getParam(req.params.id, "Certification ID");
-
-  const result = await CertificationService.updateCertification(id, req.body);
-
-  sendResponse(res, {
-    statusCode: httpStatus.OK,
-    success: true,
-    message: MESSAGE.UPDATED,
-    data: result,
-  });
-});
-
-const deleteCertification = catchAsync(async (req, res) => {
-  const id = getParam(req.params.id, "Certification ID");
-
-  const result = await CertificationService.deleteCertification(id);
-
-  sendResponse(res, {
-    statusCode: httpStatus.OK,
-    success: true,
-    message: MESSAGE.DELETED,
-    data: result,
-  });
-});
-
-const getActiveCertifications = catchAsync(async (_req, res) => {
-  const result = await CertificationService.getActiveCertifications();
-
-  sendResponse(res, {
-    statusCode: httpStatus.OK,
-    success: true,
-    message: MESSAGE.RETRIEVED,
-    data: result,
-  });
-});
-
-const getCertificationBySlug = catchAsync(async (req, res) => {
-  const slug = getParam(req.params.slug, "Slug");
+const getCertificationBySlug = catchAsync(async (req: Request, res: Response) => {
+  const slug = String(req.params.slug);
 
   const result = await CertificationService.getCertificationBySlug(slug);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
+
     success: true,
+
     message: MESSAGE.RETRIEVED,
+
     data: result,
   });
 });
 
-const getCertificationsBySkill = catchAsync(async (req, res) => {
-  const skill = getParam(req.params.skill, "Skill");
+/* -------------------------------------------------------------------------- */
+/*                                   Update                                   */
+/* -------------------------------------------------------------------------- */
+
+const updateCertification = catchAsync(async (req: Request, res: Response) => {
+  const id = String(req.params.id);
+
+  const payload: TUpdateCertificationPayload = req.body;
+
+  const result = await CertificationService.updateCertification(id, payload);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+
+    success: true,
+
+    message: MESSAGE.UPDATED,
+
+    data: result,
+  });
+});
+
+/* -------------------------------------------------------------------------- */
+/*                                   Delete                                   */
+/* -------------------------------------------------------------------------- */
+
+const deleteCertification = catchAsync(async (req: Request, res: Response) => {
+  const id = String(req.params.id);
+
+  const result = await CertificationService.deleteCertification(id);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+
+    success: true,
+
+    message: MESSAGE.DELETED,
+
+    data: result,
+  });
+});
+/* -------------------------------------------------------------------------- */
+/*                               Custom Queries                               */
+/* -------------------------------------------------------------------------- */
+
+const getActiveCertifications = catchAsync(async (_req: Request, res: Response) => {
+  const result = await CertificationService.getActiveCertifications();
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+
+    success: true,
+
+    message: MESSAGE.RETRIEVED,
+
+    data: result,
+  });
+});
+
+const getCertificationsBySkill = catchAsync(async (req: Request, res: Response) => {
+  const skill = String(req.params.skill);
 
   const result = await CertificationService.getCertificationsBySkill(skill);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
+
     success: true,
+
     message: MESSAGE.RETRIEVED,
+
     data: result,
   });
 });
 
-const getExpiredCertifications = catchAsync(async (_req, res) => {
+const getExpiredCertifications = catchAsync(async (_req: Request, res: Response) => {
   const result = await CertificationService.getExpiredCertifications();
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
+
     success: true,
+
     message: MESSAGE.RETRIEVED,
+
     data: result,
   });
 });
 
-const getValidCertifications = catchAsync(async (_req, res) => {
+const getValidCertifications = catchAsync(async (_req: Request, res: Response) => {
   const result = await CertificationService.getValidCertifications();
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
+
     success: true,
+
     message: MESSAGE.RETRIEVED,
+
     data: result,
   });
 });
 
-const getCertificationsByIssuer = catchAsync(async (req, res) => {
-  const issuer = getParam(req.params.issuer, "Issuer");
+const getCertificationsByIssuer = catchAsync(async (req: Request, res: Response) => {
+  const issuer = String(req.params.issuer);
 
   const result = await CertificationService.getCertificationsByIssuer(issuer);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
+
     success: true,
+
     message: MESSAGE.RETRIEVED,
+
     data: result,
   });
 });
+
+/* -------------------------------------------------------------------------- */
+/*                               Custom Actions                               */
+/* -------------------------------------------------------------------------- */
+
+// No custom actions.
+
+/* -------------------------------------------------------------------------- */
+/*                                   Export                                   */
+/* -------------------------------------------------------------------------- */
 
 export const CertificationController = {
   createCertification,
@@ -160,13 +242,13 @@ export const CertificationController = {
 
   getCertificationById,
 
+  getCertificationBySlug,
+
   updateCertification,
 
   deleteCertification,
 
   getActiveCertifications,
-
-  getCertificationBySlug,
 
   getCertificationsBySkill,
 

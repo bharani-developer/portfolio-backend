@@ -1,323 +1,322 @@
 // src/modules/skills/skills.seeder.ts
 
-import { generateSlug } from "../../shared/slug/index.js";
+import { SKILLS_CATEGORY } from './skills.constant.js';
+import { Skill } from './skills.model.js';
 
-import { SKILLS_CATEGORY } from "./skills.constant.js";
-import { Skill } from "./skills.model.js";
+import type { ISkill } from './skills.types.js';
+import { connectDatabase } from '../../configs/index.js';
+import mongoose from 'mongoose';
+import { generateSlug } from '../../shared/utils/index.js';
 
-import type { ISkill } from "./skills.interface.js";
-import { connectDatabase } from "../../config/index.js";
-import mongoose from "mongoose";
-
-type SkillSeed = Omit<ISkill, "slug" | "isActive" | "createdAt" | "updatedAt">;
+type SkillSeed = Omit<ISkill, 'slug' | 'isActive' | 'createdAt' | 'updatedAt'>;
 
 const skills: SkillSeed[] = [
   // Frontend
   {
-    name: "HTML5",
+    name: 'HTML5',
     category: SKILLS_CATEGORY.FRONTEND,
     proficiency: 98,
-    description: "Semantic HTML5, accessibility, SEO-friendly markup.",
+    description: 'Semantic HTML5, accessibility, SEO-friendly markup.',
     sortOrder: 1,
   },
   {
-    name: "CSS3",
+    name: 'CSS3',
     category: SKILLS_CATEGORY.FRONTEND,
     proficiency: 96,
-    description: "Modern CSS, Flexbox, Grid and responsive layouts.",
+    description: 'Modern CSS, Flexbox, Grid and responsive layouts.',
     sortOrder: 2,
   },
   {
-    name: "JavaScript",
+    name: 'JavaScript',
     category: SKILLS_CATEGORY.FRONTEND,
     proficiency: 95,
-    description: "Modern ES6+ JavaScript development.",
+    description: 'Modern ES6+ JavaScript development.',
     sortOrder: 3,
   },
   {
-    name: "TypeScript",
+    name: 'TypeScript',
     category: SKILLS_CATEGORY.FRONTEND,
     proficiency: 93,
-    description: "Type-safe JavaScript applications.",
+    description: 'Type-safe JavaScript applications.',
     sortOrder: 4,
   },
   {
-    name: "React",
+    name: 'React',
     category: SKILLS_CATEGORY.FRONTEND,
     proficiency: 94,
-    description: "Modern React application development.",
+    description: 'Modern React application development.',
     sortOrder: 5,
   },
   {
-    name: "Next.js",
+    name: 'Next.js',
     category: SKILLS_CATEGORY.FRONTEND,
     proficiency: 92,
-    description: "Production-grade React framework.",
+    description: 'Production-grade React framework.',
     sortOrder: 6,
   },
   {
-    name: "Tailwind CSS",
+    name: 'Tailwind CSS',
     category: SKILLS_CATEGORY.FRONTEND,
     proficiency: 95,
-    description: "Utility-first CSS framework.",
+    description: 'Utility-first CSS framework.',
     sortOrder: 7,
   },
   {
-    name: "Bootstrap",
+    name: 'Bootstrap',
     category: SKILLS_CATEGORY.FRONTEND,
     proficiency: 92,
-    description: "Responsive UI framework.",
+    description: 'Responsive UI framework.',
     sortOrder: 8,
   },
   {
-    name: "jQuery",
+    name: 'jQuery',
     category: SKILLS_CATEGORY.FRONTEND,
     proficiency: 90,
-    description: "DOM manipulation library.",
+    description: 'DOM manipulation library.',
     sortOrder: 9,
   },
 
   // Backend
   {
-    name: "Node.js",
+    name: 'Node.js',
     category: SKILLS_CATEGORY.BACKEND,
     proficiency: 92,
-    description: "Backend runtime.",
+    description: 'Backend runtime.',
     sortOrder: 11,
   },
   {
-    name: "Express.js",
+    name: 'Express.js',
     category: SKILLS_CATEGORY.BACKEND,
     proficiency: 93,
-    description: "REST API development.",
+    description: 'REST API development.',
     sortOrder: 12,
   },
   {
-    name: "PHP",
+    name: 'PHP',
     category: SKILLS_CATEGORY.BACKEND,
     proficiency: 92,
-    description: "Server-side scripting.",
+    description: 'Server-side scripting.',
     sortOrder: 13,
   },
   {
-    name: "Laravel",
+    name: 'Laravel',
     category: SKILLS_CATEGORY.BACKEND,
     proficiency: 93,
-    description: "Modern PHP framework.",
+    description: 'Modern PHP framework.',
     sortOrder: 14,
   },
 
   // API Integration
   {
-    name: "REST API",
+    name: 'REST API',
     category: SKILLS_CATEGORY.API_INTEGRATION,
     proficiency: 94,
-    description: "RESTful API architecture.",
+    description: 'RESTful API architecture.',
     sortOrder: 18,
   },
   {
-    name: "JWT Authentication",
+    name: 'JWT Authentication',
     category: SKILLS_CATEGORY.API_INTEGRATION,
     proficiency: 91,
-    description: "Secure authentication using JSON Web Tokens.",
+    description: 'Secure authentication using JSON Web Tokens.',
     sortOrder: 19,
   },
   {
-    name: "Razorpay",
+    name: 'Razorpay',
     category: SKILLS_CATEGORY.API_INTEGRATION,
     proficiency: 92,
-    description: "Payment gateway integration.",
+    description: 'Payment gateway integration.',
     sortOrder: 20,
   },
   {
-    name: "CCAvenue",
+    name: 'CCAvenue',
     category: SKILLS_CATEGORY.API_INTEGRATION,
     proficiency: 90,
-    description: "Online payment gateway integration.",
+    description: 'Online payment gateway integration.',
     sortOrder: 21,
   },
   {
-    name: "Zoho Inventory",
+    name: 'Zoho Inventory',
     category: SKILLS_CATEGORY.API_INTEGRATION,
     proficiency: 90,
-    description: "Inventory API integration.",
+    description: 'Inventory API integration.',
     sortOrder: 22,
   },
   {
-    name: "Zoho Books",
+    name: 'Zoho Books',
     category: SKILLS_CATEGORY.API_INTEGRATION,
     proficiency: 88,
-    description: "Accounting API integration.",
+    description: 'Accounting API integration.',
     sortOrder: 23,
   },
   {
-    name: "Microsoft Teams API",
+    name: 'Microsoft Teams API',
     category: SKILLS_CATEGORY.API_INTEGRATION,
     proficiency: 88,
-    description: "Microsoft Teams integration and automation.",
+    description: 'Microsoft Teams integration and automation.',
     sortOrder: 24,
   },
   {
-    name: "Vonage (Nexmo)",
+    name: 'Vonage (Nexmo)',
     category: SKILLS_CATEGORY.API_INTEGRATION,
     proficiency: 90,
-    description: "Voice and SMS API integration.",
+    description: 'Voice and SMS API integration.',
     sortOrder: 25,
   },
   {
-    name: "SugarCRM",
+    name: 'SugarCRM',
     category: SKILLS_CATEGORY.API_INTEGRATION,
     proficiency: 86,
-    description: "CRM integration.",
+    description: 'CRM integration.',
     sortOrder: 26,
   },
   {
-    name: "Google Maps API",
+    name: 'Google Maps API',
     category: SKILLS_CATEGORY.API_INTEGRATION,
     proficiency: 92,
-    description: "Location services and map integration.",
+    description: 'Location services and map integration.',
     sortOrder: 27,
   },
   {
-    name: "Firebase Cloud Messaging",
+    name: 'Firebase Cloud Messaging',
     category: SKILLS_CATEGORY.API_INTEGRATION,
     proficiency: 90,
-    description: "Push notification integration.",
+    description: 'Push notification integration.',
     sortOrder: 28,
   },
 
   // Database
   {
-    name: "MongoDB",
+    name: 'MongoDB',
     category: SKILLS_CATEGORY.DATABASE,
     proficiency: 93,
-    description: "NoSQL database.",
+    description: 'NoSQL database.',
     sortOrder: 29,
   },
   {
-    name: "MySQL",
+    name: 'MySQL',
     category: SKILLS_CATEGORY.DATABASE,
     proficiency: 94,
-    description: "Relational database.",
+    description: 'Relational database.',
     sortOrder: 30,
   },
   {
-    name: "SQLite",
+    name: 'SQLite',
     category: SKILLS_CATEGORY.DATABASE,
     proficiency: 90,
-    description: "Embedded database.",
+    description: 'Embedded database.',
     sortOrder: 31,
   },
 
   // Mobile
   {
-    name: "Flutter",
+    name: 'Flutter',
     category: SKILLS_CATEGORY.MOBILE,
     proficiency: 90,
-    description: "Cross-platform mobile apps.",
+    description: 'Cross-platform mobile apps.',
     sortOrder: 32,
   },
   {
-    name: "Dart",
+    name: 'Dart',
     category: SKILLS_CATEGORY.MOBILE,
     proficiency: 88,
-    description: "Flutter programming language.",
+    description: 'Flutter programming language.',
     sortOrder: 33,
   },
 
   // DevOps
   {
-    name: "Git",
+    name: 'Git',
     category: SKILLS_CATEGORY.DEVOPS,
     proficiency: 95,
-    description: "Version control.",
+    description: 'Version control.',
     sortOrder: 34,
   },
   {
-    name: "GitHub",
+    name: 'GitHub',
     category: SKILLS_CATEGORY.DEVOPS,
     proficiency: 94,
-    description: "Repository hosting.",
+    description: 'Repository hosting.',
     sortOrder: 35,
   },
   {
-    name: "Docker",
+    name: 'Docker',
     category: SKILLS_CATEGORY.DEVOPS,
     proficiency: 80,
-    description: "Containerization.",
+    description: 'Containerization.',
     sortOrder: 36,
   },
 
   // Cloud
   {
-    name: "Vercel",
+    name: 'Vercel',
     category: SKILLS_CATEGORY.CLOUD,
     proficiency: 90,
-    description: "Frontend deployment.",
+    description: 'Frontend deployment.',
     sortOrder: 37,
   },
   {
-    name: "Render",
+    name: 'Render',
     category: SKILLS_CATEGORY.CLOUD,
     proficiency: 88,
-    description: "Backend deployment.",
+    description: 'Backend deployment.',
     sortOrder: 38,
   },
   {
-    name: "Cloudinary",
+    name: 'Cloudinary',
     category: SKILLS_CATEGORY.CLOUD,
     proficiency: 90,
-    description: "Media management.",
+    description: 'Media management.',
     sortOrder: 39,
   },
 
   // Tools
   {
-    name: "VS Code",
+    name: 'VS Code',
     category: SKILLS_CATEGORY.TOOLS,
     proficiency: 98,
-    description: "Code editor.",
+    description: 'Code editor.',
     sortOrder: 40,
   },
   {
-    name: "Postman",
+    name: 'Postman',
     category: SKILLS_CATEGORY.TOOLS,
     proficiency: 95,
-    description: "API testing.",
+    description: 'API testing.',
     sortOrder: 41,
   },
   {
-    name: "Swagger",
+    name: 'Swagger',
     category: SKILLS_CATEGORY.TOOLS,
     proficiency: 91,
-    description: "API documentation.",
+    description: 'API documentation.',
     sortOrder: 42,
   },
   {
-    name: "npm",
+    name: 'npm',
     category: SKILLS_CATEGORY.TOOLS,
     proficiency: 95,
-    description: "Node package manager.",
+    description: 'Node package manager.',
     sortOrder: 43,
   },
   {
-    name: "Composer",
+    name: 'Composer',
     category: SKILLS_CATEGORY.TOOLS,
     proficiency: 92,
-    description: "PHP dependency manager.",
+    description: 'PHP dependency manager.',
     sortOrder: 44,
   },
   {
-    name: "Chrome DevTools",
+    name: 'Chrome DevTools',
     category: SKILLS_CATEGORY.TOOLS,
     proficiency: 96,
-    description: "Browser developer tools.",
+    description: 'Browser developer tools.',
     sortOrder: 45,
   },
 ];
 export const seedSkills = async (): Promise<void> => {
   try {
-    console.info("Seeding skills...");
+    console.info('Seeding skills...');
 
     for (const skill of skills) {
       const exists = await Skill.exists({
@@ -339,9 +338,9 @@ export const seedSkills = async (): Promise<void> => {
       await Skill.create(payload);
     }
 
-    console.info("Skills seeded successfully.");
+    console.info('Skills seeded successfully.');
   } catch (error) {
-    console.error("Failed to seed skills.", error);
+    console.error('Failed to seed skills.', error);
 
     throw error;
   }
@@ -355,7 +354,7 @@ export const runSkillsSeeder = async (standalone = false): Promise<void> => {
 
     await seedSkills();
 
-    console.info("Skills seeding completed.");
+    console.info('Skills seeding completed.');
   } finally {
     if (standalone) {
       await mongoose.connection.close();
@@ -363,7 +362,7 @@ export const runSkillsSeeder = async (standalone = false): Promise<void> => {
   }
 };
 
-if (process.argv[1]?.includes("skills.seeder")) {
+if (process.argv[1]?.includes('skills.seeder')) {
   void runSkillsSeeder(true);
 }
 

@@ -1,3 +1,15 @@
-// src\shared\schemas\index.ts
+// src/shared/schemas/index.ts
 
-export * from "./image.schema.js";
+/**
+ * Shared Mongoose schemas.
+ *
+ * Centralized exports for reusable sub-document schemas.
+ *
+ * Responsibilities:
+ * - Image schema
+ * - Future reusable embedded schemas
+ *
+ * This module contains no runtime logic.
+ */
+
+export * from './image.schema.js';

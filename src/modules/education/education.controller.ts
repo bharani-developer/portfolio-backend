@@ -1,145 +1,326 @@
-// src\modules\education\education.controller.ts
+// src/modules/education/education.controller.ts
 
-import { MESSAGE, httpStatus } from "../../constants/index.js";
+/* -------------------------------------------------------------------------- */
+/*                                   Imports                                  */
+/* -------------------------------------------------------------------------- */
 
-import AppError from "../../utils/AppError.js";
-import { catchAsync, sendResponse } from "../../utils/index.js";
+// Express
+import type { Request, Response } from 'express';
 
-import { EducationService } from "./education.service.js";
+// Third-party
+import httpStatus from 'http-status';
 
-const getRequiredParam = (
-  value: string | string[] | undefined,
-  field: string,
-): string => {
-  if (typeof value !== "string" || value.trim() === "") {
-    throw new AppError(httpStatus.BAD_REQUEST, `${field} is required`);
+// Constants
+import { MESSAGE } from '../../constants/index.js';
+
+// Shared
+import { AppError, catchAsync, sendResponse } from '../../shared/utils/index.js';
+
+// Module
+import { EducationService } from './education.service.js';
+
+// Types
+import type {
+  TEducationLevel,
+  TEducationType,
+  TCreateEducationPayload,
+  TUpdateEducationPayload,
+} from './education.types.js';
+
+/* -------------------------------------------------------------------------- */
+/*                              Helper Functions                              */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * Ensures a required route parameter exists.
+ */
+const getParam = (value: string | string[] | undefined, name: string): string => {
+  if (!value || Array.isArray(value)) {
+    throw new AppError(httpStatus.BAD_REQUEST, `${name} is required`);
   }
 
-  return value;
+  return value.trim();
 };
 
-const createEducation = catchAsync(async (req, res) => {
-  const result = await EducationService.createEducation(req.body);
+/* -------------------------------------------------------------------------- */
+/*                                Helper Types                                */
+/* -------------------------------------------------------------------------- */
+
+// No additional helper types.
+
+/* -------------------------------------------------------------------------- */
+/*                                   Create                                   */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * Create a new education record.
+ */
+const createEducation = catchAsync(async (req: Request, res: Response) => {
+  const payload: TCreateEducationPayload = req.body;
+
+  const result = await EducationService.createEducation(payload);
 
   sendResponse(res, {
     statusCode: httpStatus.CREATED,
+
     success: true,
+
     message: MESSAGE.CREATED,
+
     data: result,
   });
 });
 
-const getEducations = catchAsync(async (req, res) => {
+/* -------------------------------------------------------------------------- */
+/*                                  Get All                                   */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * Get all education records.
+ */
+const getEducations = catchAsync(async (req: Request, res: Response) => {
   const result = await EducationService.getEducations(req.query);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
+
     success: true,
+
     message: MESSAGE.RETRIEVED,
+
     meta: result.meta,
+
     data: result.result,
   });
 });
+/* -------------------------------------------------------------------------- */
+/*                                  Get One                                   */
+/* -------------------------------------------------------------------------- */
 
-const getEducationById = catchAsync(async (req, res) => {
-  const id = getRequiredParam(req.params.id, "Education ID");
+/**
+ * Get education by ID.
+ */
+const getEducationById = catchAsync(async (req: Request, res: Response) => {
+  const id = getParam(req.params.id, 'Education ID');
 
   const result = await EducationService.getEducationById(id);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
+
     success: true,
+
     message: MESSAGE.RETRIEVED,
+
     data: result,
   });
 });
 
-const updateEducation = catchAsync(async (req, res) => {
-  const id = getRequiredParam(req.params.id, "Education ID");
-
-  const result = await EducationService.updateEducation(id, req.body);
-
-  sendResponse(res, {
-    statusCode: httpStatus.OK,
-    success: true,
-    message: MESSAGE.UPDATED,
-    data: result,
-  });
-});
-
-const deleteEducation = catchAsync(async (req, res) => {
-  const id = getRequiredParam(req.params.id, "Education ID");
-
-  const result = await EducationService.deleteEducation(id);
-
-  sendResponse(res, {
-    statusCode: httpStatus.OK,
-    success: true,
-    message: MESSAGE.DELETED,
-    data: result,
-  });
-});
-
-const getActiveEducations = catchAsync(async (_req, res) => {
-  const result = await EducationService.getActiveEducations();
-
-  sendResponse(res, {
-    statusCode: httpStatus.OK,
-    success: true,
-    message: MESSAGE.RETRIEVED,
-    data: result,
-  });
-});
-
-const getCurrentEducations = catchAsync(async (_req, res) => {
-  const result = await EducationService.getCurrentEducations();
-
-  sendResponse(res, {
-    statusCode: httpStatus.OK,
-    success: true,
-    message: MESSAGE.RETRIEVED,
-    data: result,
-  });
-});
-
-const getEducationBySlug = catchAsync(async (req, res) => {
-  const slug = getRequiredParam(req.params.slug, "Slug");
+/**
+ * Get education by slug.
+ */
+const getEducationBySlug = catchAsync(async (req: Request, res: Response) => {
+  const slug = getParam(req.params.slug, 'Slug');
 
   const result = await EducationService.getEducationBySlug(slug);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
+
     success: true,
+
     message: MESSAGE.RETRIEVED,
+
     data: result,
   });
 });
 
-const getEducationsByLevel = catchAsync(async (req, res) => {
-  const level = getRequiredParam(req.params.level, "Education level");
+/* -------------------------------------------------------------------------- */
+/*                                   Update                                   */
+/* -------------------------------------------------------------------------- */
 
-  const result = await EducationService.getEducationsByLevel(level as never);
+/**
+ * Update an education record.
+ */
+const updateEducation = catchAsync(async (req: Request, res: Response) => {
+  const id = getParam(req.params.id, 'Education ID');
+
+  const payload: TUpdateEducationPayload = req.body;
+
+  const result = await EducationService.updateEducation(id, payload);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
+
     success: true,
-    message: MESSAGE.RETRIEVED,
+
+    message: MESSAGE.UPDATED,
+
     data: result,
   });
 });
 
-const getEducationsBySkill = catchAsync(async (req, res) => {
-  const skill = getRequiredParam(req.params.skill, "Skill");
+/* -------------------------------------------------------------------------- */
+/*                                   Delete                                   */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * Delete an education record.
+ */
+const deleteEducation = catchAsync(async (req: Request, res: Response) => {
+  const id = getParam(req.params.id, 'Education ID');
+
+  const result = await EducationService.deleteEducation(id);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+
+    success: true,
+
+    message: MESSAGE.DELETED,
+
+    data: result,
+  });
+});
+/* -------------------------------------------------------------------------- */
+/*                               Custom Queries                               */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * Get all active education records.
+ */
+const getActiveEducations = catchAsync(async (_req: Request, res: Response) => {
+  const result = await EducationService.getActiveEducations();
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+
+    success: true,
+
+    message: MESSAGE.RETRIEVED,
+
+    data: result,
+  });
+});
+
+/**
+ * Get current education records.
+ */
+const getCurrentEducations = catchAsync(async (_req: Request, res: Response) => {
+  const result = await EducationService.getCurrentEducations();
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+
+    success: true,
+
+    message: MESSAGE.RETRIEVED,
+
+    data: result,
+  });
+});
+
+/**
+ * Get education records by level.
+ */
+const getEducationsByLevel = catchAsync(async (req: Request, res: Response) => {
+  const educationLevel = getParam(req.params.level, 'Education level') as TEducationLevel;
+
+  const result = await EducationService.getEducationsByLevel(educationLevel);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+
+    success: true,
+
+    message: MESSAGE.RETRIEVED,
+
+    data: result,
+  });
+});
+
+/**
+ * Get education records by skill.
+ */
+const getEducationsBySkill = catchAsync(async (req: Request, res: Response) => {
+  const skill = getParam(req.params.skill, 'Skill');
 
   const result = await EducationService.getEducationsBySkill(skill);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
+
     success: true,
+
     message: MESSAGE.RETRIEVED,
+
     data: result,
   });
 });
+
+/**
+ * Get education records by education type.
+ */
+const getEducationsByType = catchAsync(async (req: Request, res: Response) => {
+  const educationType = getParam(req.params.type, 'Education type') as TEducationType;
+
+  const result = await EducationService.getEducationsByType(educationType);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+
+    success: true,
+
+    message: MESSAGE.RETRIEVED,
+
+    data: result,
+  });
+});
+
+/**
+ * Get education records by institution.
+ */
+const getEducationsByInstitution = catchAsync(async (req: Request, res: Response) => {
+  const institution = getParam(req.params.institution, 'Institution');
+
+  const result = await EducationService.getEducationsByInstitution(institution);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+
+    success: true,
+
+    message: MESSAGE.RETRIEVED,
+
+    data: result,
+  });
+});
+
+/**
+ * Get education statistics.
+ */
+const getEducationStats = catchAsync(async (_req: Request, res: Response) => {
+  const result = await EducationService.getEducationStats();
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+
+    success: true,
+
+    message: MESSAGE.RETRIEVED,
+
+    data: result,
+  });
+});
+
+/* -------------------------------------------------------------------------- */
+/*                               Custom Actions                               */
+/* -------------------------------------------------------------------------- */
+
+// No custom actions.
+/* -------------------------------------------------------------------------- */
+/*                                   Export                                   */
+/* -------------------------------------------------------------------------- */
 
 export const EducationController = {
   createEducation,
@@ -147,6 +328,8 @@ export const EducationController = {
   getEducations,
 
   getEducationById,
+
+  getEducationBySlug,
 
   updateEducation,
 
@@ -156,9 +339,13 @@ export const EducationController = {
 
   getCurrentEducations,
 
-  getEducationBySlug,
-
   getEducationsByLevel,
 
   getEducationsBySkill,
-};
+
+  getEducationsByType,
+
+  getEducationsByInstitution,
+
+  getEducationStats,
+} as const;

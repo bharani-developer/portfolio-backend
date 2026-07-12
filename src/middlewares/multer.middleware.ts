@@ -1,14 +1,13 @@
 // src\middlewares\multer.middleware.ts
 
-import fs from "fs";
-import path from "path";
+import fs from 'fs';
+import path from 'path';
 
-import multer from "multer";
-import httpStatus from "http-status";
+import multer from 'multer';
+import httpStatus from 'http-status';
+import { AppError } from '../shared/utils/index.js';
 
-import AppError from "../utils/AppError.js";
-
-const uploadDirectory = path.join(process.cwd(), "uploads");
+const uploadDirectory = path.join(process.cwd(), 'uploads');
 
 if (!fs.existsSync(uploadDirectory)) {
   fs.mkdirSync(uploadDirectory, {
@@ -30,20 +29,12 @@ const storage = multer.diskStorage({
   },
 });
 
-const fileFilter: multer.Options["fileFilter"] = (_req, file, callback) => {
-  const allowedMimeTypes = [
-    "image/jpeg",
-    "image/jpg",
-    "image/png",
-    "image/webp",
-  ];
+const fileFilter: multer.Options['fileFilter'] = (_req, file, callback) => {
+  const allowedMimeTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
 
   if (!allowedMimeTypes.includes(file.mimetype)) {
     callback(
-      new AppError(
-        httpStatus.BAD_REQUEST,
-        "Only JPG, JPEG, PNG and WEBP images are allowed",
-      ),
+      new AppError(httpStatus.BAD_REQUEST, 'Only JPG, JPEG, PNG and WEBP images are allowed'),
     );
 
     return;

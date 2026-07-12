@@ -1,3 +1,3 @@
 // src\shared\logger\index.ts
 
-export * from "./logger.js";
+export * from './logger.js';

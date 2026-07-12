@@ -1,16 +1,16 @@
-import { ROLE, type TRole } from "../../constants/role.constant.js";
+import { ROLE, type TRole } from '../../constants/role.constants.js';
 
-import { Blog } from "../blogs/blogs.model.js";
-import { Certification } from "../certifications/certifications.model.js";
-import { Contact } from "../contact/contact.model.js";
-import { Education } from "../education/education.model.js";
-import { Experience } from "../experience/experience.model.js";
-import { Hero } from "../hero/hero.model.js";
-import { Project } from "../projects/projects.model.js";
-import { Service } from "../services/services.model.js";
-import { Settings } from "../settings/settings.model.js";
-import { Skill } from "../skills/skills.model.js";
-import { Testimonial } from "../testimonials/testimonials.model.js";
+import { Blog } from '../blogs/blogs.model.js';
+import { Certification } from '../certifications/certifications.model.js';
+import { Contact } from '../contact/contact.model.js';
+import { Education } from '../education/education.model.js';
+import { Experience } from '../experience/experience.model.js';
+import { Hero } from '../hero/hero.model.js';
+import { Project } from '../projects/projects.model.js';
+import { Service } from '../services/services.model.js';
+import { Settings } from '../settings/settings.model.js';
+import { Skill } from '../skills/skills.model.js';
+import { Testimonial } from '../testimonials/testimonials.model.js';
 
 const getDashboardStats = async (role: TRole) => {
   const isAdmin = role === ROLE.ADMIN;
@@ -111,7 +111,7 @@ const getDashboardStats = async (role: TRole) => {
     Settings.exists({}),
 
     Project.find()
-      .select("title slug category featured createdAt")
+      .select('title slug category featured createdAt')
       .sort({
         createdAt: -1,
       })
@@ -119,7 +119,7 @@ const getDashboardStats = async (role: TRole) => {
       .lean(),
 
     Blog.find()
-      .select("title slug category isPublished isFeatured createdAt")
+      .select('title slug category isPublished isFeatured createdAt')
       .sort({
         createdAt: -1,
       })
@@ -127,7 +127,7 @@ const getDashboardStats = async (role: TRole) => {
       .lean(),
 
     Contact.find()
-      .select("name email subject status priority isRead createdAt")
+      .select('name email subject status priority isRead createdAt')
       .sort({
         createdAt: -1,
       })
