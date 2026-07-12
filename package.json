@@ -23,12 +23,11 @@
     "zod"
   ],
   "scripts": {
-    "prepare": "npm run type-check",
-    "check:all": "npm run type-check && npm run lint && npm run build",
     "dev": "tsx watch src/app/server.ts",
+    "prebuild": "rimraf dist",
     "build": "tsc",
     "start": "node dist/app/server.js",
-    "start:prod": "npm run build && node dist/app/server.js",
+    "start:prod": "node dist/app/server.js",
     "clean": "rimraf dist",
     "rebuild": "npm run clean && npm run build",
     "type-check": "tsc --noEmit",
@@ -37,6 +36,7 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "check": "npm run type-check && npm run lint && npm run format:check",
+    "check:all": "npm run type-check && npm run lint && npm run build",
     "seed": "tsx src/seeders/seed.ts",
     "seed:auth": "tsx src/modules/auth/auth.seeder.ts",
     "seed:settings": "tsx src/modules/settings/settings.seeder.ts",
